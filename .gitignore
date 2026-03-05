@@ -24,3 +24,6 @@ __pycache__/
 *.pdf
 *.csv
 *.xlsx
+
+# meteologica
+backend/src/meteologica/examples_from_api_docs/*
