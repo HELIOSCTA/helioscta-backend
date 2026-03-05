@@ -26,4 +26,4 @@ __pycache__/
 *.xlsx
 
 # meteologica
-backend/src/meteologica/examples_from_api_docs/*
+backend/src/meteologica/examples_from_api_docs/
