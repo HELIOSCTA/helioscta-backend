@@ -13,7 +13,9 @@
       "Bash(PGPASSWORD=$AZURE_PG_PASSWORD psql:*)",
       "Bash(mkdir:*)",
       "Bash(dbt parse:*)",
-      "Bash(dbt ls:*)"
+      "Bash(dbt ls:*)",
+      "Bash(python:*)",
+      "Bash(dbt show:*)"
     ]
   }
 }

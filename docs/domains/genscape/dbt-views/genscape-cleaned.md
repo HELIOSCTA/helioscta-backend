@@ -25,7 +25,7 @@ Raw Genscape tables (genscape schema)
 | **Upstream** | `staging_v2_genscape_gas_production_forecast` |
 | **Use Cases** | Natural gas supply outlook, gas-power cross-commodity analysis |
 | **Refresh** | View -- refreshes on query |
-| **SQL** | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/genscape/genscape_cleaned/marts/docs/reference.sql) |
+| **SQL** | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/genscape/genscape_cleaned/.docs/genscape_gas_production_forecast.sql) |
 
 ### genscape_daily_pipeline_production
 
@@ -37,7 +37,7 @@ Raw Genscape tables (genscape schema)
 | **Upstream** | `staging_v2_daily_pipeline_production` |
 | **Use Cases** | Track actual vs forecast production, monitor supply trends |
 | **Refresh** | View -- refreshes on query |
-| **SQL** | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/genscape/genscape_cleaned/marts/docs/reference.sql) |
+| **SQL** | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/genscape/genscape_cleaned/.docs/genscape_daily_pipeline_production.sql) |
 
 ---
 
