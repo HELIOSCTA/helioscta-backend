@@ -56,7 +56,8 @@
       "Read(//c/Users/AidanKeaveny/Documents/github/helioscta-backend/$dir/**)",
       "Bash(cp:*)",
       "Bash(dbt compile:*)",
-      "Bash(dbt ls:*)"
+      "Bash(dbt ls:*)",
+      "Bash(sed:*)"
     ]
   }
 }

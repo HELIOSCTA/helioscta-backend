@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Consumer-facing views and tables for WSI weather-driven weighted degree day (WDD) data: observed actuals, 10/30-year normals (long format), and combined NWP model + WSI proprietary forecasts with normals, departures, and period totals. Used by the HeliosCTA desk for gas-weather analysis and heating/cooling demand modeling.
+Consumer-facing views and tables for WSI weather-driven weighted degree day (WDD) data: observed actuals, 10/30-year normals (long format), and combined model run + WSI proprietary forecasts with normals, and run-over-run differences. Used by the HeliosCTA desk for gas-weather analysis and heating/cooling demand modeling.
 
 ## Grain
 
@@ -18,7 +18,7 @@ Consumer-facing views and tables for WSI weather-driven weighted degree day (WDD
 |--------|---------------|
 | WSI daily observed WDD | `source_v1_daily_observed_wdd` |
 | WSI WDD observed (30-year history) | `source_v1_daily_observed_wdd` (filtered to 30 years) |
-| WSI WDD NWP model forecasts | `staging_v1_wdd_forecast_models` |
+| WSI WDD model run forecasts | `staging_v1_wdd_forecast_models` |
 | WSI WDD blend forecasts | `staging_v1_wdd_forecast_wsi` |
 
 ## Key Columns
@@ -33,19 +33,16 @@ Consumer-facing views and tables for WSI weather-driven weighted degree day (WDD
 | `pw_cdd` / `population_cdd` | Population-weighted cooling degree days |
 | `tdd` / `tdd_normal` | Total degree days (`gas_hdd + population_cdd`) |
 | `model` | Forecast model: `GFS_OP`, `GFS_ENS`, `ECMWF_OP`, `ECMWF_ENS`, or `WSI` |
-| `cycle` | Model run cycle: `00Z` or `12Z` (NWP models); NULL for WSI blend |
+| `cycle` | Model run cycle: `00Z` or `12Z` (model runs); NULL for WSI blend |
 | `forecast_rank` | Recency rank (1 = most recent vintage) |
-| `labelled_forecast_execution_timestamp` | Human-readable label: `Current Forecast`, `12hrs Ago`, `24hrs Ago`, `Friday 12z` |
-| `*_10_yr_normal` | 10-year normal value for the WDD type |
-| `*_diff` | Difference vs prior run (12hr for models, 24hr for WSI) |
-| `*_departure` | Departure from 10-year normal |
-| `*_total` | Cumulative period total |
+| `forecast_label` | Human-readable label: `Current Forecast`, `12hrs Ago`, `24hrs Ago`, `Friday 12z` |
+| `*_diff_run_over_run` | Run-over-run change vs prior forecast run (12hr for models, 24hr for WSI) |
 
 ## Transformation Notes
 
 - `wdd_observed_daily` is a **view** directly over the source observed WDD table.
 - `wdd_normals_daily` is a **table** in long format (one row per `mm_dd x region x period`). Computes 10-year and 30-year rolling normals from observed history. Feb 29 values folded into Feb 28. Includes `normal`, `min`, `max`, `stddev`, and year count metadata per WDD type.
-- `wdd_forecasts_daily` is a **view** that unions NWP model forecasts (GFS/ECMWF with 00Z/12Z cycles) and WSI proprietary blend (no cycle). Includes 10yr normals, run-over-run diffs, departures from normal, and period totals. Ranked by execution time via `DENSE_RANK`.
+- `wdd_forecasts_daily` is a **view** that unions model run forecasts (GFS/ECMWF with 00Z/12Z cycles) and WSI proprietary blend (no cycle). Includes run-over-run differences. Ranked by execution time via `DENSE_RANK`.
 
 ## Data Quality Checks
 
