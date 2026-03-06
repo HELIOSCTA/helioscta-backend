@@ -7,8 +7,8 @@ const config = {
   tagline: "Data catalog, pipelines, and dbt views",
   // favicon: "img/favicon.ico",
 
-  url: "https://akeavenyhelioscta.github.io",
-  baseUrl: "/helioscta-backend/",
+  url: "https://helioscta-backend.vercel.app",
+  baseUrl: "/",
 
   organizationName: "akeavenyhelioscta",
   projectName: "helioscta-backend",
