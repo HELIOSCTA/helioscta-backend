@@ -1,0 +1,20 @@
+select
+  date
+  ,period
+  ,coal
+  ,gas
+  ,hydro
+  ,multiple_fuels
+  ,nuclear
+  ,oil
+  ,solar
+  ,storage
+  ,wind
+  ,other
+  ,other_renewables
+  ,total
+  ,thermal
+  ,renewables
+  ,gas_pct_thermal
+  ,coal_pct_thermal
+from pjm_cleaned.pjm_fuel_mix_daily

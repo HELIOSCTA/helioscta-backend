@@ -53,7 +53,10 @@
       "Bash(npm run:*)",
       "Bash(for dir in \"backend/dbt/dbt_azure_postgresql/models/power/pjm_cleaned/marts\" \"backend/dbt/dbt_azure_postgresql/models/meteologica/meteologica_cleaned/marts\" \"backend/dbt/dbt_azure_postgresql/models/genscape/genscape_cleaned/marts\" \"backend/dbt/dbt_azure_postgresql/models/positions_and_trades/positions_cleaned/marts\" \"backend/dbt/dbt_azure_postgresql/models/positions_and_trades/trades_cleaned/marts\" \"backend/dbt/dbt_azure_postgresql/models/wsi/wsi_cleaned/marts\")",
       "Bash(do echo \"=== $dir ===\")",
-      "Read(//c/Users/AidanKeaveny/Documents/github/helioscta-backend/$dir/**)"
+      "Read(//c/Users/AidanKeaveny/Documents/github/helioscta-backend/$dir/**)",
+      "Bash(cp:*)",
+      "Bash(dbt compile:*)",
+      "Bash(dbt ls:*)"
     ]
   }
 }

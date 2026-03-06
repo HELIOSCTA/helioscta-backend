@@ -84,15 +84,48 @@ One-two sentence summary of what data this domain covers and why it matters.
 ## Known Caveats
 ```
 
-### dbt Mart README
+### dbt Mart Documentation
 
-Every dbt mart directory (`models/<domain>/<domain>_cleaned/marts/`) must have a `docs/` subfolder containing:
+Each dbt domain has a `.docs/` folder at the `<domain>_cleaned` level containing SQL reference files and a README:
 
-- `docs/reference.sql` — canonical reference query (same across all marts)
-- `docs/README.md` — mart-specific documentation
+```
+models/<domain>/<domain>_cleaned/.docs/
+  README.md              — mart-specific documentation
+  <mart_name>.sql        — one file per mart view (e.g., pjm_lmps_hourly.sql)
+```
+
+**Why `.docs/` instead of `docs/`?** dbt compiles every `.sql` file under `models/` as a model. Placing documentation SQL files in a dot-prefixed folder and adding `.docs/` to `.dbtignore` prevents dbt from treating them as models (which caused name collisions).
+
+**`.dbtignore` entry** (already configured):
+```
+**/.docs/
+.docs/
+```
+
+#### Reference SQL Files
+
+Each mart view gets its own `.sql` file named identically to the mart model. The file contains a `SELECT` listing every column with `FROM <schema>.<view_name>`:
+
+```sql
+select
+  datetime
+  ,date
+  ,hour_ending
+  ,hub
+  ,market
+  ,lmp_total
+  ,lmp_system_energy_price
+  ,lmp_congestion_price
+  ,lmp_marginal_loss_price
+from pjm_cleaned.pjm_lmps_hourly
+```
+
+When adding a new mart model, create a matching `.sql` file in the domain's `.docs/` folder.
+
+#### README.md
 
 ```markdown
-# <mart_name> marts
+# <domain>_cleaned marts
 
 ## Purpose
 ## Grain
@@ -111,32 +144,16 @@ Every dbt mart directory (`models/<domain>/<domain>_cleaned/marts/`) must have a
 - **Transformation Notes:** Bullet list covering materialization strategy, where business logic lives, and domain-specific details.
 - **Data Quality Checks:** Bullet list of `not_null`, `accepted_values`, and other schema tests from `schema.yml`.
 
-**`docs/reference.sql`** contains this exact SQL (do not modify):
-
-```sql
-select
-  datetime
-  ,date
-  ,hour_ending
-  ,hub
-  ,market
-  ,lmp_total
-  ,lmp_system_energy_price
-  ,lmp_congestion_price
-  ,lmp_marginal_loss_price
-from pjm_cleaned.pjm_lmps_hourly
-```
-
 ### Current Mart Directories
 
-| Mart | Path |
-|------|------|
-| pjm_cleaned | `models/power/pjm_cleaned/marts/` |
-| meteologica_cleaned | `models/meteologica/meteologica_cleaned/marts/` |
-| genscape_cleaned | `models/genscape/genscape_cleaned/marts/` |
-| positions_cleaned | `models/positions_and_trades/positions_cleaned/marts/` |
-| trades_cleaned | `models/positions_and_trades/trades_cleaned/marts/` |
-| wsi_cleaned | `models/wsi/wsi_cleaned/marts/` |
+| Mart | Marts Path | Docs Path |
+|------|-----------|-----------|
+| pjm_cleaned | `models/power/pjm_cleaned/marts/` | `models/power/pjm_cleaned/.docs/` |
+| meteologica_cleaned | `models/meteologica/meteologica_cleaned/marts/` | `models/meteologica/meteologica_cleaned/.docs/` |
+| genscape_cleaned | `models/genscape/genscape_cleaned/marts/` | `models/genscape/genscape_cleaned/.docs/` |
+| positions_cleaned | `models/positions_and_trades/positions_cleaned/marts/` | `models/positions_and_trades/positions_cleaned/.docs/` |
+| trades_cleaned | `models/positions_and_trades/trades_cleaned/marts/` | `models/positions_and_trades/trades_cleaned/.docs/` |
+| wsi_cleaned | `models/wsi/wsi_cleaned/marts/` | `models/wsi/wsi_cleaned/.docs/` |
 
 ## Adding a New Domain
 
@@ -145,6 +162,7 @@ from pjm_cleaned.pjm_lmps_hourly
 3. Add the domain as a category in `sidebars.js` with doc IDs
 4. Add entries to `docs/dbt-cleaned-catalog.md`
 5. Update `docs/executive-summary.md` tables
+6. Create `models/<domain>/<domain>_cleaned/.docs/` with a `README.md` and one `.sql` file per mart view
 
 ## Adding a New Scrape Page
 

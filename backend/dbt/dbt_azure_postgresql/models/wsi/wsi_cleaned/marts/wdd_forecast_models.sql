@@ -79,14 +79,108 @@ FINAL AS (
         f.model,
         f.bias_corrected,
         f.region,
+
+        -- forecast values
         f.electric_cdd,
         f.electric_hdd,
         f.gas_cdd,
         f.gas_hdd,
         f.pw_cdd,
-        f.pw_hdd
+        f.pw_hdd,
+
+        -- normals (WSI-provided 10yr avg)
+        f.electric_cdd_normal,
+        f.electric_hdd_normal,
+        f.gas_cdd_normal,
+        f.gas_hdd_normal,
+        f.pw_cdd_normal,
+        f.pw_hdd_normal,
+
+        -- departure from normal
+        f.electric_cdd_dfn,
+        f.electric_hdd_dfn,
+        f.gas_cdd_dfn,
+        f.gas_hdd_dfn,
+        f.pw_cdd_dfn,
+        f.pw_hdd_dfn,
+
+        -- 6hr differences
+        f.electric_cdd_6hr_difference,
+        f.electric_hdd_6hr_difference,
+        f.gas_cdd_6hr_difference,
+        f.gas_hdd_6hr_difference,
+        f.pw_cdd_6hr_difference,
+        f.pw_hdd_6hr_difference,
+
+        -- 12hr differences
+        f.electric_cdd_12hr_difference,
+        f.electric_hdd_12hr_difference,
+        f.gas_cdd_12hr_difference,
+        f.gas_hdd_12hr_difference,
+        f.pw_cdd_12hr_difference,
+        f.pw_hdd_12hr_difference,
+
+        -- 18hr differences
+        f.electric_cdd_18hr_difference,
+        f.electric_hdd_18hr_difference,
+        f.gas_cdd_18hr_difference,
+        f.gas_hdd_18hr_difference,
+        f.pw_cdd_18hr_difference,
+        f.pw_hdd_18hr_difference,
+
+        -- 24hr differences
+        f.electric_cdd_24hr_difference,
+        f.electric_hdd_24hr_difference,
+        f.gas_cdd_24hr_difference,
+        f.gas_hdd_24hr_difference,
+        f.pw_cdd_24hr_difference,
+        f.pw_hdd_24hr_difference,
+
+        -- 30hr differences
+        f.electric_cdd_30hr_difference,
+        f.electric_hdd_30hr_difference,
+        f.gas_cdd_30hr_difference,
+        f.gas_hdd_30hr_difference,
+        f.pw_cdd_30hr_difference,
+        f.pw_hdd_30hr_difference,
+
+        -- 36hr differences
+        f.electric_cdd_36hr_difference,
+        f.electric_hdd_36hr_difference,
+        f.gas_cdd_36hr_difference,
+        f.gas_hdd_36hr_difference,
+        f.pw_cdd_36hr_difference,
+        f.pw_hdd_36hr_difference,
+
+        -- totals across forecast period
+        SUM(f.electric_cdd) OVER (w_total) AS electric_cdd_total,
+        SUM(f.electric_hdd) OVER (w_total) AS electric_hdd_total,
+        SUM(f.gas_cdd) OVER (w_total) AS gas_cdd_total,
+        SUM(f.gas_hdd) OVER (w_total) AS gas_hdd_total,
+        SUM(f.pw_cdd) OVER (w_total) AS pw_cdd_total,
+        SUM(f.pw_hdd) OVER (w_total) AS pw_hdd_total,
+
+        -- normal totals across forecast period
+        SUM(f.electric_cdd_normal) OVER (w_total) AS electric_cdd_normal_total,
+        SUM(f.electric_hdd_normal) OVER (w_total) AS electric_hdd_normal_total,
+        SUM(f.gas_cdd_normal) OVER (w_total) AS gas_cdd_normal_total,
+        SUM(f.gas_hdd_normal) OVER (w_total) AS gas_hdd_normal_total,
+        SUM(f.pw_cdd_normal) OVER (w_total) AS pw_cdd_normal_total,
+        SUM(f.pw_hdd_normal) OVER (w_total) AS pw_hdd_normal_total,
+
+        -- difference totals across forecast period
+        SUM(f.electric_cdd_12hr_difference) OVER (w_total) AS electric_cdd_12hr_difference_total,
+        SUM(f.electric_hdd_12hr_difference) OVER (w_total) AS electric_hdd_12hr_difference_total,
+        SUM(f.gas_cdd_12hr_difference) OVER (w_total) AS gas_cdd_12hr_difference_total,
+        SUM(f.gas_hdd_12hr_difference) OVER (w_total) AS gas_hdd_12hr_difference_total,
+        SUM(f.pw_cdd_12hr_difference) OVER (w_total) AS pw_cdd_12hr_difference_total,
+        SUM(f.pw_hdd_12hr_difference) OVER (w_total) AS pw_hdd_12hr_difference_total
+
     FROM COMPLETE_FORECASTS f
     JOIN LABELLED_EXECUTIONS r ON f.forecast_execution_datetime = r.forecast_execution_datetime
+    WINDOW w_total AS (
+        PARTITION BY f.forecast_execution_datetime, f.model, f.cycle, f.bias_corrected, f.region
+    )
 )
 
 SELECT * FROM FINAL
