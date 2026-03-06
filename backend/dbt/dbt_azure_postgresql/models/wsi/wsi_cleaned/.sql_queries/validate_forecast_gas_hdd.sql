@@ -3,7 +3,7 @@
     Pivoted summary matching WSI website layout.
 
     - Latest 00Z run per model (CONUS, bias_corrected = false)
-    - Differences row = current 00Z value minus previous 00Z value (24h earlier)
+    - Differences row = current 00Z value minus previous run (12h comparator: latest prior 00Z/12Z)
     - 10-year normals row from observed data
     - 15-day forecast window starting from CURRENT_DATE
 */
@@ -13,20 +13,39 @@
 -------------------------------------------------------------
 
 WITH forecast_union AS (
-    SELECT init_time, period_start AS forecast_date, model, site_id, bias_corrected, gas_hdd
+    SELECT init_time, period_start AS forecast_date, model, site_id, bias_corrected, gas_hdd, updated_at
     FROM wsi.wsi_wdd_day_forecast_v2_2025_dec_17
     UNION ALL
-    SELECT init_time, period_start AS forecast_date, model, site_id, bias_corrected, gas_hdd
+    SELECT init_time, period_start AS forecast_date, model, site_id, bias_corrected, gas_hdd, updated_at
     FROM wsi.gfs_op_wdd_day_forecast_v2_2025_dec_17
     UNION ALL
-    SELECT init_time, period_start AS forecast_date, model, site_id, bias_corrected, gas_hdd
+    SELECT init_time, period_start AS forecast_date, model, site_id, bias_corrected, gas_hdd, updated_at
     FROM wsi.gfs_ens_wdd_day_forecast_v2_2025_dec_17
     UNION ALL
-    SELECT init_time, period_start AS forecast_date, model, site_id, bias_corrected, gas_hdd
+    SELECT init_time, period_start AS forecast_date, model, site_id, bias_corrected, gas_hdd, updated_at
     FROM wsi.ecmwf_op_wdd_day_forecast_v2_2025_dec_17
     UNION ALL
-    SELECT init_time, period_start AS forecast_date, model, site_id, bias_corrected, gas_hdd
+    SELECT init_time, period_start AS forecast_date, model, site_id, bias_corrected, gas_hdd, updated_at
     FROM wsi.ecmwf_ens_wdd_day_forecast_v2_2025_dec_17
+),
+
+forecast_dedup AS (
+    SELECT init_time, forecast_date, model, site_id, bias_corrected, gas_hdd
+    FROM (
+        SELECT
+            init_time,
+            forecast_date,
+            model,
+            site_id,
+            bias_corrected,
+            gas_hdd,
+            ROW_NUMBER() OVER (
+                PARTITION BY model, site_id, bias_corrected, init_time, forecast_date
+                ORDER BY updated_at DESC
+            ) AS forecast_revision
+        FROM forecast_union
+    ) t
+    WHERE forecast_revision = 1
 ),
 
 -------------------------------------------------------------
@@ -39,10 +58,22 @@ runs_00z AS (
         init_time,
         forecast_date,
         ROUND(gas_hdd::NUMERIC, 1) AS gas_hdd
-    FROM forecast_union
+    FROM forecast_dedup
     WHERE site_id = 'CONUS'
       AND bias_corrected = 'false'
       AND EXTRACT(HOUR FROM init_time) = 0
+),
+
+runs_00z_12z AS (
+    SELECT
+        model,
+        init_time,
+        forecast_date,
+        ROUND(gas_hdd::NUMERIC, 1) AS gas_hdd
+    FROM forecast_dedup
+    WHERE site_id = 'CONUS'
+      AND bias_corrected = 'false'
+      AND EXTRACT(HOUR FROM init_time) IN (0, 12)
 ),
 
 -------------------------------------------------------------
@@ -56,7 +87,7 @@ latest_init AS (
 ),
 
 -------------------------------------------------------------
--- 4. Current run (latest 00Z) and previous 00Z run via LAG
+-- 4. Current run (latest 00Z) and previous run (00Z/12Z comparator)
 -------------------------------------------------------------
 
 current_run AS (
@@ -66,16 +97,16 @@ current_run AS (
 ),
 
 prev_init AS (
-    -- second-latest 00Z per model (the run 24h before the latest)
+    -- latest prior run per model using 00Z/12Z cycles
     SELECT r.model, MAX(r.init_time) AS prev_init_time
-    FROM runs_00z r
+    FROM runs_00z_12z r
     JOIN latest_init l ON r.model = l.model AND r.init_time < l.max_init_time
     GROUP BY r.model
 ),
 
 prev_run AS (
     SELECT r.model, r.forecast_date, r.gas_hdd AS prev_gas_hdd
-    FROM runs_00z r
+    FROM runs_00z_12z r
     JOIN prev_init p ON r.model = p.model AND r.init_time = p.prev_init_time
 ),
 
@@ -89,7 +120,7 @@ with_diff AS (
         c.init_time,
         c.forecast_date,
         c.gas_hdd,
-        ROUND(c.gas_hdd - p.prev_gas_hdd, 1) AS diff_24h
+        ROUND(c.gas_hdd - p.prev_gas_hdd, 1) AS diff_prev
     FROM current_run c
     LEFT JOIN prev_run p ON c.model = p.model AND c.forecast_date = p.forecast_date
 ),
@@ -125,7 +156,7 @@ forecast_pivot AS (
 ),
 
 -------------------------------------------------------------
--- 7. PIVOT: differences row (current 00Z minus previous 00Z)
+-- 7. PIVOT: differences row (current 00Z minus previous comparator run)
 -------------------------------------------------------------
 
 diff_pivot AS (
@@ -133,22 +164,22 @@ diff_pivot AS (
         model,
         'Differences' AS row_type,
         init_time,
-        MAX(CASE WHEN forecast_date = CURRENT_DATE + 0  THEN diff_24h END) AS day_01,
-        MAX(CASE WHEN forecast_date = CURRENT_DATE + 1  THEN diff_24h END) AS day_02,
-        MAX(CASE WHEN forecast_date = CURRENT_DATE + 2  THEN diff_24h END) AS day_03,
-        MAX(CASE WHEN forecast_date = CURRENT_DATE + 3  THEN diff_24h END) AS day_04,
-        MAX(CASE WHEN forecast_date = CURRENT_DATE + 4  THEN diff_24h END) AS day_05,
-        MAX(CASE WHEN forecast_date = CURRENT_DATE + 5  THEN diff_24h END) AS day_06,
-        MAX(CASE WHEN forecast_date = CURRENT_DATE + 6  THEN diff_24h END) AS day_07,
-        MAX(CASE WHEN forecast_date = CURRENT_DATE + 7  THEN diff_24h END) AS day_08,
-        MAX(CASE WHEN forecast_date = CURRENT_DATE + 8  THEN diff_24h END) AS day_09,
-        MAX(CASE WHEN forecast_date = CURRENT_DATE + 9  THEN diff_24h END) AS day_10,
-        MAX(CASE WHEN forecast_date = CURRENT_DATE + 10 THEN diff_24h END) AS day_11,
-        MAX(CASE WHEN forecast_date = CURRENT_DATE + 11 THEN diff_24h END) AS day_12,
-        MAX(CASE WHEN forecast_date = CURRENT_DATE + 12 THEN diff_24h END) AS day_13,
-        MAX(CASE WHEN forecast_date = CURRENT_DATE + 13 THEN diff_24h END) AS day_14,
-        MAX(CASE WHEN forecast_date = CURRENT_DATE + 14 THEN diff_24h END) AS day_15,
-        ROUND(SUM(diff_24h), 1) AS total
+        MAX(CASE WHEN forecast_date = CURRENT_DATE + 0  THEN diff_prev END) AS day_01,
+        MAX(CASE WHEN forecast_date = CURRENT_DATE + 1  THEN diff_prev END) AS day_02,
+        MAX(CASE WHEN forecast_date = CURRENT_DATE + 2  THEN diff_prev END) AS day_03,
+        MAX(CASE WHEN forecast_date = CURRENT_DATE + 3  THEN diff_prev END) AS day_04,
+        MAX(CASE WHEN forecast_date = CURRENT_DATE + 4  THEN diff_prev END) AS day_05,
+        MAX(CASE WHEN forecast_date = CURRENT_DATE + 5  THEN diff_prev END) AS day_06,
+        MAX(CASE WHEN forecast_date = CURRENT_DATE + 6  THEN diff_prev END) AS day_07,
+        MAX(CASE WHEN forecast_date = CURRENT_DATE + 7  THEN diff_prev END) AS day_08,
+        MAX(CASE WHEN forecast_date = CURRENT_DATE + 8  THEN diff_prev END) AS day_09,
+        MAX(CASE WHEN forecast_date = CURRENT_DATE + 9  THEN diff_prev END) AS day_10,
+        MAX(CASE WHEN forecast_date = CURRENT_DATE + 10 THEN diff_prev END) AS day_11,
+        MAX(CASE WHEN forecast_date = CURRENT_DATE + 11 THEN diff_prev END) AS day_12,
+        MAX(CASE WHEN forecast_date = CURRENT_DATE + 12 THEN diff_prev END) AS day_13,
+        MAX(CASE WHEN forecast_date = CURRENT_DATE + 13 THEN diff_prev END) AS day_14,
+        MAX(CASE WHEN forecast_date = CURRENT_DATE + 14 THEN diff_prev END) AS day_15,
+        ROUND(SUM(diff_prev), 1) AS total
     FROM with_diff
     WHERE forecast_date >= CURRENT_DATE AND forecast_date < CURRENT_DATE + 15
     GROUP BY model, init_time
@@ -242,3 +273,4 @@ ORDER BY
         WHEN 'Differences' THEN 2
         WHEN 'Normals'     THEN 3
     END;
+

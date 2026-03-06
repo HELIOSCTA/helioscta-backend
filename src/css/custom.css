@@ -1,53 +1,135 @@
-/* -- True-black dark theme -- */
+/* --------------------------------------------------------
+   Theme matched to helioscta-gas-frontend Sidebar / Layout
+   Background  #0f1117  (body)  /  #0b0d14 (sidebar)
+   Borders     #1f2937  (gray-800)
+   Text        #e5e7eb  (gray-200)  /  #9ca3af (gray-400)
+   Active      rgba(31,41,55,0.6) + white
+   -------------------------------------------------------- */
+
+/* -- Dark theme -- */
 [data-theme="dark"] {
-  --ifm-background-color: #000;
-  --ifm-background-surface-color: #0a0a0a;
-  --ifm-color-primary: #6ea8fe;
-  --ifm-color-primary-dark: #5494ed;
-  --ifm-color-primary-darker: #4388e6;
-  --ifm-color-primary-darkest: #2470d4;
-  --ifm-color-primary-light: #88bcff;
-  --ifm-color-primary-lighter: #99c7ff;
-  --ifm-color-primary-lightest: #c2dfff;
-  --ifm-font-color-base: rgba(255, 255, 255, 0.92);
-  --ifm-font-color-secondary: rgba(255, 255, 255, 0.72);
-  --ifm-code-background: #0d0d0d;
-  --ifm-navbar-background-color: #000;
-  --ifm-footer-background-color: #000;
-  --ifm-toc-border-color: #222;
-  --ifm-table-stripe-background: #0a0a0a;
-  --ifm-table-border-color: #333;
-  --docusaurus-highlighted-code-line-bg: #1a1a1a;
+  --ifm-background-color: #0f1117;
+  --ifm-background-surface-color: #131620;
+  --ifm-color-primary: #9ca3af;
+  --ifm-color-primary-dark: #8790a0;
+  --ifm-color-primary-darker: #7d8698;
+  --ifm-color-primary-darkest: #64697a;
+  --ifm-color-primary-light: #b1b7be;
+  --ifm-color-primary-lighter: #bbc0c6;
+  --ifm-color-primary-lightest: #d9dce0;
+  --ifm-font-color-base: #e5e7eb;
+  --ifm-font-color-secondary: #9ca3af;
+  --ifm-code-background: #0b0d14;
+  --ifm-navbar-background-color: #0b0d14;
+  --ifm-footer-background-color: #0b0d14;
+  --ifm-toc-border-color: #1f2937;
+  --ifm-table-stripe-background: #131620;
+  --ifm-table-border-color: #1f2937;
+  --docusaurus-highlighted-code-line-bg: #1f2937;
+  --ifm-menu-color: #9ca3af;
+  --ifm-menu-color-active: #ffffff;
 }
 
 /* -- Light theme -- */
 [data-theme="light"] {
-  --ifm-color-primary: #1a56db;
-  --ifm-color-primary-dark: #174cc5;
-  --ifm-color-primary-darker: #1548ba;
-  --ifm-color-primary-darkest: #113b99;
-  --ifm-color-primary-light: #1d60f1;
-  --ifm-color-primary-lighter: #2a6af3;
-  --ifm-color-primary-lightest: #5088f5;
-}
-
-/* -- Sidebar active state -- */
-[data-theme="dark"] .menu__link--active:not(.menu__link--sublist) {
-  color: #ffc245;
-  font-weight: 600;
-}
-
-[data-theme="dark"] .menu__link--active:not(.menu__link--sublist)::after {
-  background-color: #ffc245;
+  --ifm-color-primary: #374151;
+  --ifm-color-primary-dark: #2f3848;
+  --ifm-color-primary-darker: #2b3443;
+  --ifm-color-primary-darkest: #232a37;
+  --ifm-color-primary-light: #3f4a5a;
+  --ifm-color-primary-lighter: #434e5f;
+  --ifm-color-primary-lightest: #535e6f;
 }
 
 /* -- Sidebar background -- */
 [data-theme="dark"] .menu {
-  background: #000;
+  background: #0b0d14;
+  padding: 0.5rem 0;
 }
 
+/* Active sidebar item: subtle gray highlight + white text */
+[data-theme="dark"] .menu__link--active:not(.menu__link--sublist) {
+  background-color: rgba(31, 41, 55, 0.6);
+  color: #ffffff;
+  font-weight: 600;
+  border-radius: 6px;
+}
+
+[data-theme="dark"] .menu__link--active:not(.menu__link--sublist)::after {
+  background-color: transparent;
+}
+
+/* Sidebar links: gray-400 */
+[data-theme="dark"] .menu__link {
+  color: #9ca3af;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+[data-theme="dark"] .menu__link:hover {
+  color: #e5e7eb;
+  background-color: rgba(31, 41, 55, 0.4);
+}
+
+/* Category labels: white, bold, uppercase (matches frontend section.label) */
+[data-theme="dark"] .menu__list-item-collapsible > .menu__link--sublist,
+[data-theme="dark"] .menu__link--sublist {
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Subcategory labels: gray-600, tiny, uppercase (matches frontend group headers) */
+[data-theme="dark"] .menu__list .menu__list .menu__list-item-collapsible > .menu__link--sublist {
+  color: #4b5563;
+  font-weight: 700;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* Sidebar divider between categories */
+[data-theme="dark"] .menu__list > .menu__list-item {
+  border-top: 1px solid #1f2937;
+  padding-top: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+[data-theme="dark"] .menu__list > .menu__list-item:first-child {
+  border-top: none;
+  padding-top: 0;
+  margin-top: 0;
+}
+
+/* Sidebar collapse/expand arrow: gray-600 */
+[data-theme="dark"] .menu__caret::before,
+[data-theme="dark"] .menu__link--sublist-caret::after {
+  filter: brightness(0.4);
+}
+
+/* -- Navbar -- */
 [data-theme="dark"] nav.navbar {
-  border-bottom: 1px solid #222;
+  border-bottom: 1px solid #1f2937;
+}
+
+[data-theme="dark"] .navbar__title {
+  color: #e5e7eb;
+  font-weight: 700;
+}
+
+[data-theme="dark"] .navbar__link {
+  color: #9ca3af;
+}
+
+[data-theme="dark"] .navbar__link:hover {
+  color: #ffffff;
+}
+
+/* -- Footer -- */
+[data-theme="dark"] .footer {
+  border-top: 1px solid #1f2937;
 }
 
 /* -- Full-width content -- */
@@ -61,18 +143,25 @@ article {
 
 /* -- Table improvements -- */
 [data-theme="dark"] table th {
-  background: #111;
+  background: #131620;
 }
 
 [data-theme="dark"] table td,
 [data-theme="dark"] table th {
-  border-color: #333;
+  border-color: #1f2937;
 }
 
 /* -- Admonition tweaks -- */
 [data-theme="dark"] .admonition {
-  background: #0d0d0d;
+  background: #0b0d14;
   border-left-width: 4px;
+}
+
+/* -- Content headings -- */
+[data-theme="dark"] .markdown h1 {
+  font-weight: 800;
+  font-size: 2.2rem;
+  color: #ffffff;
 }
 
 /* -- Readable spacing -- */

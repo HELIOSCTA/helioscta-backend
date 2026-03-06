@@ -31,5 +31,8 @@ __pycache__/
 *.csv
 *.xlsx
 
+# refactor
+.refactor/
+
 # meteologica
 backend/src/meteologica/examples_from_api_docs/

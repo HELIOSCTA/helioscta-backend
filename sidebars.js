@@ -12,17 +12,25 @@ const sidebars = {
       label: "Data Catalog",
     },
     {
-      type: "doc",
-      id: "executive-summary",
-      label: "Summary",
-    },
-    {
       type: "category",
-      label: "Reference",
-      collapsed: false,
+      label: "Weather (WSI)",
+      collapsed: true,
       items: [
-        { type: "doc", id: "glossary", label: "Glossary" },
-        { type: "doc", id: "owners-and-slas", label: "Owners & SLAs" },
+        {
+          type: "doc",
+          id: "domains/wsi/overview",
+          label: "Overview",
+        },
+        {
+          type: "doc",
+          id: "domains/wsi/scrapes/wsi-scrapes",
+          label: "Scrapes",
+        },
+        {
+          type: "doc",
+          id: "domains/wsi/dbt-views/wsi-cleaned",
+          label: "dbt Views",
+        },
       ],
     },
     {
@@ -121,28 +129,6 @@ const sidebars = {
         {
           type: "doc",
           id: "domains/meteologica/dbt-views/meteologica-cleaned",
-          label: "dbt Views",
-        },
-      ],
-    },
-    {
-      type: "category",
-      label: "Weather (WSI)",
-      collapsed: true,
-      items: [
-        {
-          type: "doc",
-          id: "domains/wsi/overview",
-          label: "Overview",
-        },
-        {
-          type: "doc",
-          id: "domains/wsi/scrapes/wsi-scrapes",
-          label: "Scrapes",
-        },
-        {
-          type: "doc",
-          id: "domains/wsi/dbt-views/wsi-cleaned",
           label: "dbt Views",
         },
       ],
