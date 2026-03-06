@@ -57,7 +57,8 @@
       "Bash(cp:*)",
       "Bash(dbt compile:*)",
       "Bash(dbt ls:*)",
-      "Bash(sed:*)"
+      "Bash(sed:*)",
+      "Bash(bash:*)"
     ]
   }
 }
