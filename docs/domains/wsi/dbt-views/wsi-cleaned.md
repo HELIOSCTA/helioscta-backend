@@ -26,7 +26,7 @@ Raw WSI tables (wsi schema)
 | **Key Columns** | `date`, `region`, `electric_cdd`, `electric_hdd`, `gas_cdd`, `gas_hdd`, `population_cdd`, `population_hdd` |
 | **Use Cases** | Weather normalization, degree day tracking, historical baseline |
 | **Refresh** | View -- refreshes on query |
-| **SQL** | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/wsi/wsi_cleaned/marts/wdd_observed.sql) | [Raw](https://raw.githubusercontent.com/helioscta/helioscta-backend/main/backend/dbt/dbt_azure_postgresql/models/wsi/wsi_cleaned/marts/wdd_observed.sql) |
+| **SQL** | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/wsi/wsi_cleaned/marts/docs/reference.sql) |
 
 ### wdd_normals
 
@@ -41,7 +41,7 @@ Raw WSI tables (wsi schema)
 | **Logic** | TDD = gas_hdd + population_cdd |
 | **Use Cases** | Anomaly detection, weather vs normal comparisons |
 | **Refresh** | Full table rebuild on each dbt run |
-| **SQL** | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/wsi/wsi_cleaned/marts/wdd_normals.sql) | [Raw](https://raw.githubusercontent.com/helioscta/helioscta-backend/main/backend/dbt/dbt_azure_postgresql/models/wsi/wsi_cleaned/marts/wdd_normals.sql) |
+| **SQL** | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/wsi/wsi_cleaned/marts/docs/reference.sql) |
 
 ### wdd_forecast_models
 
@@ -55,7 +55,7 @@ Raw WSI tables (wsi schema)
 | **Logic** | Ranks forecasts by recency; labels: "Current Forecast" (rank 1), "12hrs Ago" (rank 2), "24hrs Ago" (rank 3), "Friday 12z" (special logic for DOW=5, hour=12) |
 | **Use Cases** | Model comparison, forecast vintage analysis |
 | **Refresh** | View -- refreshes on query |
-| **SQL** | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/wsi/wsi_cleaned/marts/wdd_forecast_models.sql) | [Raw](https://raw.githubusercontent.com/helioscta/helioscta-backend/main/backend/dbt/dbt_azure_postgresql/models/wsi/wsi_cleaned/marts/wdd_forecast_models.sql) |
+| **SQL** | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/wsi/wsi_cleaned/marts/docs/reference.sql) |
 
 ### wdd_forecast_wsi
 
@@ -69,7 +69,7 @@ Raw WSI tables (wsi schema)
 | **Logic** | Filters to model = 'WSI' only; labels: "Current Forecast" (rank 1), "24hrs Ago" (rank 2), "Friday 12z" (DOW=5) |
 | **Use Cases** | Primary weather forecast for trading decisions, degree day outlook |
 | **Refresh** | View -- refreshes on query |
-| **SQL** | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/wsi/wsi_cleaned/marts/wdd_forecast_wsi.sql) | [Raw](https://raw.githubusercontent.com/helioscta/helioscta-backend/main/backend/dbt/dbt_azure_postgresql/models/wsi/wsi_cleaned/marts/wdd_forecast_wsi.sql) |
+| **SQL** | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/wsi/wsi_cleaned/marts/docs/reference.sql) |
 
 ---
 

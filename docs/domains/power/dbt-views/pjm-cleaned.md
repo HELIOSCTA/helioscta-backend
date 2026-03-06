@@ -22,7 +22,7 @@ Source and staging models are **ephemeral** (not materialized as tables/views). 
 | **Upstream** | `staging_v1_pjm_lmps_hourly` |
 | **Use Cases** | DA vs RT price spread analysis, node-level price tracking, congestion analysis |
 | **Refresh** | View -- refreshes on query |
-| **SQL** | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/power/pjm_cleaned/marts/pjm_lmps_hourly.sql) | [Raw](https://raw.githubusercontent.com/helioscta/helioscta-backend/main/backend/dbt/dbt_azure_postgresql/models/power/pjm_cleaned/marts/pjm_lmps_hourly.sql) |
+| **SQL** | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/power/pjm_cleaned/marts/docs/reference.sql) |
 
 ### pjm_lmps_daily
 
@@ -34,7 +34,7 @@ Source and staging models are **ephemeral** (not materialized as tables/views). 
 | **Upstream** | `staging_v1_pjm_lmps_daily` |
 | **Use Cases** | Daily price trend analysis, settlement reconciliation |
 | **Refresh** | View -- refreshes on query |
-| **SQL** | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/power/pjm_cleaned/marts/pjm_lmps_daily.sql) | [Raw](https://raw.githubusercontent.com/helioscta/helioscta-backend/main/backend/dbt/dbt_azure_postgresql/models/power/pjm_cleaned/marts/pjm_lmps_daily.sql) |
+| **SQL** | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/power/pjm_cleaned/marts/docs/reference.sql) |
 
 ### pjm_lmps_rt_hourly
 
@@ -47,7 +47,7 @@ Source and staging models are **ephemeral** (not materialized as tables/views). 
 | **Logic** | Uses verified prices when available; falls back to unverified for recent data |
 | **Use Cases** | Real-time price monitoring, intraday P&L |
 | **Refresh** | View -- refreshes on query |
-| **SQL** | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/power/pjm_cleaned/marts/pjm_lmps_rt_hourly.sql) | [Raw](https://raw.githubusercontent.com/helioscta/helioscta-backend/main/backend/dbt/dbt_azure_postgresql/models/power/pjm_cleaned/marts/pjm_lmps_rt_hourly.sql) |
+| **SQL** | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/power/pjm_cleaned/marts/docs/reference.sql) |
 
 ### pjm_load_da_hourly
 
@@ -59,7 +59,7 @@ Source and staging models are **ephemeral** (not materialized as tables/views). 
 | **Upstream** | `staging_v1_pjm_load_da_hourly` |
 | **Use Cases** | Expected next-day demand, DA load vs actual comparison |
 | **Refresh** | View -- refreshes on query |
-| **SQL** | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/power/pjm_cleaned/marts/pjm_load_da_hourly.sql) | [Raw](https://raw.githubusercontent.com/helioscta/helioscta-backend/main/backend/dbt/dbt_azure_postgresql/models/power/pjm_cleaned/marts/pjm_load_da_hourly.sql) |
+| **SQL** | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/power/pjm_cleaned/marts/docs/reference.sql) |
 
 ### pjm_load_da_daily
 
@@ -70,7 +70,7 @@ Source and staging models are **ephemeral** (not materialized as tables/views). 
 | **Primary Keys** | `date`, `region`, `period` |
 | **Upstream** | `staging_v1_pjm_load_da_daily` |
 | **Refresh** | View -- refreshes on query |
-| **SQL** | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/power/pjm_cleaned/marts/pjm_load_da_daily.sql) | [Raw](https://raw.githubusercontent.com/helioscta/helioscta-backend/main/backend/dbt/dbt_azure_postgresql/models/power/pjm_cleaned/marts/pjm_load_da_daily.sql) |
+| **SQL** | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/power/pjm_cleaned/marts/docs/reference.sql) |
 
 ### pjm_load_rt_metered_hourly
 
@@ -82,7 +82,7 @@ Source and staging models are **ephemeral** (not materialized as tables/views). 
 | **Upstream** | `staging_v1_pjm_load_rt_metered_hourly` |
 | **Use Cases** | Ground truth load for forecast accuracy, settlement |
 | **Refresh** | View -- refreshes on query |
-| **SQL** | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/power/pjm_cleaned/marts/pjm_load_rt_metered_hourly.sql) | [Raw](https://raw.githubusercontent.com/helioscta/helioscta-backend/main/backend/dbt/dbt_azure_postgresql/models/power/pjm_cleaned/marts/pjm_load_rt_metered_hourly.sql) |
+| **SQL** | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/power/pjm_cleaned/marts/docs/reference.sql) |
 
 ### pjm_load_rt_metered_daily
 
@@ -93,7 +93,7 @@ Source and staging models are **ephemeral** (not materialized as tables/views). 
 | **Primary Keys** | `date`, `region`, `period` |
 | **Upstream** | `staging_v1_pjm_load_rt_metered_daily` |
 | **Refresh** | View -- refreshes on query |
-| **SQL** | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/power/pjm_cleaned/marts/pjm_load_rt_metered_daily.sql) | [Raw](https://raw.githubusercontent.com/helioscta/helioscta-backend/main/backend/dbt/dbt_azure_postgresql/models/power/pjm_cleaned/marts/pjm_load_rt_metered_daily.sql) |
+| **SQL** | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/power/pjm_cleaned/marts/docs/reference.sql) |
 
 ### pjm_load_rt_prelim_hourly
 
@@ -105,7 +105,7 @@ Source and staging models are **ephemeral** (not materialized as tables/views). 
 | **Upstream** | `staging_v1_pjm_load_rt_prelim_hourly` |
 | **Use Cases** | Intraday load tracking before metered data is available |
 | **Refresh** | View -- refreshes on query |
-| **SQL** | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/power/pjm_cleaned/marts/pjm_load_rt_prelim_hourly.sql) | [Raw](https://raw.githubusercontent.com/helioscta/helioscta-backend/main/backend/dbt/dbt_azure_postgresql/models/power/pjm_cleaned/marts/pjm_load_rt_prelim_hourly.sql) |
+| **SQL** | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/power/pjm_cleaned/marts/docs/reference.sql) |
 
 ### pjm_load_rt_prelim_daily
 
@@ -116,7 +116,7 @@ Source and staging models are **ephemeral** (not materialized as tables/views). 
 | **Primary Keys** | `date`, `region`, `period` |
 | **Upstream** | `staging_v1_pjm_load_rt_prelim_daily` |
 | **Refresh** | View -- refreshes on query |
-| **SQL** | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/power/pjm_cleaned/marts/pjm_load_rt_prelim_daily.sql) | [Raw](https://raw.githubusercontent.com/helioscta/helioscta-backend/main/backend/dbt/dbt_azure_postgresql/models/power/pjm_cleaned/marts/pjm_load_rt_prelim_daily.sql) |
+| **SQL** | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/power/pjm_cleaned/marts/docs/reference.sql) |
 
 ### pjm_load_rt_instantaneous_hourly
 
@@ -128,7 +128,7 @@ Source and staging models are **ephemeral** (not materialized as tables/views). 
 | **Upstream** | `staging_v1_pjm_load_rt_instantaneous_hourly` |
 | **Logic** | Aggregates 5-min readings to hourly averages |
 | **Refresh** | View -- refreshes on query |
-| **SQL** | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/power/pjm_cleaned/marts/pjm_load_rt_instantaneous_hourly.sql) | [Raw](https://raw.githubusercontent.com/helioscta/helioscta-backend/main/backend/dbt/dbt_azure_postgresql/models/power/pjm_cleaned/marts/pjm_load_rt_instantaneous_hourly.sql) |
+| **SQL** | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/power/pjm_cleaned/marts/docs/reference.sql) |
 
 ### pjm_load_forecast_hourly
 
@@ -141,7 +141,7 @@ Source and staging models are **ephemeral** (not materialized as tables/views). 
 | **Logic** | Ranks forecasts by recency (DENSE_RANK); filters to complete 24h forecasts only |
 | **Use Cases** | Compare against Meteologica/trader forecasts, anticipate demand |
 | **Refresh** | View -- refreshes on query |
-| **SQL** | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/power/pjm_cleaned/marts/pjm_load_forecast_hourly.sql) | [Raw](https://raw.githubusercontent.com/helioscta/helioscta-backend/main/backend/dbt/dbt_azure_postgresql/models/power/pjm_cleaned/marts/pjm_load_forecast_hourly.sql) |
+| **SQL** | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/power/pjm_cleaned/marts/docs/reference.sql) |
 
 ### pjm_load_forecast_daily
 
@@ -152,7 +152,7 @@ Source and staging models are **ephemeral** (not materialized as tables/views). 
 | **Primary Keys** | `forecast_rank`, `forecast_date`, `region`, `period` |
 | **Upstream** | `staging_v1_pjm_load_forecast_daily` |
 | **Refresh** | View -- refreshes on query |
-| **SQL** | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/power/pjm_cleaned/marts/pjm_load_forecast_daily.sql) | [Raw](https://raw.githubusercontent.com/helioscta/helioscta-backend/main/backend/dbt/dbt_azure_postgresql/models/power/pjm_cleaned/marts/pjm_load_forecast_daily.sql) |
+| **SQL** | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/power/pjm_cleaned/marts/docs/reference.sql) |
 
 ### pjm_gridstatus_load_forecast_hourly
 
@@ -163,7 +163,7 @@ Source and staging models are **ephemeral** (not materialized as tables/views). 
 | **Primary Keys** | `forecast_rank`, `forecast_date`, `hour_ending`, `region` |
 | **Upstream** | `staging_v1_gridstatus_pjm_load_forecast_hourly` |
 | **Refresh** | View -- refreshes on query |
-| **SQL** | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/power/pjm_cleaned/marts/pjm_gridstatus_load_forecast_hourly.sql) | [Raw](https://raw.githubusercontent.com/helioscta/helioscta-backend/main/backend/dbt/dbt_azure_postgresql/models/power/pjm_cleaned/marts/pjm_gridstatus_load_forecast_hourly.sql) |
+| **SQL** | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/power/pjm_cleaned/marts/docs/reference.sql) |
 
 ### pjm_fuel_mix_hourly
 
@@ -175,7 +175,7 @@ Source and staging models are **ephemeral** (not materialized as tables/views). 
 | **Upstream** | `staging_v1_pjm_fuel_mix_hourly` |
 | **Use Cases** | Monitor gas vs coal switching, renewable penetration |
 | **Refresh** | View -- refreshes on query |
-| **SQL** | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/power/pjm_cleaned/marts/pjm_fuel_mix_hourly.sql) | [Raw](https://raw.githubusercontent.com/helioscta/helioscta-backend/main/backend/dbt/dbt_azure_postgresql/models/power/pjm_cleaned/marts/pjm_fuel_mix_hourly.sql) |
+| **SQL** | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/power/pjm_cleaned/marts/docs/reference.sql) |
 
 ### pjm_fuel_mix_daily
 
@@ -186,7 +186,7 @@ Source and staging models are **ephemeral** (not materialized as tables/views). 
 | **Primary Keys** | `date`, `period` |
 | **Upstream** | `staging_v1_pjm_fuel_mix_daily` |
 | **Refresh** | View -- refreshes on query |
-| **SQL** | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/power/pjm_cleaned/marts/pjm_fuel_mix_daily.sql) | [Raw](https://raw.githubusercontent.com/helioscta/helioscta-backend/main/backend/dbt/dbt_azure_postgresql/models/power/pjm_cleaned/marts/pjm_fuel_mix_daily.sql) |
+| **SQL** | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/power/pjm_cleaned/marts/docs/reference.sql) |
 
 ### pjm_outages_actual_daily
 
@@ -198,7 +198,7 @@ Source and staging models are **ephemeral** (not materialized as tables/views). 
 | **Upstream** | `staging_v1_pjm_outages_actual_daily` |
 | **Use Cases** | Track supply availability, compare actual vs forecast outages |
 | **Refresh** | View -- refreshes on query |
-| **SQL** | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/power/pjm_cleaned/marts/pjm_outages_actual_daily.sql) | [Raw](https://raw.githubusercontent.com/helioscta/helioscta-backend/main/backend/dbt/dbt_azure_postgresql/models/power/pjm_cleaned/marts/pjm_outages_actual_daily.sql) |
+| **SQL** | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/power/pjm_cleaned/marts/docs/reference.sql) |
 
 ### pjm_outages_forecast_daily
 
@@ -209,7 +209,7 @@ Source and staging models are **ephemeral** (not materialized as tables/views). 
 | **Primary Keys** | `forecast_rank`, `forecast_execution_date`, `forecast_date`, `region` |
 | **Upstream** | `staging_v1_pjm_outages_forecast_daily` |
 | **Refresh** | View -- refreshes on query |
-| **SQL** | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/power/pjm_cleaned/marts/pjm_outages_forecast_daily.sql) | [Raw](https://raw.githubusercontent.com/helioscta/helioscta-backend/main/backend/dbt/dbt_azure_postgresql/models/power/pjm_cleaned/marts/pjm_outages_forecast_daily.sql) |
+| **SQL** | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/power/pjm_cleaned/marts/docs/reference.sql) |
 
 ### pjm_tie_flows_hourly
 
@@ -221,7 +221,7 @@ Source and staging models are **ephemeral** (not materialized as tables/views). 
 | **Upstream** | `staging_v1_pjm_tie_flows_hourly` |
 | **Use Cases** | Import/export tracking, cross-ISO flow analysis |
 | **Refresh** | View -- refreshes on query |
-| **SQL** | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/power/pjm_cleaned/marts/pjm_tie_flows_hourly.sql) | [Raw](https://raw.githubusercontent.com/helioscta/helioscta-backend/main/backend/dbt/dbt_azure_postgresql/models/power/pjm_cleaned/marts/pjm_tie_flows_hourly.sql) |
+| **SQL** | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/power/pjm_cleaned/marts/docs/reference.sql) |
 
 ### pjm_tie_flows_daily
 
@@ -232,7 +232,7 @@ Source and staging models are **ephemeral** (not materialized as tables/views). 
 | **Primary Keys** | `date`, `tie_flow_name`, `period` |
 | **Upstream** | `staging_v1_pjm_tie_flows_daily` |
 | **Refresh** | View -- refreshes on query |
-| **SQL** | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/power/pjm_cleaned/marts/pjm_tie_flows_daily.sql) | [Raw](https://raw.githubusercontent.com/helioscta/helioscta-backend/main/backend/dbt/dbt_azure_postgresql/models/power/pjm_cleaned/marts/pjm_tie_flows_daily.sql) |
+| **SQL** | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/power/pjm_cleaned/marts/docs/reference.sql) |
 
 ### pjm_solar_forecast_hourly
 
@@ -243,7 +243,7 @@ Source and staging models are **ephemeral** (not materialized as tables/views). 
 | **Primary Keys** | `forecast_rank`, `forecast_date`, `hour_ending` |
 | **Upstream** | `staging_v1_pjm_solar_forecast_hourly` |
 | **Refresh** | View -- refreshes on query |
-| **SQL** | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/power/pjm_cleaned/marts/pjm_solar_forecast_hourly.sql) | [Raw](https://raw.githubusercontent.com/helioscta/helioscta-backend/main/backend/dbt/dbt_azure_postgresql/models/power/pjm_cleaned/marts/pjm_solar_forecast_hourly.sql) |
+| **SQL** | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/power/pjm_cleaned/marts/docs/reference.sql) |
 
 ### pjm_wind_forecast_hourly
 
@@ -254,7 +254,7 @@ Source and staging models are **ephemeral** (not materialized as tables/views). 
 | **Primary Keys** | `forecast_rank`, `forecast_date`, `hour_ending` |
 | **Upstream** | `staging_v1_pjm_wind_forecast_hourly` |
 | **Refresh** | View -- refreshes on query |
-| **SQL** | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/power/pjm_cleaned/marts/pjm_wind_forecast_hourly.sql) | [Raw](https://raw.githubusercontent.com/helioscta/helioscta-backend/main/backend/dbt/dbt_azure_postgresql/models/power/pjm_cleaned/marts/pjm_wind_forecast_hourly.sql) |
+| **SQL** | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/power/pjm_cleaned/marts/docs/reference.sql) |
 
 ---
 

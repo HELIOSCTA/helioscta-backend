@@ -24,7 +24,7 @@ Raw position files (marex.*, nav.* schemas)
 | **Materialization** | TABLE (not a view) |
 | **Upstream** | `staging_v5_marex_and_nav_positions` |
 | **Use Cases** | Daily position reconciliation, risk monitoring, fund-level exposure tracking |
-| **SQL** | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/positions_and_trades/positions_cleaned/marts/marex_and_nav_positions_grouped.sql) | [Raw](https://raw.githubusercontent.com/helioscta/helioscta-backend/main/backend/dbt/dbt_azure_postgresql/models/positions_and_trades/positions_cleaned/marts/marex_and_nav_positions_grouped.sql) |
+| **SQL** | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/positions_and_trades/positions_cleaned/marts/docs/reference.sql) |
 
 #### marex_and_nav_positions_grouped_latest
 
@@ -35,18 +35,18 @@ Raw position files (marex.*, nav.* schemas)
 | **Key Columns** | Includes `daily_change_total`, `daily_pnl_total`, `previous_sftp_date` |
 | **Upstream** | `marex_and_nav_positions_grouped` |
 | **Use Cases** | Morning position review, daily P&L attribution |
-| **SQL** | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/positions_and_trades/positions_cleaned/marts/marex_and_nav_positions_grouped_latest.sql) | [Raw](https://raw.githubusercontent.com/helioscta/helioscta-backend/main/backend/dbt/dbt_azure_postgresql/models/positions_and_trades/positions_cleaned/marts/marex_and_nav_positions_grouped_latest.sql) |
+| **SQL** | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/positions_and_trades/positions_cleaned/marts/docs/reference.sql) |
 
 #### Individual Fund Views
 
 | View | Description | SQL |
 |------|-------------|-----|
-| `marex_positions` | Marex-only positions (latest SFTP upload per date) | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/positions_and_trades/positions_cleaned/marts/marex_positions.sql) |
-| `nav_positions` | Combined NAV positions across all funds | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/positions_and_trades/positions_cleaned/marts/nav_positions.sql) |
-| `nav_positions_agr` | AGR fund positions with product codes | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/positions_and_trades/positions_cleaned/marts/nav_positions_agr.sql) |
-| `nav_positions_moross` | Moross fund positions with product codes | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/positions_and_trades/positions_cleaned/marts/nav_positions_moross.sql) |
-| `nav_positions_pnt` | PNT fund positions with product codes | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/positions_and_trades/positions_cleaned/marts/nav_positions_pnt.sql) |
-| `nav_positions_titan` | Titan fund positions with product codes | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/positions_and_trades/positions_cleaned/marts/nav_positions_titan.sql) |
+| `marex_positions` | Marex-only positions (latest SFTP upload per date) | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/positions_and_trades/positions_cleaned/marts/docs/reference.sql) |
+| `nav_positions` | Combined NAV positions across all funds | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/positions_and_trades/positions_cleaned/marts/docs/reference.sql) |
+| `nav_positions_agr` | AGR fund positions with product codes | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/positions_and_trades/positions_cleaned/marts/docs/reference.sql) |
+| `nav_positions_moross` | Moross fund positions with product codes | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/positions_and_trades/positions_cleaned/marts/docs/reference.sql) |
+| `nav_positions_pnt` | PNT fund positions with product codes | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/positions_and_trades/positions_cleaned/marts/docs/reference.sql) |
+| `nav_positions_titan` | Titan fund positions with product codes | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/positions_and_trades/positions_cleaned/marts/docs/reference.sql) |
 
 ### Staging Pipeline (4 steps)
 
@@ -83,17 +83,17 @@ Raw trade files (clear_street.*, marex.* schemas)
 
 | View | Description | Upstream | SQL |
 |------|-------------|----------|-----|
-| `clear_street_trades` | End-of-day trade confirmations with product codes | `staging_v2_clear_street_trades_2_product_codes` | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/positions_and_trades/trades_cleaned/marts/clear_street_trades.sql) |
-| `clear_street_intraday_trades` | Intraday trade confirmations with product codes | `staging_v2_clear_street_intraday_2_product_codes` | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/positions_and_trades/trades_cleaned/marts/clear_street_intraday_trades.sql) |
-| `marex_allocated_trades` | Allocated (cleared) Marex trades with product codes | `staging_v2_marex_allocated_trades_2_product_codes` | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/positions_and_trades/trades_cleaned/marts/marex_allocated_trades.sql) |
+| `clear_street_trades` | End-of-day trade confirmations with product codes | `staging_v2_clear_street_trades_2_product_codes` | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/positions_and_trades/trades_cleaned/marts/docs/reference.sql) |
+| `clear_street_intraday_trades` | Intraday trade confirmations with product codes | `staging_v2_clear_street_intraday_2_product_codes` | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/positions_and_trades/trades_cleaned/marts/docs/reference.sql) |
+| `marex_allocated_trades` | Allocated (cleared) Marex trades with product codes | `staging_v2_marex_allocated_trades_2_product_codes` | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/positions_and_trades/trades_cleaned/marts/docs/reference.sql) |
 
 #### Grouped Views (aggregated by product/contract)
 
 | View | Description | SQL |
 |------|-------------|-----|
-| `clear_street_trades_grouped` | Daily Clear Street trades aggregated by product code grouping and region | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/positions_and_trades/trades_cleaned/marts/clear_street_trades_grouped.sql) |
-| `clear_street_intraday_trades_grouped` | Intraday Clear Street trades aggregated by product grouping | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/positions_and_trades/trades_cleaned/marts/clear_street_intraday_trades_grouped.sql) |
-| `marex_allocated_trades_grouped` | Marex allocated trades aggregated by product grouping and region | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/positions_and_trades/trades_cleaned/marts/marex_allocated_trades_grouped.sql) |
+| `clear_street_trades_grouped` | Daily Clear Street trades aggregated by product code grouping and region | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/positions_and_trades/trades_cleaned/marts/docs/reference.sql) |
+| `clear_street_intraday_trades_grouped` | Intraday Clear Street trades aggregated by product grouping | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/positions_and_trades/trades_cleaned/marts/docs/reference.sql) |
+| `marex_allocated_trades_grouped` | Marex allocated trades aggregated by product grouping and region | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/positions_and_trades/trades_cleaned/marts/docs/reference.sql) |
 
 ### Trade Staging Pipeline (2 steps each)
 

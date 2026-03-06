@@ -1,100 +1,110 @@
 /*
-    VALIDATION v2: Gas Weighted HDD Daily Forecast — CONUS
-    Pivoted summary matching WSI website layout.
+    VALIDATION v2: Gas Weighted HDD Daily Forecast - CONUS
+    Pivoted summary matching validate_forecast_gas_hdd.sql output layout.
 
-    Sources: marts layer (wsi_cleaned.wdd_forecast_wsi, wsi_cleaned.wdd_forecast_models, wsi_cleaned.wdd_normals)
     - Latest 00Z run per model (CONUS, bias_corrected = false)
-    - Differences row = current 00Z value minus previous 00Z value
-    - 10-year normals row from wdd_normals mart
+    - Differences row = current 00Z value minus prior 00Z value from exactly 24h earlier
+      for the same model + forecast_date
+    - If prior 00Z is missing, diff remains NULL
+    - 10-year normals row from wsi_cleaned.wdd_normals
     - 15-day forecast window starting from CURRENT_DATE
 */
 
--------------------------------------------------------------
--- 1. UNION WSI + NWP model forecasts from marts
--------------------------------------------------------------
-
 WITH forecast_union AS (
-    -- WSI has no cycle column; it is effectively always 00Z
-    SELECT forecast_execution_datetime, forecast_date, model, bias_corrected, region, NULL AS cycle, gas_hdd
+    -- WSI run timestamp is normalized to daily 00Z.
+    SELECT
+        DATE_TRUNC('day', forecast_execution_datetime) AS run_datetime_utc,
+        forecast_date::DATE AS forecast_date,
+        model,
+        bias_corrected,
+        region,
+        '00Z'::TEXT AS cycle,
+        gas_hdd
     FROM wsi_cleaned.wdd_forecast_wsi
+
     UNION ALL
-    SELECT forecast_execution_datetime, forecast_date, model, bias_corrected, region, cycle, gas_hdd
+
+    SELECT
+        forecast_execution_datetime AS run_datetime_utc,
+        forecast_date::DATE AS forecast_date,
+        model,
+        bias_corrected,
+        region,
+        cycle,
+        gas_hdd
     FROM wsi_cleaned.wdd_forecast_models
 ),
-
--------------------------------------------------------------
--- 2. Filter to CONUS, unbiased, 00Z only
--------------------------------------------------------------
 
 runs_00z AS (
     SELECT
         model,
-        forecast_execution_datetime,
+        run_datetime_utc,
         forecast_date,
         ROUND(gas_hdd::NUMERIC, 1) AS gas_hdd
     FROM forecast_union
     WHERE region = 'CONUS'
-      AND bias_corrected = 'false'
-      AND (cycle = '00Z' OR cycle IS NULL)
+      AND LOWER(bias_corrected::TEXT) = 'false'
+      AND UPPER(cycle) = '00Z'
+      AND EXTRACT(HOUR FROM run_datetime_utc) = 0
 ),
 
--------------------------------------------------------------
--- 3. Latest 00Z execution per model
--------------------------------------------------------------
-
-latest_exec AS (
-    SELECT model, MAX(forecast_execution_datetime) AS max_exec
+run_dedup AS (
+    SELECT
+        model,
+        run_datetime_utc,
+        forecast_date,
+        gas_hdd,
+        ROW_NUMBER() OVER (
+            PARTITION BY model, run_datetime_utc, forecast_date
+            ORDER BY run_datetime_utc DESC
+        ) AS rn
     FROM runs_00z
+),
+
+runs_00z_unique AS (
+    SELECT model, run_datetime_utc, forecast_date, gas_hdd
+    FROM run_dedup
+    WHERE rn = 1
+),
+
+latest_run AS (
+    SELECT model, MAX(run_datetime_utc) AS run_datetime_utc
+    FROM runs_00z_unique
     GROUP BY model
 ),
 
--------------------------------------------------------------
--- 4. Current run and previous 00Z run
--------------------------------------------------------------
-
-current_run AS (
-    SELECT r.model, r.forecast_execution_datetime, r.forecast_date, r.gas_hdd
-    FROM runs_00z r
-    JOIN latest_exec l ON r.model = l.model AND r.forecast_execution_datetime = l.max_exec
-),
-
-prev_exec AS (
-    SELECT r.model, MAX(r.forecast_execution_datetime) AS prev_exec_time
-    FROM runs_00z r
-    JOIN latest_exec l ON r.model = l.model AND r.forecast_execution_datetime < l.max_exec
-    GROUP BY r.model
-),
-
-prev_run AS (
-    SELECT r.model, r.forecast_date, r.gas_hdd AS prev_gas_hdd
-    FROM runs_00z r
-    JOIN prev_exec p ON r.model = p.model AND r.forecast_execution_datetime = p.prev_exec_time
-),
-
--------------------------------------------------------------
--- 5. Join current + previous to compute differences
--------------------------------------------------------------
-
-with_diff AS (
+current_vs_prev AS (
     SELECT
-        c.model,
-        c.forecast_execution_datetime,
-        c.forecast_date,
-        c.gas_hdd,
-        ROUND(c.gas_hdd - p.prev_gas_hdd, 1) AS diff_24h
-    FROM current_run c
-    LEFT JOIN prev_run p ON c.model = p.model AND c.forecast_date = p.forecast_date
+        cur.model,
+        cur.run_datetime_utc,
+        cur.forecast_date,
+        cur.gas_hdd,
+        prev.run_datetime_utc AS prev_run_datetime_utc,
+        prev.gas_hdd AS prev_gas_hdd,
+        CASE
+            WHEN prev.run_datetime_utc IS NULL THEN NULL
+            ELSE ROUND(cur.gas_hdd - prev.gas_hdd, 1)
+        END AS diff_24h
+    FROM runs_00z_unique cur
+    LEFT JOIN runs_00z_unique prev
+      ON prev.model = cur.model
+     AND prev.forecast_date = cur.forecast_date
+     AND prev.run_datetime_utc = cur.run_datetime_utc - INTERVAL '24 hours'
 ),
 
--------------------------------------------------------------
--- 6. PIVOT: forecast values row
--------------------------------------------------------------
+latest_with_diff AS (
+    SELECT c.*
+    FROM current_vs_prev c
+    JOIN latest_run l
+      ON c.model = l.model
+     AND c.run_datetime_utc = l.run_datetime_utc
+),
 
 forecast_pivot AS (
     SELECT
         model,
         'Forecast' AS row_type,
-        forecast_execution_datetime,
+        run_datetime_utc AT TIME ZONE 'UTC' AS init_time,
         MAX(CASE WHEN forecast_date = CURRENT_DATE + 0  THEN gas_hdd END) AS day_01,
         MAX(CASE WHEN forecast_date = CURRENT_DATE + 1  THEN gas_hdd END) AS day_02,
         MAX(CASE WHEN forecast_date = CURRENT_DATE + 2  THEN gas_hdd END) AS day_03,
@@ -111,20 +121,17 @@ forecast_pivot AS (
         MAX(CASE WHEN forecast_date = CURRENT_DATE + 13 THEN gas_hdd END) AS day_14,
         MAX(CASE WHEN forecast_date = CURRENT_DATE + 14 THEN gas_hdd END) AS day_15,
         ROUND(SUM(gas_hdd), 1) AS total
-    FROM with_diff
-    WHERE forecast_date >= CURRENT_DATE AND forecast_date < CURRENT_DATE + 15
-    GROUP BY model, forecast_execution_datetime
+    FROM latest_with_diff
+    WHERE forecast_date >= CURRENT_DATE
+      AND forecast_date < CURRENT_DATE + 15
+    GROUP BY model, run_datetime_utc
 ),
-
--------------------------------------------------------------
--- 7. PIVOT: differences row (current 00Z minus previous 00Z)
--------------------------------------------------------------
 
 diff_pivot AS (
     SELECT
         model,
         'Differences' AS row_type,
-        forecast_execution_datetime,
+        run_datetime_utc AT TIME ZONE 'UTC' AS init_time,
         MAX(CASE WHEN forecast_date = CURRENT_DATE + 0  THEN diff_24h END) AS day_01,
         MAX(CASE WHEN forecast_date = CURRENT_DATE + 1  THEN diff_24h END) AS day_02,
         MAX(CASE WHEN forecast_date = CURRENT_DATE + 2  THEN diff_24h END) AS day_03,
@@ -141,20 +148,17 @@ diff_pivot AS (
         MAX(CASE WHEN forecast_date = CURRENT_DATE + 13 THEN diff_24h END) AS day_14,
         MAX(CASE WHEN forecast_date = CURRENT_DATE + 14 THEN diff_24h END) AS day_15,
         ROUND(SUM(diff_24h), 1) AS total
-    FROM with_diff
-    WHERE forecast_date >= CURRENT_DATE AND forecast_date < CURRENT_DATE + 15
-    GROUP BY model, forecast_execution_datetime
+    FROM latest_with_diff
+    WHERE forecast_date >= CURRENT_DATE
+      AND forecast_date < CURRENT_DATE + 15
+    GROUP BY model, run_datetime_utc
 ),
-
--------------------------------------------------------------
--- 8. NORMALS: 10-year gas_hdd from wdd_normals mart
--------------------------------------------------------------
 
 normals_pivot AS (
     SELECT
         'NORMAL_10YR' AS model,
         'Normals' AS row_type,
-        NULL::TIMESTAMP AS forecast_execution_datetime,
+        NULL::TIMESTAMP AS init_time,
         MAX(CASE WHEN mm_dd = TO_CHAR(CURRENT_DATE + 0,  'MM-DD') THEN ROUND(gas_hdd_10_yr_normal::NUMERIC, 1) END) AS day_01,
         MAX(CASE WHEN mm_dd = TO_CHAR(CURRENT_DATE + 1,  'MM-DD') THEN ROUND(gas_hdd_10_yr_normal::NUMERIC, 1) END) AS day_02,
         MAX(CASE WHEN mm_dd = TO_CHAR(CURRENT_DATE + 2,  'MM-DD') THEN ROUND(gas_hdd_10_yr_normal::NUMERIC, 1) END) AS day_03,
@@ -182,12 +186,8 @@ normals_pivot AS (
         TO_CHAR(CURRENT_DATE + 10, 'MM-DD'), TO_CHAR(CURRENT_DATE + 11, 'MM-DD'),
         TO_CHAR(CURRENT_DATE + 12, 'MM-DD'), TO_CHAR(CURRENT_DATE + 13, 'MM-DD'),
         TO_CHAR(CURRENT_DATE + 14, 'MM-DD')
-    )
+      )
 ),
-
--------------------------------------------------------------
--- 9. FINAL: stack forecast + differences + normals
--------------------------------------------------------------
 
 combined AS (
     SELECT * FROM forecast_pivot
@@ -200,7 +200,7 @@ combined AS (
 SELECT
     model,
     row_type,
-    forecast_execution_datetime,
+    init_time,
     day_01, day_02, day_03, day_04, day_05,
     day_06, day_07, day_08, day_09, day_10,
     day_11, day_12, day_13, day_14, day_15,

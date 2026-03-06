@@ -84,6 +84,60 @@ One-two sentence summary of what data this domain covers and why it matters.
 ## Known Caveats
 ```
 
+### dbt Mart README
+
+Every dbt mart directory (`models/<domain>/<domain>_cleaned/marts/`) must have a `docs/` subfolder containing:
+
+- `docs/reference.sql` — canonical reference query (same across all marts)
+- `docs/README.md` — mart-specific documentation
+
+```markdown
+# <mart_name> marts
+
+## Purpose
+## Grain
+## Source Relations
+## Key Columns
+## Transformation Notes
+## Data Quality Checks
+```
+
+**Heading order is strict** — do not reorder or omit headings.
+
+- **Purpose:** 1-2 sentences on what the mart exposes and who consumes it.
+- **Grain:** Table with `Model` and `Grain` columns listing every mart model's primary key.
+- **Source Relations:** Table with `Source` and `Upstream Staging Model` columns.
+- **Key Columns:** Table with `Column` and `Description` columns for the most important output columns.
+- **Transformation Notes:** Bullet list covering materialization strategy, where business logic lives, and domain-specific details.
+- **Data Quality Checks:** Bullet list of `not_null`, `accepted_values`, and other schema tests from `schema.yml`.
+
+**`docs/reference.sql`** contains this exact SQL (do not modify):
+
+```sql
+select
+  datetime
+  ,date
+  ,hour_ending
+  ,hub
+  ,market
+  ,lmp_total
+  ,lmp_system_energy_price
+  ,lmp_congestion_price
+  ,lmp_marginal_loss_price
+from pjm_cleaned.pjm_lmps_hourly
+```
+
+### Current Mart Directories
+
+| Mart | Path |
+|------|------|
+| pjm_cleaned | `models/power/pjm_cleaned/marts/` |
+| meteologica_cleaned | `models/meteologica/meteologica_cleaned/marts/` |
+| genscape_cleaned | `models/genscape/genscape_cleaned/marts/` |
+| positions_cleaned | `models/positions_and_trades/positions_cleaned/marts/` |
+| trades_cleaned | `models/positions_and_trades/trades_cleaned/marts/` |
+| wsi_cleaned | `models/wsi/wsi_cleaned/marts/` |
+
 ## Adding a New Domain
 
 1. Create `docs/domains/<domain>/overview.md`
