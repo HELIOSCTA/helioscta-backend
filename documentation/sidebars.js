@@ -13,28 +13,6 @@ const sidebars = {
     },
     {
       type: "category",
-      label: "Reference",
-      collapsed: false,
-      items: [
-        {
-          type: "doc",
-          id: "task-scheduling",
-          label: "Task Scheduling",
-        },
-        {
-          type: "doc",
-          id: "owners-and-slas",
-          label: "Owners & SLAs",
-        },
-        {
-          type: "doc",
-          id: "glossary",
-          label: "Glossary",
-        },
-      ],
-    },
-    {
-      type: "category",
       label: "Weather (WSI)",
       collapsed: true,
       items: [
@@ -166,25 +144,14 @@ const sidebars = {
           label: "Overview",
         },
         {
-          type: "category",
+          type: "doc",
+          id: "domains/eia/scrapes/eia-scrapes",
           label: "Scrapes",
-          items: [
-            {
-              type: "doc",
-              id: "domains/eia/scrapes/fuel-type-hrl-gen",
-              label: "Fuel Mix",
-            },
-            {
-              type: "doc",
-              id: "domains/eia/scrapes/weekly-underground-storage",
-              label: "Gas Storage",
-            },
-            {
-              type: "doc",
-              id: "domains/eia/scrapes/eia-860",
-              label: "Form 860",
-            },
-          ],
+        },
+        {
+          type: "doc",
+          id: "domains/eia/dbt-views/eia-cleaned",
+          label: "dbt Views",
         },
       ],
     },

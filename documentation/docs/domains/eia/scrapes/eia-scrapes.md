@@ -1,6 +1,6 @@
-# EIA Hourly Generation by Fuel Type
+# EIA Scrape Cards
 
-## Scrape Card
+## Hourly Generation by Fuel Type
 
 | Field | Value |
 |-------|-------|
@@ -14,11 +14,11 @@
 | **Freshness** | ~1 hour lag |
 | **Owner** | TBD |
 
-## Business Purpose
+### Business Purpose
 
 Provides a comprehensive view of U.S. electricity generation broken down by fuel source (natural gas, coal, nuclear, wind, solar, etc.) across all major balancing authorities. Answers the question: "Where is the power coming from right now?"
 
-## Data Captured
+### Data Captured
 
 | Field | Description |
 |-------|-------------|
@@ -39,11 +39,7 @@ Provides a comprehensive view of U.S. electricity generation broken down by fuel
 | `other` | MW from other sources |
 | + 6 more columns | Additional storage and integrated types |
 
-## Primary Key
-
-`datetime_utc`, `date`, `hour`, `respondent`
-
-## Respondents Covered
+### Respondents Covered
 
 ~50+ balancing authorities organized by region:
 - **National:** US48
@@ -58,8 +54,66 @@ Provides a comprehensive view of U.S. electricity generation broken down by fuel
 - **Southwest:** AZPS, DEAA, EPE
 - **California:** CISO (CAISO), BANC, LDWP, IID, TIDC
 
-## Known Caveats
+### Known Caveats
 
 - EIA API paginated at 5,000 rows; script handles pagination automatically
 - Some respondents may have duplicate fuel type columns (e.g., two "pumped_storage" columns); the script sums duplicates
 - Backfill available from 2019 onward via `backfill()` function
+
+---
+
+## Weekly Natural Gas Underground Storage
+
+| Field | Value |
+|-------|-------|
+| **Script** | `backend/src/eia/weekly_underground_storage_test.py` |
+| **Source** | EIA Open Data API v2 (`/natural-gas/stor/wkly`) |
+| **Target Table** | `eia.weekly_underground_storage_test` |
+| **Schema** | `eia` |
+| **Trigger** | Scheduled (Prefect) |
+| **Default Pull Window** | Last 61 days |
+| **Freshness** | Same-day (Thursday release) |
+| **Owner** | TBD |
+
+### Business Purpose
+
+Tracks weekly natural gas in underground storage by region. This is one of the most closely watched energy reports -- released every Thursday at 10:30 AM ET by the EIA. Storage levels relative to the 5-year average are a key driver of natural gas prices.
+
+### Data Captured
+
+| Field | Description |
+|-------|-------------|
+| `eia_week_ending` | The Friday that ends the reporting week |
+| `region` | Storage region (East, Midwest, Mountain, Pacific, South Central, etc.) |
+| `value` | Volume in BCF (Billion Cubic Feet) |
+| `series_description` | Full EIA series description |
+
+### Known Caveats
+
+- Script name ends in `_test` but this is the production script
+- Region is extracted from `series_description` via regex
+- Weekly frequency -- not suitable for intraday analysis
+
+---
+
+## Form 860 (Generator Attributes)
+
+| Field | Value |
+|-------|-------|
+| **Script** | `backend/src/eia/eia_860_test.py` |
+| **Source** | EIA Open Data API v2 (`/electricity/rto/fuel-type-data`) |
+| **Target Table** | `eia.eia_860_test` |
+| **Schema** | `eia` |
+| **Trigger** | Scheduled (Prefect) |
+| **Freshness** | TBD |
+| **Owner** | TBD |
+
+### Business Purpose
+
+Captures generator-level attributes including capacity and fuel type. Used as reference data for understanding the generation fleet.
+
+### Known Caveats
+
+- Script name ends in `_test` but this is the production script
+- Uses the same EIA fuel-type-data endpoint as the hourly generation script but with different formatting
+- May overlap with hourly generation data -- check with team for intended distinction

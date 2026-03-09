@@ -18,7 +18,8 @@
       "Bash(dbt show:*)",
       "Bash(mv:*)",
       "Bash(dbt build:*)",
-      "Bash(dbt:*)"
+      "Bash(dbt:*)",
+      "Bash(rm:*)"
     ]
   }
 }
