@@ -106,6 +106,17 @@ Click any link in the Source Scrape or dbt View columns for details. Terms uncle
 
 ---
 
+## Utils -- Shared Date Dimensions
+
+| Model / Table | Plain-English Purpose | Business Question Answered | Source Scrape(s) | Related dbt View(s) | Refresh Frequency | Owner |
+|---|---|---|---|---|---|---|
+| `utils_v1_dates_daily` | Daily date spine (2010 through current+7 years, excludes Feb 29) with season, EIA week, and NERC holiday flags | "What EIA storage week does this date fall in? Is it a NERC holiday?" | None (generated) | — | Live (view) | TBD |
+| `utils_v1_dates_weekly` | Weekly aggregation by EIA storage week with holiday counts | "How many NERC holidays fall in this storage week?" | None (generated) | — | Live (view) | TBD |
+
+> **Note:** A third model, `utils_v1_nerc_holidays`, is defined in `schema.yml` as a static NERC holiday lookup (2014-2028) but does not yet have a SQL implementation.
+
+---
+
 ## Summary
 
 | Domain | Schema | View Count | Status |
@@ -117,7 +128,8 @@ Click any link in the Source Scrape or dbt View columns for details. Terms uncle
 | Positions | `positions_cleaned` | 8 | Fully cleaned |
 | Trades | `trades_cleaned` | 6 | Fully cleaned |
 | EIA | `eia_cleaned` | 2 | EIA-930 hourly + daily cleaned; storage raw |
-| **Total** | | **46 views + 1 raw** | |
+| Utils | `dbt` | 2 | Date spines; NERC holidays pending |
+| **Total** | | **48 views + 1 raw** | |
 
 ---
 
