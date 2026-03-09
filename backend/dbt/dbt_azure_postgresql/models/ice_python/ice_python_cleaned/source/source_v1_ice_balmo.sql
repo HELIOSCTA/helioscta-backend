@@ -32,7 +32,6 @@
 
 WITH DATES AS (
     SELECT
-        date,
         gas_day,
         trade_date
     FROM {{ ref('utils_v1_ice_gas_day_dates_daily') }}
@@ -60,7 +59,6 @@ ICEXL AS (
 
 FINAL AS (
     SELECT
-        dates.date,
         dates.gas_day,
         dates.trade_date
 
@@ -73,4 +71,4 @@ FINAL AS (
 )
 
 SELECT * FROM FINAL
-ORDER BY date DESC
+ORDER BY trade_date DESC

@@ -7,10 +7,6 @@ models:
       Joins ICE raw data with gas day dates and pivots 15 hub symbols into
       individual columns. Grain: one row per trade_date.
     columns:
-      - name: date
-        description: '{{ doc("ice_python_col_date") }}'
-        tests:
-          - not_null
       - name: gas_day
         description: '{{ doc("ice_python_col_gas_day") }}'
       - name: trade_date

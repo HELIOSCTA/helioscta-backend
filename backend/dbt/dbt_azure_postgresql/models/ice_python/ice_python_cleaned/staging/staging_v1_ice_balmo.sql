@@ -32,7 +32,6 @@
 
 WITH DAILY AS (
     SELECT
-        date,
         gas_day,
         trade_date
 
@@ -49,13 +48,12 @@ WITH DAILY AS (
 
 GROUPED_DATA AS (
     SELECT
-        date,
         gas_day,
         trade_date
 
         {% for c in columns %}
             ,{{ c.col }}
-            ,SUM(CASE WHEN {{ c.col }} IS NOT NULL THEN 1 ELSE 0 END) OVER (ORDER BY date) AS {{ c.grp }}
+            ,SUM(CASE WHEN {{ c.col }} IS NOT NULL THEN 1 ELSE 0 END) OVER (ORDER BY trade_date) AS {{ c.grp }}
         {% endfor %}
 
     FROM DAILY
@@ -67,12 +65,11 @@ GROUPED_DATA AS (
 
 FILLED_DATA AS (
     SELECT
-        date,
         gas_day,
         trade_date
 
         {% for c in columns %}
-            ,FIRST_VALUE({{ c.col }}) OVER (PARTITION BY {{ c.grp }} ORDER BY date ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS {{ c.col }}
+            ,FIRST_VALUE({{ c.col }}) OVER (PARTITION BY {{ c.grp }} ORDER BY trade_date ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS {{ c.col }}
         {% endfor %}
 
     FROM GROUPED_DATA
@@ -84,7 +81,6 @@ FILLED_DATA AS (
 
 FINAL AS (
     SELECT
-        date,
         gas_day,
         trade_date
 
@@ -93,8 +89,8 @@ FINAL AS (
         {% endfor %}
 
     FROM FILLED_DATA
-    WHERE date <= (SELECT MAX(date) FROM {{ ref('source_v1_ice_balmo') }} WHERE hh_balmo IS NOT NULL)
+    WHERE trade_date <= (SELECT MAX(trade_date) FROM {{ ref('source_v1_ice_balmo') }} WHERE hh_balmo IS NOT NULL)
 )
 
 SELECT * FROM FINAL
-ORDER BY date DESC
+ORDER BY trade_date DESC

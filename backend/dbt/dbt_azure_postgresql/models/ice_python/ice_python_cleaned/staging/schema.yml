@@ -8,10 +8,6 @@ models:
       holidays. Filtered to only include rows up to the latest date with
       actual data. Grain: one row per trade_date.
     columns:
-      - name: date
-        description: '{{ doc("ice_python_col_date") }}'
-        tests:
-          - not_null
       - name: gas_day
         description: '{{ doc("ice_python_col_gas_day") }}'
       - name: trade_date

@@ -4,10 +4,6 @@ models:
   - name: ice_python_balmo
     description: '{{ doc("ice_python_mart_balmo") }}'
     columns:
-      - name: date
-        description: '{{ doc("ice_python_col_date") }}'
-        tests:
-          - not_null
       - name: gas_day
         description: '{{ doc("ice_python_col_gas_day") }}'
       - name: trade_date
