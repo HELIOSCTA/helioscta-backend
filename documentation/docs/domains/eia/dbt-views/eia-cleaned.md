@@ -40,4 +40,4 @@ All views are materialized in the `eia_cleaned` schema.
 | **Upstream** | `staging_v1_eia_ng_consumption_by_end_use_monthly` |
 | **Use Cases** | Seasonal gas demand analysis by sector, state-level consumption trends, residential vs electric power demand comparison |
 | **Refresh** | View -- refreshes on query |
-| **SQL** | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/eia/eia_cleaned/marts/eia_natural_gas_consumption_by_end_use_monthly.sql) |
+| **SQL** | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/eia/eia_cleaned/.docs/eia_natural_gas_consumption_by_end_use_monthly.sql) |
