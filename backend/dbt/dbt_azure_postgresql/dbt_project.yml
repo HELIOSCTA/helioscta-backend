@@ -95,6 +95,56 @@ models:
         marts:
           +materialized: view
 
+      ercot_cleaned:
+        +schema: ercot_cleaned
+        +materialized: ephemeral
+        source:
+          +materialized: ephemeral
+        staging:
+          +materialized: ephemeral
+        marts:
+          +materialized: view
+
+      miso_cleaned:
+        +schema: miso_cleaned
+        +materialized: ephemeral
+        source:
+          +materialized: ephemeral
+        staging:
+          +materialized: ephemeral
+        marts:
+          +materialized: view
+
+      caiso_cleaned:
+        +schema: caiso_cleaned
+        +materialized: ephemeral
+        source:
+          +materialized: ephemeral
+        staging:
+          +materialized: ephemeral
+        marts:
+          +materialized: view
+
+      nyiso_cleaned:
+        +schema: nyiso_cleaned
+        +materialized: ephemeral
+        source:
+          +materialized: ephemeral
+        staging:
+          +materialized: ephemeral
+        marts:
+          +materialized: view
+
+      spp_cleaned:
+        +schema: spp_cleaned
+        +materialized: ephemeral
+        source:
+          +materialized: ephemeral
+        staging:
+          +materialized: ephemeral
+        marts:
+          +materialized: view
+
     # ── WSI ────────────────────────────────────────────────────────────────────
     wsi:
       wsi_cleaned:

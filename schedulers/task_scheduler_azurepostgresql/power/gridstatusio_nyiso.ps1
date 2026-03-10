@@ -1,5 +1,5 @@
 $condaPath = "$env:USERPROFILE\miniconda3\Scripts\activate.bat"
-$runScript = "C:\Users\AidanKeaveny\Documents\github\helioscta-backend\backend\src\power\gridstatusio_api_key\nysio\runs.py"
+$runScript = "C:\Users\AidanKeaveny\Documents\github\helioscta-backend\backend\src\power\gridstatus\nyiso\runs.py"
 
 $action = New-ScheduledTaskAction `
     -Execute "cmd.exe" `
@@ -9,7 +9,7 @@ $action = New-ScheduledTaskAction `
 $trigger = New-ScheduledTaskTrigger -Once -At (Get-Date).Date -RepetitionInterval (New-TimeSpan -Hours 1)
 
 Register-ScheduledTask `
-    -TaskName "NYISO (GridStatus.io)" `
+    -TaskName "NYISO (GridStatus)" `
     -Action $action `
     -Trigger $trigger `
     -TaskPath "\helioscta-backend\Power\" `

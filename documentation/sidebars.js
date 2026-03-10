@@ -110,9 +110,40 @@ const sidebars = {
           ],
         },
         {
-          type: "doc",
-          id: "domains/power/dbt-views/pjm-cleaned",
+          type: "category",
           label: "dbt Views",
+          items: [
+            {
+              type: "doc",
+              id: "domains/power/dbt-views/pjm-cleaned",
+              label: "PJM",
+            },
+            {
+              type: "doc",
+              id: "domains/power/dbt-views/caiso-cleaned",
+              label: "CAISO",
+            },
+            {
+              type: "doc",
+              id: "domains/power/dbt-views/ercot-cleaned",
+              label: "ERCOT",
+            },
+            {
+              type: "doc",
+              id: "domains/power/dbt-views/miso-cleaned",
+              label: "MISO",
+            },
+            {
+              type: "doc",
+              id: "domains/power/dbt-views/nyiso-cleaned",
+              label: "NYISO",
+            },
+            {
+              type: "doc",
+              id: "domains/power/dbt-views/spp-cleaned",
+              label: "SPP",
+            },
+          ],
         },
       ],
     },

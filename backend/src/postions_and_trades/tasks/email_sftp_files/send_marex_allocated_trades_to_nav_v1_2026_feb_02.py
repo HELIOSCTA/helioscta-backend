@@ -50,7 +50,7 @@ def main(
     trade_file_pattern: str = "Helios_Allocated_Trades_*.*.csv",  # NOTE: Helios_Allocated_Trades_20251006_2315.20251006_161528.csv
     sender_email_address: str = settings.SENDER_EMAIL_ADDRESS,
     recipient_email_addresses: list[str] = settings.RECIPIENT_EMAIL_ADDRESSES,
-    validate_date: bool = True,
+    validate_date: bool = False,
     expected_date: date | None = None,
 ):
 

@@ -7,7 +7,7 @@ $action = New-ScheduledTaskAction `
 
 # Define the days and times
 $days = @('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday')
-$times = @('05:00', '05:30', '06:00', '06:30')
+$times = @('05:00', '05:30', '06:00', '06:30', '07:00', '07:30', '08:00')
 
 $triggers = @()
 foreach ($day in $days) {
