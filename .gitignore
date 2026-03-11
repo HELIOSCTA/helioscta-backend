@@ -1,6 +1,7 @@
 # Environment files (secrets)
 .env
 **/.env
+.mcp.json
 
 # Python build/dist directories
 dist/*
