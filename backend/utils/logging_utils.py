@@ -6,8 +6,6 @@ from datetime import datetime
 from typing import Optional, Union, List
 from contextlib import contextmanager
 
-from prefect.logging import get_run_logger
-
 from backend.utils import (
     file_utils,
 )
@@ -66,6 +64,63 @@ LEVEL_ICONS = {
     logging.ERROR: "❌",
     logging.CRITICAL: "🔥",
 }
+
+ASCII_LEVEL_ICONS = {
+    logging.DEBUG: "[DBG]",
+    logging.INFO: "[INFO]",
+    logging.WARNING: "[WARN]",
+    logging.ERROR: "[ERR]",
+    logging.CRITICAL: "[CRIT]",
+}
+
+
+def supports_unicode(stream=None) -> bool:
+    """Check whether the target stream can encode common Unicode log glyphs."""
+    stream = stream or sys.stdout
+    encoding = getattr(stream, "encoding", None) or "utf-8"
+    try:
+        "✓ ℹ️ ─ ⏱️ ✅ █ ░".encode(encoding)
+    except Exception:
+        return False
+    return True
+
+
+def get_level_icon(levelno: int) -> str:
+    """Return a Unicode level icon when supported, otherwise ASCII."""
+    if supports_unicode():
+        return LEVEL_ICONS.get(levelno, "")
+    return ASCII_LEVEL_ICONS.get(levelno, "")
+
+
+def get_prefect_run_logger():
+    """Import Prefect lazily so non-Prefect scripts do not initialize plugins."""
+    if not (
+        os.environ.get("PREFECT__FLOW_RUN_ID")
+        or os.environ.get("PREFECT__TASK_RUN_ID")
+    ):
+        return None
+
+    try:
+        from prefect.logging import get_run_logger
+    except Exception:
+        return None
+
+    try:
+        return get_run_logger()
+    except Exception:
+        return None
+
+
+def get_divider_char() -> str:
+    """Use Unicode box drawing when possible, otherwise ASCII."""
+    return "─" if supports_unicode() else "-"
+
+
+def get_progress_chars() -> tuple[str, str]:
+    """Return console-safe progress bar characters."""
+    if supports_unicode():
+        return "█", "░"
+    return "#", "-"
 
 
 def supports_color() -> bool:
@@ -150,7 +205,7 @@ class ColoredFormatter(logging.Formatter):
         
         # Add icons
         if self.use_icons:
-            icon = LEVEL_ICONS.get(record.levelno, "")
+            icon = get_level_icon(record.levelno)
             record.levelname = f"{icon} {record.levelname}"
         
         # Format the record
@@ -180,7 +235,7 @@ class PlainFormatter(logging.Formatter):
     def format(self, record: logging.LogRecord) -> str:
         if self.use_icons:
             original_levelname = record.levelname
-            icon = LEVEL_ICONS.get(record.levelno, "")
+            icon = get_level_icon(record.levelno)
             record.levelname = f"{icon} {record.levelname}"
             result = super().format(record)
             record.levelname = original_levelname
@@ -205,10 +260,9 @@ class PrefectHandler(logging.Handler):
         if self._emitting:
             return
 
-        try:
-            prefect_logger = get_run_logger()
-        except Exception:
-            # Not inside a Prefect flow/task run — nothing to do
+        prefect_logger = get_prefect_run_logger()
+        if prefect_logger is None:
+            # Not inside a Prefect flow/task run - nothing to do
             return
 
         # Prevent the Prefect run logger from duplicating output to stdout.
@@ -464,11 +518,12 @@ class PipelineLogger:
     
     def success(self, msg: str) -> None:
         """Log a success message (INFO level with green color)."""
+        marker = "✓" if supports_unicode() else "+"
         if self.use_colors and supports_color():
-            colored_msg = f"{Colors.BRIGHT_GREEN}✓ {msg}{Colors.RESET}"
+            colored_msg = f"{Colors.BRIGHT_GREEN}{marker} {msg}{Colors.RESET}"
             self.logger.info(colored_msg)
         else:
-            self.logger.info(f"✓ {msg}")
+            self.logger.info(f"{marker} {msg}")
     
     # Formatting utilities
     def header(self, title: str, char: str = "=", length: int = 60) -> None:
@@ -486,14 +541,15 @@ class PipelineLogger:
     
     def section(self, title: str) -> None:
         """Print a colored section divider."""
+        divider = get_divider_char() * 10
         if self.use_colors and supports_color():
             self.info("")
-            self.info(f"{Colors.BRIGHT_BLUE}{'─' * 10} {title} {'─' * 10}{Colors.RESET}")
+            self.info(f"{Colors.BRIGHT_BLUE}{divider} {title} {divider}{Colors.RESET}")
         else:
             self.info("")
-            self.info(f"{'─' * 10} {title} {'─' * 10}")
-    
-    def divider(self, char: str = "─", length: int = 40) -> None:
+            self.info(f"{divider} {title} {divider}")
+
+    def divider(self, char: str = "-", length: int = 40) -> None:
         """Print a simple divider line."""
         if self.use_colors and supports_color():
             self.info(f"{Colors.DIM}{char * length}{Colors.RESET}")
@@ -504,24 +560,27 @@ class PipelineLogger:
     def timer(self, name: str):
         """Context manager for timing operations with colored output."""
         start_time = datetime.now()
+        start_label = "⏱️  Starting" if supports_unicode() else "START"
+        done_label = "✅ Completed" if supports_unicode() else "DONE"
         if self.use_colors and supports_color():
-            self.info(f"{Colors.BRIGHT_MAGENTA}⏱️  Starting: {name}{Colors.RESET}")
+            self.info(f"{Colors.BRIGHT_MAGENTA}{start_label}: {name}{Colors.RESET}")
         else:
-            self.info(f"⏱️  Starting: {name}")
+            self.info(f"{start_label}: {name}")
         try:
             yield
         finally:
             elapsed = (datetime.now() - start_time).total_seconds()
             if self.use_colors and supports_color():
-                self.info(f"{Colors.BRIGHT_GREEN}✅ Completed: {name} ({elapsed:.2f}s){Colors.RESET}")
+                self.info(f"{Colors.BRIGHT_GREEN}{done_label}: {name} ({elapsed:.2f}s){Colors.RESET}")
             else:
-                self.info(f"✅ Completed: {name} ({elapsed:.2f}s)")
+                self.info(f"{done_label}: {name} ({elapsed:.2f}s)")
     
     def progress(self, current: int, total: int, prefix: str = "", width: int = 30) -> None:
         """Print a colored progress bar."""
         percent = current / total if total > 0 else 0
         filled = int(width * percent)
-        bar = "█" * filled + "░" * (width - filled)
+        filled_char, empty_char = get_progress_chars()
+        bar = filled_char * filled + empty_char * (width - filled)
         
         if self.use_colors and supports_color():
             color = Colors.BRIGHT_GREEN if percent >= 1 else Colors.BRIGHT_YELLOW

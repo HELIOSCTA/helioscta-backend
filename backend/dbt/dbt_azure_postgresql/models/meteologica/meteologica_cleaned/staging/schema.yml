@@ -31,14 +31,6 @@ models:
         description: '{{ doc("col_meteologica_hour_ending") }}'
         tests:
           - not_null
-      - name: date_utc
-        description: '{{ doc("col_date_utc") }}'
-        tests:
-          - not_null
-      - name: hour_ending_utc
-        description: '{{ doc("col_hour_ending_utc") }}'
-        tests:
-          - not_null
       - name: region
         description: '{{ doc("col_meteologica_region") }}'
         tests:
@@ -113,14 +105,6 @@ models:
         description: '{{ doc("col_meteologica_hour_ending") }}'
         tests:
           - not_null
-      - name: date_utc
-        description: '{{ doc("col_date_utc") }}'
-        tests:
-          - not_null
-      - name: hour_ending_utc
-        description: '{{ doc("col_hour_ending_utc") }}'
-        tests:
-          - not_null
       - name: source
         description: '{{ doc("col_generation_source") }}'
         tests:
@@ -175,14 +159,6 @@ models:
           - not_null
       - name: hour_ending
         description: '{{ doc("col_meteologica_hour_ending") }}'
-        tests:
-          - not_null
-      - name: date_utc
-        description: '{{ doc("col_date_utc") }}'
-        tests:
-          - not_null
-      - name: hour_ending_utc
-        description: '{{ doc("col_hour_ending_utc") }}'
         tests:
           - not_null
       - name: hub

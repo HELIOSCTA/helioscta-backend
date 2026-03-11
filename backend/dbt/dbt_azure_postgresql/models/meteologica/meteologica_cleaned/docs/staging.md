@@ -10,7 +10,7 @@ Hourly demand (load) forecasts for PJM by region, from Meteologica's weather-dri
 ### Key Transformations
 - UNIONs 36 region-specific tables with a `region` label
 - Converts `issue_date` (VARCHAR, UTC) to `forecast_execution_datetime` (TIMESTAMP, EPT)
-- Converts `forecast_period_start` (UTC) to EPT `forecast_date` + `hour_ending`
+- Extracts `forecast_date` + `hour_ending` from `forecast_period_start` (already EPT)
 - Ranks vintages by recency via `DENSE_RANK()` partitioned by `(forecast_date, region)`
 - No completeness filter — partial vintages are retained (see overview for rationale)
 
@@ -28,7 +28,7 @@ Hourly demand (load) forecasts for PJM by region, from Meteologica's weather-dri
 | Raw Column | Staging Column |
 |------------|---------------|
 | `issue_date` | `forecast_execution_datetime`, `forecast_execution_date` |
-| `forecast_period_start` | `forecast_date`, `hour_ending`, `date_utc`, `hour_ending_utc`, `forecast_datetime` |
+| `forecast_period_start` | `forecast_date`, `hour_ending`, `forecast_datetime` |
 | `forecast_mw` | `forecast_load_mw` |
 
 {% enddocs %}
@@ -67,7 +67,7 @@ weather-driven model.
 | Raw Column | Staging Column |
 |------------|---------------|
 | `issue_date` | `forecast_execution_datetime`, `forecast_execution_date` |
-| `forecast_period_start` | `forecast_date`, `hour_ending`, `date_utc`, `hour_ending_utc`, `forecast_datetime` |
+| `forecast_period_start` | `forecast_date`, `hour_ending`, `forecast_datetime` |
 | `forecast_mw` | `forecast_generation_mw` |
 
 {% enddocs %}
@@ -105,7 +105,7 @@ Hourly DA electricity price forecasts for PJM by pricing hub, from Meteologica's
 | Raw Column | Staging Column |
 |------------|---------------|
 | `issue_date` | `forecast_execution_datetime`, `forecast_execution_date` |
-| `forecast_period_start` | `forecast_date`, `hour_ending`, `date_utc`, `hour_ending_utc`, `forecast_datetime` |
+| `forecast_period_start` | `forecast_date`, `hour_ending`, `forecast_datetime` |
 | `day_ahead_price` | `forecast_da_price` |
 
 {% enddocs %}

@@ -16,22 +16,13 @@ yields `2026-03-04 00:00:00`.
 {% enddocs %}
 
 {% docs col_forecast_date %}
-The date being forecasted, in Eastern Prevailing Time (EPT). Derived from
-`forecast_period_start` converted from UTC to America/New_York.
+The date being forecasted, in Eastern Prevailing Time (EPT). Derived directly from
+`forecast_period_start` which is already stored in EPT.
 {% enddocs %}
 
 {% docs col_meteologica_hour_ending %}
-Hour ending in Eastern Prevailing Time (1-24). Derived from `forecast_period_start` converted
-from UTC to EPT: `EXTRACT(HOUR FROM ... AT TIME ZONE 'America/New_York') + 1`.
-{% enddocs %}
-
-{% docs col_date_utc %}
-Forecast target date in UTC. The raw `forecast_period_start` date before timezone conversion.
-Retained for debugging and cross-referencing with the Meteologica API.
-{% enddocs %}
-
-{% docs col_hour_ending_utc %}
-Hour ending in UTC (1-24). The raw hour from `forecast_period_start` before timezone conversion.
+Hour ending in Eastern Prevailing Time (1-24). Derived directly from `forecast_period_start`
+which is already stored in EPT: `EXTRACT(HOUR FROM forecast_period_start) + 1`.
 {% enddocs %}
 
 {% docs col_meteologica_forecast_rank %}

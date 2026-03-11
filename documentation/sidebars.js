@@ -176,6 +176,28 @@ const sidebars = {
     },
     {
       type: "category",
+      label: "Energy Aspects",
+      collapsed: true,
+      items: [
+        {
+          type: "doc",
+          id: "domains/energy_aspects/overview",
+          label: "Overview",
+        },
+        {
+          type: "doc",
+          id: "domains/energy_aspects/scrapes/energy-aspects-scrapes",
+          label: "Scrapes",
+        },
+        {
+          type: "doc",
+          id: "domains/energy_aspects/dbt-views/energy-aspects-cleaned",
+          label: "dbt Views",
+        },
+      ],
+    },
+    {
+      type: "category",
       label: "EIA",
       collapsed: true,
       items: [

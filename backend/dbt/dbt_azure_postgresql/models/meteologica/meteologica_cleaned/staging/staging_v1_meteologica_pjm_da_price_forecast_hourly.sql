@@ -178,10 +178,8 @@ NORMALIZED AS (
         hub
         ,(issue_date::TIMESTAMP AT TIME ZONE 'UTC' AT TIME ZONE 'America/New_York') AS forecast_execution_datetime
         ,(issue_date::TIMESTAMP AT TIME ZONE 'UTC' AT TIME ZONE 'America/New_York')::DATE AS forecast_execution_date
-        ,(forecast_period_start AT TIME ZONE 'UTC' AT TIME ZONE 'America/New_York')::DATE AS forecast_date
-        ,EXTRACT(HOUR FROM forecast_period_start AT TIME ZONE 'UTC' AT TIME ZONE 'America/New_York')::INT + 1 AS hour_ending
-        ,forecast_period_start::DATE AS date_utc
-        ,EXTRACT(HOUR FROM forecast_period_start)::INT + 1 AS hour_ending_utc
+        ,forecast_period_start::DATE AS forecast_date
+        ,EXTRACT(HOUR FROM forecast_period_start)::INT + 1 AS hour_ending
         ,day_ahead_price::NUMERIC AS forecast_da_price
     FROM UNIONED
 ),
@@ -220,8 +218,6 @@ FINAL AS (
         ,(n.forecast_date + INTERVAL '1 hour' * (n.hour_ending - 1)) AS forecast_datetime
         ,n.forecast_date
         ,n.hour_ending
-        ,n.date_utc
-        ,n.hour_ending_utc
 
         ,n.hub
         ,n.forecast_da_price

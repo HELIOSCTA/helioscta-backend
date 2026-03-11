@@ -98,6 +98,9 @@ EIA_API_KEY = os.getenv("EIA_API_KEY")
 # ────── GENSCAPE ──────
 GEN_API_KEY = os.getenv("GEN_API_KEY")
 
+# ────── ENERGY ASPECTS ──────
+ENERGY_ASPECTS_API_KEY = os.getenv("ENERGY_ASPECTS_API_KEY")
+
 # ────── METEOLOGICA ──────
 # Lower 48 (US48 aggregate) account
 XTRADERS_API_USERNAME_L48 = os.getenv("XTRADERS_API_USERNAME_L48")

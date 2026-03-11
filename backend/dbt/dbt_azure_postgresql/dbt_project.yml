@@ -187,6 +187,18 @@ models:
         marts:
           +materialized: view
 
+    # ── Energy Aspects ──────────────────────────────────────────────────────
+    energy_aspects:
+      energy_aspects_cleaned:
+        +schema: energy_aspects_cleaned
+        +materialized: ephemeral
+        source:
+          +materialized: ephemeral
+        staging:
+          +materialized: ephemeral
+        marts:
+          +materialized: view
+
     # ── ICE Python ──────────────────────────────────────────────────────────
     ice_python:
       ice_python_cleaned:

@@ -26,7 +26,6 @@ Consumer-facing views for Meteologica xTraders API PJM forecasts covering demand
 |--------|-------------|
 | `forecast_date` | Target forecast date (EPT) |
 | `hour_ending` | Hour ending 1-24 (EPT) |
-| `date_utc` / `hour_ending_utc` | UTC reference timestamps |
 | `forecast_execution_datetime` | When the forecast model was run |
 | `forecast_rank` | Recency rank (1 = most recent vintage) via `DENSE_RANK` |
 | `region` | PJM region or utility-level sub-region (36 demand, 17 generation) |
@@ -38,7 +37,7 @@ Consumer-facing views for Meteologica xTraders API PJM forecasts covering demand
 ## Transformation Notes
 
 - All marts are materialized as **views** (`SELECT * FROM staging`).
-- Staging UNIONs 66 raw Meteologica source tables, normalizes timestamps UTC to EPT, and ranks vintages by `DENSE_RANK` on `forecast_execution_datetime`.
+- Staging UNIONs 66 raw Meteologica source tables, extracts EPT date/hour from raw timestamps (already in EPT), and ranks vintages by `DENSE_RANK` on `forecast_execution_datetime`.
 - Demand forecasts cover RTO + 3 macro regions + 32 utility sub-regions.
 - Generation forecasts span solar (4 regions), wind (12 regions), and hydro (1 region).
 - DA price forecasts cover SYSTEM + 12 pricing hubs.

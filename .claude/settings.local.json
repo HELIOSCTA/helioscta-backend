@@ -60,7 +60,8 @@
       "Bash(sed:*)",
       "Bash(bash:*)",
       "Bash(git mv:*)",
-      "Bash(dbt parse:*)"
+      "Bash(dbt parse:*)",
+      "mcp__azure-postgres__query"
     ]
   }
 }

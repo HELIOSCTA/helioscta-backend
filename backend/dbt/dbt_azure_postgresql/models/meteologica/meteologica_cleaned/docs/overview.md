@@ -72,16 +72,12 @@ a multi-day forward forecast horizon. All vintages are retained and ranked by re
 
 ## Timezone Handling
 
-Raw Meteologica data is stored in **UTC**. Staging models convert all timestamps to
-**Eastern Prevailing Time (EPT)** using:
+Raw Meteologica data (`issue_date`, `forecast_period_start`) is stored in **EPT**
+(Eastern Prevailing Time). Staging models extract date and hour components directly —
+no timezone conversion is needed.
 
-```sql
-(issue_date::TIMESTAMP AT TIME ZONE 'UTC' AT TIME ZONE 'America/New_York')
-```
-
-Both EPT and UTC columns are exposed in the final views:
-- `forecast_date` / `hour_ending` — EPT (primary)
-- `date_utc` / `hour_ending_utc` — UTC (reference)
+All columns in the final views are in EPT:
+- `forecast_date` / `hour_ending` — EPT
 
 ## Known Issues
 
@@ -104,7 +100,7 @@ forecast_date should handle this gracefully.
 ### Raw Columns Stored as VARCHAR
 
 The `issue_date` column in raw Meteologica tables is stored as `VARCHAR`, not `TIMESTAMP`.
-Staging models cast explicitly with `issue_date::TIMESTAMP` before timezone conversion.
+Staging models cast explicitly with `issue_date::TIMESTAMP`.
 The `forecast_period_start` column is natively `TIMESTAMP`.
 
 {% enddocs %}

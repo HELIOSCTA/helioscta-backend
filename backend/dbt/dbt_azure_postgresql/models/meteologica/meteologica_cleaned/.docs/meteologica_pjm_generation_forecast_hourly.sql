@@ -5,8 +5,6 @@ select
   ,forecast_datetime
   ,forecast_date
   ,hour_ending
-  ,date_utc
-  ,hour_ending_utc
   ,source
   ,region
   ,forecast_generation_mw
