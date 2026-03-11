@@ -20,6 +20,7 @@ Documentation for all data pipelines, raw tables, and dbt views in the HeliosCTA
 | Domain | What it covers |
 |--------|---------------|
 | [Power](domains/power/overview.md) | Load, LMPs, fuel mix, outages, forecasts across 7 ISOs |
+| [Energy Aspects](domains/energy_aspects/overview.md) | Power generation, dispatch costs, prices, capacity forecasts |
 | [Meteologica](domains/meteologica/overview.md) | Independent demand, generation, and price forecasts (374 scripts) |
 | [Weather (WSI)](domains/wsi/overview.md) | Temperature forecasts, degree days, observations |
 | [EIA](domains/eia/overview.md) | Government energy data -- generation mix, gas storage |

@@ -26,3 +26,28 @@ def _load_main(script_name: str):
 @flow(name="runner_pjm_short_term_contract_dates", retries=2, retry_delay_seconds=60, log_prints=True)
 def runner_pjm_short_term_contract_dates(**kwargs):
     return _load_main("runner_pjm_short_term")(**kwargs)
+
+
+@flow(name="runner_next_day_gas_contract_dates", retries=2, retry_delay_seconds=60, log_prints=True)
+def runner_next_day_gas_contract_dates(**kwargs):
+    return _load_main("runner_next_day_gas")(**kwargs)
+
+
+@flow(name="runner_balmo_contract_dates", retries=2, retry_delay_seconds=60, log_prints=True)
+def runner_balmo_contract_dates(**kwargs):
+    return _load_main("runner_balmo")(**kwargs)
+
+
+@flow(name="runner_future_contracts_gas_contract_dates", retries=2, retry_delay_seconds=60, log_prints=True)
+def runner_future_contracts_gas_contract_dates(**kwargs):
+    return _load_main("runner_future_contracts_gas")(**kwargs)
+
+
+@flow(name="runner_future_contracts_power_pjm_contract_dates", retries=2, retry_delay_seconds=60, log_prints=True)
+def runner_future_contracts_power_pjm_contract_dates(**kwargs):
+    return _load_main("runner_future_contracts_power_pjm")(**kwargs)
+
+
+@flow(name="runner_future_contracts_power_ercot_contract_dates", retries=2, retry_delay_seconds=60, log_prints=True)
+def runner_future_contracts_power_ercot_contract_dates(**kwargs):
+    return _load_main("runner_future_contracts_power_ercot")(**kwargs)

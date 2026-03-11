@@ -57,6 +57,12 @@ MST = timezone(timedelta(hours=-7), name="MST")
 
 QUOTES_MAX_SYMBOLS_PER_REQUEST = 500
 
+# Month-to-strip-letter mapping (ICE convention).
+STRIP_MAPPING: dict[int, str] = {
+    1: "F", 2: "G", 3: "H", 4: "J", 5: "K", 6: "M",
+    7: "N", 8: "Q", 9: "U", 10: "V", 11: "X", 12: "Z",
+}
+
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -70,6 +76,37 @@ def empty_contract_dates_frame() -> pd.DataFrame:
 def current_trade_date_mst() -> date:
     """Return today's date in MST."""
     return datetime.now(timezone.utc).astimezone(MST).date()
+
+
+def build_futures_symbols(
+    product_codes: list[str],
+    contract_start_year: int | None = None,
+    contract_end_year: int | None = None,
+    months_forward: int = 36,
+    suffix: str = "-IUS",
+) -> list[str]:
+    """Build the full ICE symbol list for futures products.
+
+    Expands product prefixes across relevant year/month strips.
+    e.g. product "HNG", year 2026, month 3 -> "HNG H26-IUS"
+    """
+    now = datetime.now()
+    start_year = contract_start_year or now.year
+    end_year = contract_end_year or (now.year + 3)
+
+    symbols: list[str] = []
+    for year in range(start_year, end_year + 1):
+        for month in range(1, 13):
+            months_diff = (year - now.year) * 12 + month - now.month
+            if months_diff < 0:
+                continue
+            if months_diff > months_forward:
+                continue
+            strip = STRIP_MAPPING[month]
+            for product in product_codes:
+                symbols.append(f"{product} {strip}{str(year)[-2:]}{suffix}")
+
+    return symbols
 
 
 def _chunk_symbols(
