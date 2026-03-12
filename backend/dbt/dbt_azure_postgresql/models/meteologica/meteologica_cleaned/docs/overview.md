@@ -27,6 +27,7 @@ PJM forecasts use the **ISO** account.
 | Category | Source Tables | Regions / Hubs | Key Column |
 |----------|--------------|----------------|------------|
 | **Demand** | 36 | RTO + 3 macro regions + 32 utility-level sub-regions | `forecast_load_mw` |
+| **Demand (ECMWF-ENS)** | 36 | Same 36 regions as deterministic demand | `forecast_load_average_mw`, `forecast_load_bottom_mw`, `forecast_load_top_mw`, `ens_00_mw`–`ens_50_mw` |
 | **Generation** | 17 | Solar (4), Wind (12), Hydro (1) | `forecast_generation_mw` |
 | **DA Prices** | 13 | SYSTEM + 12 pricing hubs | `forecast_da_price` |
 
@@ -57,11 +58,11 @@ MIDATL_PN, SOUTH_DOM, WEST_AEP, WEST_AP, WEST_ATSI, WEST_CE.
 ## Pipeline Architecture
 
 ```
-source/          Raw API tables in `meteologica` schema (66 tables)
+source/          Raw API tables in `meteologica` schema (102 tables)
     |
-staging/         UNION + normalize + rank (EPHEMERAL, 3 models)
+staging/         UNION + normalize + rank (EPHEMERAL, 4 models)
     |
-marts/           Analysis-ready views (VIEW, 3 models)
+marts/           Analysis-ready views (VIEW, 4 models)
 ```
 
 ## Update Cadence

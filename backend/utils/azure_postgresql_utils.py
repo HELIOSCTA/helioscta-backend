@@ -163,7 +163,6 @@ def _get_query_create_table(
         columns: List[str],
         data_types: List[str],
         primary_key: List[str],
-        include_audit_columns: bool = True,
     ) -> str:
     """
     with connection.cursor() as cursor:
@@ -192,14 +191,12 @@ def _get_query_create_table(
     columns_dtypes_str = ', '.join([f"{col} {dtype}" for col, dtype in zip(columns, data_types)])
     primary_key_str = ', '.join([f"{col}" for col in primary_key])
 
-    audit_columns_sql = ""
-    if include_audit_columns:
-        audit_columns_sql = (
-            ", created_at TIMESTAMPTZ DEFAULT "
-            "(CURRENT_TIMESTAMP AT TIME ZONE 'America/Edmonton'), "
-            "updated_at TIMESTAMPTZ DEFAULT "
-            "(CURRENT_TIMESTAMP AT TIME ZONE 'America/Edmonton')"
-        )
+    audit_columns_sql = (
+        ", created_at TIMESTAMPTZ DEFAULT "
+        "(CURRENT_TIMESTAMP AT TIME ZONE 'America/Edmonton'), "
+        "updated_at TIMESTAMPTZ DEFAULT "
+        "(CURRENT_TIMESTAMP AT TIME ZONE 'America/Edmonton')"
+    )
 
     create_table_query = f"""
         CREATE TABLE IF NOT EXISTS {schema}.{table_name}(
@@ -220,7 +217,6 @@ def _get_query_upsert(
         columns: List[str],
         data_types: List[str],
         primary_key: List[str],
-        include_audit_columns: bool = True,
     ) -> str:
     """
     """
@@ -230,19 +226,15 @@ def _get_query_upsert(
     primary_key_str = ', '.join([f"{col}" for col in primary_key])
     update_set_str = ', '.join([f"{col} = EXCLUDED.{col}" for col in columns])
 
-    if include_audit_columns:
-        insert_columns = f"{columns_str}, created_at, updated_at"
-        select_columns = (
-            f"{source_columns_str}, NOW() AT TIME ZONE 'America/Edmonton', "
-            "NOW() AT TIME ZONE 'America/Edmonton'"
-        )
-        update_set_str = (
-            f"{update_set_str}, "
-            "updated_at = NOW() AT TIME ZONE 'America/Edmonton'"
-        )
-    else:
-        insert_columns = columns_str
-        select_columns = source_columns_str
+    insert_columns = f"{columns_str}, created_at, updated_at"
+    select_columns = (
+        f"{source_columns_str}, NOW() AT TIME ZONE 'America/Edmonton', "
+        "NOW() AT TIME ZONE 'America/Edmonton'"
+    )
+    update_set_str = (
+        f"{update_set_str}, "
+        "updated_at = NOW() AT TIME ZONE 'America/Edmonton'"
+    )
 
     upsert_query = f""" 
         INSERT INTO {schema}.{table_name} ({insert_columns})
@@ -264,7 +256,6 @@ def upsert_to_azure_postgresql(
         primary_key: List[str],
         data_types: List[str] = None,
         database: str = "helioscta",
-        include_audit_columns: bool = True,
     ) -> bool:
     """
     """
@@ -281,7 +272,6 @@ def upsert_to_azure_postgresql(
         columns=columns,
         data_types=data_types,
         primary_key=primary_key,
-        include_audit_columns=include_audit_columns,
     )
     
     create_table_query = _get_query_create_table(
@@ -290,7 +280,6 @@ def upsert_to_azure_postgresql(
         columns=columns,
         data_types=data_types,
         primary_key=primary_key,
-        include_audit_columns=include_audit_columns,
     )
 
     upsert_query = _get_query_upsert(
@@ -299,7 +288,6 @@ def upsert_to_azure_postgresql(
         columns=columns,
         data_types=data_types,
         primary_key=primary_key,
-        include_audit_columns=include_audit_columns,
     )
 
     try:
@@ -316,10 +304,9 @@ def upsert_to_azure_postgresql(
 
         # Add this before the COPY operation
         df_temp = df.copy()
-        if include_audit_columns:
-            mst = pytz.timezone('America/Edmonton')
-            df_temp['created_at'] = pd.Timestamp.now(tz=mst)
-            df_temp['updated_at'] = pd.Timestamp.now(tz=mst)
+        mst = pytz.timezone('America/Edmonton')
+        df_temp['created_at'] = pd.Timestamp.now(tz=mst)
+        df_temp['updated_at'] = pd.Timestamp.now(tz=mst)
         # push data to temp table
         sio = io.StringIO()
         sio.write(df_temp.to_csv(index=False, header=False, quoting=csv.QUOTE_NONNUMERIC,sep=','))  # Write the Pandas DataFrame as a csv to the buffer

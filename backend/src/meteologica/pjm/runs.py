@@ -24,7 +24,7 @@ def discover_scripts() -> list[Path]:
     """Find all .py scripts in the PJM directory (excluding __init__, run, flows)."""
     return sorted(
         p for p in SCRIPT_DIR.glob("*.py")
-        if p.name not in ("__init__.py", "run.py", "runs.py", "flows.py")
+        if p.name not in ("__init__.py", "run.py", "runs.py", "runs_ecmwf_ens.py", "flows.py")
     )
 
 

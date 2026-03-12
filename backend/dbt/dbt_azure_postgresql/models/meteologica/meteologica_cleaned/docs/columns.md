@@ -60,6 +60,18 @@ Wind generation forecasts include 8 utility-level sub-regions:
 MIDATL_AE, MIDATL_PL, MIDATL_PN, SOUTH_DOM, WEST_AEP, WEST_AP, WEST_ATSI, WEST_CE.
 {% enddocs %}
 
+{% docs col_forecast_load_average_mw %}
+Ensemble average (mean of 51 ECMWF-ENS members) demand forecast in MW.
+{% enddocs %}
+
+{% docs col_forecast_load_bottom_mw %}
+Ensemble minimum (lowest of 51 ECMWF-ENS members) demand forecast in MW.
+{% enddocs %}
+
+{% docs col_forecast_load_top_mw %}
+Ensemble maximum (highest of 51 ECMWF-ENS members) demand forecast in MW.
+{% enddocs %}
+
 {% docs col_meteologica_hub %}
 PJM pricing hub for DA price forecasts. **SYSTEM** is the system-wide price.
 Hub nodes: AEP DAYTON, AEP GEN, ATSI GEN, CHICAGO GEN, CHICAGO, DOMINION, EASTERN,

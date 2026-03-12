@@ -13,6 +13,7 @@ import time
 from datetime import datetime, timedelta, timezone
 
 import pandas as pd
+import pytz
 
 from backend.src.ice_python import utils
 from backend.utils import azure_postgresql_utils as azure_postgresql
@@ -74,9 +75,9 @@ COLUMN_TO_FIELD: dict[str, str] = {
     column_name: field_name for field_name, column_name in FIELD_TO_COLUMN.items()
 }
 
-# ICE snapshots are stored in fixed-offset MST (UTC-7), not the machine's local
-# timezone and not America/Denver daylight-saving time.
-MST = timezone(timedelta(hours=-7), name="MST")
+# Mountain time — uses America/Edmonton to match the rest of the codebase,
+# automatically handling MST/MDT transitions.
+MT = pytz.timezone("America/Edmonton")
 
 INTRADAY_QUOTES_TABLE_NAME = "intraday_quotes"
 INTRADAY_QUOTES_COLUMNS: list[str] = [
@@ -133,7 +134,7 @@ def current_snapshot_at_mst(now: datetime | None = None) -> datetime:
     base_time = now or datetime.now(timezone.utc)
     if base_time.tzinfo is None:
         base_time = base_time.replace(tzinfo=timezone.utc)
-    return base_time.astimezone(MST).replace(second=0, microsecond=0)
+    return base_time.astimezone(MT).replace(second=0, microsecond=0)
 
 
 def normalize_snapshot_at_mst(snapshot_at: datetime | None = None) -> datetime:
@@ -141,9 +142,9 @@ def normalize_snapshot_at_mst(snapshot_at: datetime | None = None) -> datetime:
     if snapshot_at is None:
         return current_snapshot_at_mst()
     if snapshot_at.tzinfo is None:
-        snapshot_at = snapshot_at.replace(tzinfo=MST)
+        snapshot_at = MT.localize(snapshot_at)
     else:
-        snapshot_at = snapshot_at.astimezone(MST)
+        snapshot_at = snapshot_at.astimezone(MT)
     return snapshot_at.replace(second=0, microsecond=0)
 
 
@@ -456,10 +457,11 @@ def ensure_intraday_quotes_table(
 
         cursor.execute(validate_columns_query)
         existing_columns = [row[0] for row in cursor.fetchall()]
-        if existing_columns != INTRADAY_QUOTES_COLUMNS:
+        expected = INTRADAY_QUOTES_COLUMNS + ["created_at", "updated_at"]
+        if existing_columns != expected:
             raise ValueError(
                 f"Expected {schema}.{table_name} columns "
-                f"{INTRADAY_QUOTES_COLUMNS}, found {existing_columns}"
+                f"{expected}, found {existing_columns}"
             )
 
         cursor.execute(validate_constraint_query)
@@ -503,5 +505,4 @@ def upsert_intraday_quotes(
         columns=INTRADAY_QUOTES_COLUMNS,
         data_types=INTRADAY_QUOTES_DATA_TYPES,
         primary_key=primary_key,
-        include_audit_columns=False,
     )

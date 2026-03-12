@@ -9,6 +9,7 @@ Consumer-facing views for Meteologica xTraders API PJM forecasts covering demand
 | Model | Grain |
 |-------|-------|
 | `meteologica_pjm_demand_forecast_hourly` | `forecast_date x hour_ending x region x forecast_rank` |
+| `meteologica_pjm_demand_forecast_ecmwf_ens_hourly` | `forecast_date x hour_ending x region x forecast_rank` |
 | `meteologica_pjm_generation_forecast_hourly` | `forecast_date x hour_ending x region x generation_type x forecast_rank` |
 | `meteologica_pjm_da_price_forecast_hourly` | `forecast_date x hour_ending x hub x forecast_rank` |
 
@@ -17,6 +18,7 @@ Consumer-facing views for Meteologica xTraders API PJM forecasts covering demand
 | Source | Upstream Staging Model |
 |--------|----------------------|
 | Meteologica xTraders API (ISO account) | `staging_v1_meteologica_pjm_demand_forecast_hourly` |
+| Meteologica xTraders API (ISO account) | `staging_v1_meteo_pjm_demand_fcst_ecmwf_ens_hourly` |
 | Meteologica xTraders API (ISO account) | `staging_v1_meteologica_pjm_gen_forecast_hourly` |
 | Meteologica xTraders API (ISO account) | `staging_v1_meteologica_pjm_da_price_forecast_hourly` |
 
@@ -31,13 +33,17 @@ Consumer-facing views for Meteologica xTraders API PJM forecasts covering demand
 | `region` | PJM region or utility-level sub-region (36 demand, 17 generation) |
 | `hub` | PJM pricing hub (13 hubs for DA price forecasts) |
 | `forecast_load_mw` | Forecasted demand in megawatts |
+| `forecast_load_average_mw` | ECMWF-ENS ensemble average demand (MW) |
+| `forecast_load_bottom_mw` | ECMWF-ENS ensemble minimum demand (MW) |
+| `forecast_load_top_mw` | ECMWF-ENS ensemble maximum demand (MW) |
+| `ens_00_mw`–`ens_50_mw` | Individual ECMWF-ENS ensemble member forecasts (51 members) |
 | `forecast_generation_mw` | Forecasted generation in megawatts |
 | `forecast_da_price` | Forecasted day-ahead price ($/MWh) |
 
 ## Transformation Notes
 
 - All marts are materialized as **views** (`SELECT * FROM staging`).
-- Staging UNIONs 66 raw Meteologica source tables, extracts EPT date/hour from raw timestamps (already in EPT), and ranks vintages by `DENSE_RANK` on `forecast_execution_datetime`.
+- Staging UNIONs 102 raw Meteologica source tables, extracts EPT date/hour from raw timestamps (already in EPT), and ranks vintages by `DENSE_RANK` on `forecast_execution_datetime`.
 - Demand forecasts cover RTO + 3 macro regions + 32 utility sub-regions.
 - Generation forecasts span solar (4 regions), wind (12 regions), and hydro (1 region).
 - DA price forecasts cover SYSTEM + 12 pricing hubs.
@@ -47,4 +53,4 @@ Consumer-facing views for Meteologica xTraders API PJM forecasts covering demand
 
 - `not_null` on `forecast_rank`, `forecast_date`, `hour_ending`, `region`/`hub`, and forecast value columns.
 - `accepted_values` on `forecast_rank`: `[1, 2, 3, 4, 5]`.
-- Schema tests defined in `schema.yml` for all 3 mart models.
+- Schema tests defined in `schema.yml` for all 4 mart models.

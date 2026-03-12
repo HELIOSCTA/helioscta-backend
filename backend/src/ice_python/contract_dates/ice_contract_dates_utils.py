@@ -12,6 +12,7 @@ import time
 from datetime import date, datetime, timedelta, timezone
 
 import pandas as pd
+import pytz
 
 from backend.src.ice_python import utils
 from backend.utils import azure_postgresql_utils as azure_postgresql
@@ -52,8 +53,9 @@ CONTRACT_DATES_PRIMARY_KEY: list[str] = [
     "symbol",
 ]
 
-# Fixed-offset MST (UTC-7) — matches the intraday_quotes convention.
-MST = timezone(timedelta(hours=-7), name="MST")
+# Mountain time — uses America/Edmonton to match the rest of the codebase,
+# automatically handling MST/MDT transitions.
+MT = pytz.timezone("America/Edmonton")
 
 QUOTES_MAX_SYMBOLS_PER_REQUEST = 500
 
@@ -75,7 +77,7 @@ def empty_contract_dates_frame() -> pd.DataFrame:
 
 def current_trade_date_mst() -> date:
     """Return today's date in MST."""
-    return datetime.now(timezone.utc).astimezone(MST).date()
+    return datetime.now(timezone.utc).astimezone(MT).date()
 
 
 def build_futures_symbols(
@@ -281,10 +283,11 @@ def ensure_contract_dates_table(
 
         cursor.execute(validate_columns_query)
         existing_columns = [row[0] for row in cursor.fetchall()]
-        if existing_columns != CONTRACT_DATES_COLUMNS:
+        expected = CONTRACT_DATES_COLUMNS + ["created_at", "updated_at"]
+        if existing_columns != expected:
             raise ValueError(
                 f"Expected {schema}.{table_name} columns "
-                f"{CONTRACT_DATES_COLUMNS}, found {existing_columns}"
+                f"{expected}, found {existing_columns}"
             )
 
         cursor.execute(validate_constraint_query)
@@ -332,5 +335,4 @@ def upsert_contract_dates(
         columns=CONTRACT_DATES_COLUMNS,
         data_types=CONTRACT_DATES_DATA_TYPES,
         primary_key=primary_key,
-        include_audit_columns=False,
     )

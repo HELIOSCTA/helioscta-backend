@@ -77,6 +77,84 @@ models:
         description: '{{ doc("col_forecast_load_mw") }}'
 
   # ===========================
+  # ECMWF-ENS Demand Forecast
+  # ===========================
+
+  - name: staging_v1_meteo_pjm_demand_fcst_ecmwf_ens_hourly
+    description: '{{ doc("meteologica_pjm_demand_forecast_ecmwf_ens") }}'
+    columns:
+      - name: forecast_rank
+        description: '{{ doc("col_meteologica_forecast_rank") }}'
+        tests:
+          - not_null
+      - name: forecast_execution_datetime
+        description: '{{ doc("col_forecast_execution_datetime") }}'
+        tests:
+          - not_null
+      - name: forecast_execution_date
+        description: '{{ doc("col_forecast_execution_date") }}'
+        tests:
+          - not_null
+      - name: forecast_datetime
+        description: '{{ doc("col_forecast_datetime") }}'
+      - name: forecast_date
+        description: '{{ doc("col_forecast_date") }}'
+        tests:
+          - not_null
+      - name: hour_ending
+        description: '{{ doc("col_meteologica_hour_ending") }}'
+        tests:
+          - not_null
+      - name: region
+        description: '{{ doc("col_meteologica_region") }}'
+        tests:
+          - not_null
+          - accepted_values:
+              values:
+                - 'RTO'
+                - 'MIDATL'
+                - 'SOUTH'
+                - 'WEST'
+                - 'MIDATL_AE'
+                - 'MIDATL_BC'
+                - 'MIDATL_DPL'
+                - 'MIDATL_DPL_DPLCO'
+                - 'MIDATL_DPL_EASTON'
+                - 'MIDATL_JC'
+                - 'MIDATL_ME'
+                - 'MIDATL_PE'
+                - 'MIDATL_PEP'
+                - 'MIDATL_PEP_PEPCO'
+                - 'MIDATL_PEP_SMECO'
+                - 'MIDATL_PL'
+                - 'MIDATL_PL_PLCO'
+                - 'MIDATL_PL_UGI'
+                - 'MIDATL_PN'
+                - 'MIDATL_PS'
+                - 'MIDATL_RECO'
+                - 'SOUTH_DOM'
+                - 'WEST_AEP'
+                - 'WEST_AEP_AEPAPT'
+                - 'WEST_AEP_AEPIMP'
+                - 'WEST_AEP_AEPKPT'
+                - 'WEST_AEP_AEPOPT'
+                - 'WEST_AP'
+                - 'WEST_ATSI'
+                - 'WEST_ATSI_OE'
+                - 'WEST_ATSI_PAPWR'
+                - 'WEST_CE'
+                - 'WEST_DAY'
+                - 'WEST_DEOK'
+                - 'WEST_DUQ'
+                - 'WEST_EKPC'
+      - name: forecast_load_average_mw
+        description: '{{ doc("col_forecast_load_average_mw") }}'
+      - name: forecast_load_bottom_mw
+        description: '{{ doc("col_forecast_load_bottom_mw") }}'
+      - name: forecast_load_top_mw
+        description: '{{ doc("col_forecast_load_top_mw") }}'
+
+  # ===========================
   # Generation Forecast
   # ===========================
 

@@ -34,6 +34,49 @@ Hourly demand (load) forecasts for PJM by region, from Meteologica's weather-dri
 {% enddocs %}
 
 
+{% docs meteologica_pjm_demand_forecast_ecmwf_ens %}
+
+## ECMWF-ENS Demand Forecast
+
+Hourly ensemble demand (load) forecasts for PJM by region, from Meteologica's ECMWF-ENS model.
+Provides 51 individual ensemble members (ENS00–ENS50) plus summary statistics (Average, Bottom, Top)
+for quantifying forecast uncertainty.
+
+### Data Source
+- Meteologica xTraders API — 36 raw tables (RTO + 3 macro regions + 32 utility-level sub-regions)
+- Content IDs: 2724–2759
+
+### Key Transformations
+- UNIONs 36 region-specific tables with a `region` label
+- Converts `issue_date` (VARCHAR, UTC) to `forecast_execution_datetime` (TIMESTAMP, EPT)
+- Extracts `forecast_date` + `hour_ending` from `forecast_period_start` (already EPT)
+- Casts all 54 MW columns (3 summary + 51 ensemble) from VARCHAR to NUMERIC
+- Ranks vintages by recency via `DENSE_RANK()` partitioned by `(forecast_date, region)`
+- No completeness filter — partial vintages are retained (see overview for rationale)
+
+### Model
+
+| Layer | Model | Materialization |
+|-------|-------|-----------------|
+| Staging | `staging_v1_meteo_pjm_demand_fcst_ecmwf_ens_hourly` | ephemeral |
+| Mart | `meteologica_pjm_demand_forecast_ecmwf_ens_hourly` | view |
+
+**Grain:** forecast_rank x forecast_date x hour_ending x region
+
+### Column Mapping (raw -> staging)
+
+| Raw Column | Staging Column |
+|------------|---------------|
+| `issue_date` | `forecast_execution_datetime`, `forecast_execution_date` |
+| `forecast_period_start` | `forecast_date`, `hour_ending`, `forecast_datetime` |
+| `average_mw` | `forecast_load_average_mw` |
+| `bottom_mw` | `forecast_load_bottom_mw` |
+| `top_mw` | `forecast_load_top_mw` |
+| `ens_00_mw` ... `ens_50_mw` | `ens_00_mw` ... `ens_50_mw` (passed through) |
+
+{% enddocs %}
+
+
 {% docs meteologica_pjm_generation_forecast %}
 
 ## Generation Forecast
