@@ -260,3 +260,295 @@ models:
                 - 'WEST INT'
       - name: forecast_da_price
         description: '{{ doc("col_forecast_da_price") }}'
+
+  # ===========================
+  # Demand Observation
+  # ===========================
+
+  - name: staging_v1_meteologica_pjm_demand_observation
+    description: "Meteologica PJM demand observation, 36 zones unified"
+    columns:
+      - name: update_rank
+        description: "Dense rank of observation update by issue time (earliest = 1)"
+        tests:
+          - not_null
+      - name: update_datetime
+        description: "When Meteologica published this observation (EPT)"
+        tests:
+          - not_null
+      - name: update_date
+        description: "Date portion of update_datetime"
+        tests:
+          - not_null
+      - name: observation_datetime
+        description: "Observation hour slot (EPT)"
+      - name: observation_date
+        description: "Date of the observation"
+        tests:
+          - not_null
+      - name: hour_ending
+        description: "Hour ending 1-24 (EPT)"
+        tests:
+          - not_null
+      - name: region
+        description: "PJM demand zone"
+        tests:
+          - not_null
+          - accepted_values:
+              values:
+                - 'RTO'
+                - 'MIDATL'
+                - 'SOUTH'
+                - 'WEST'
+                - 'MIDATL_AE'
+                - 'MIDATL_BC'
+                - 'MIDATL_DPL'
+                - 'MIDATL_DPL_DPLCO'
+                - 'MIDATL_DPL_EASTON'
+                - 'MIDATL_JC'
+                - 'MIDATL_ME'
+                - 'MIDATL_PE'
+                - 'MIDATL_PEP'
+                - 'MIDATL_PEP_PEPCO'
+                - 'MIDATL_PEP_SMECO'
+                - 'MIDATL_PL'
+                - 'MIDATL_PL_PLCO'
+                - 'MIDATL_PL_UGI'
+                - 'MIDATL_PN'
+                - 'MIDATL_PS'
+                - 'MIDATL_RECO'
+                - 'SOUTH_DOM'
+                - 'WEST_AEP'
+                - 'WEST_AEP_AEPAPT'
+                - 'WEST_AEP_AEPIMP'
+                - 'WEST_AEP_AEPKPT'
+                - 'WEST_AEP_AEPOPT'
+                - 'WEST_AP'
+                - 'WEST_ATSI'
+                - 'WEST_ATSI_OE'
+                - 'WEST_ATSI_PAPWR'
+                - 'WEST_CE'
+                - 'WEST_DAY'
+                - 'WEST_DEOK'
+                - 'WEST_DUQ'
+                - 'WEST_EKPC'
+      - name: observation_load_mw
+        description: "Observed demand (MW)"
+
+  # ===========================
+  # Generation Observation
+  # ===========================
+
+  - name: staging_v1_meteologica_pjm_gen_observation
+    description: "Meteologica PJM generation observation (solar, wind, hydro), 9 tables unified"
+    columns:
+      - name: update_rank
+        description: "Dense rank of observation update by issue time (earliest = 1)"
+        tests:
+          - not_null
+      - name: update_datetime
+        description: "When Meteologica published this observation (EPT)"
+        tests:
+          - not_null
+      - name: update_date
+        description: "Date portion of update_datetime"
+        tests:
+          - not_null
+      - name: observation_datetime
+        description: "Observation hour slot (EPT)"
+      - name: observation_date
+        description: "Date of the observation"
+        tests:
+          - not_null
+      - name: hour_ending
+        description: "Hour ending 1-24 (EPT)"
+        tests:
+          - not_null
+      - name: source
+        description: "Generation source type"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['solar', 'wind', 'hydro']
+      - name: region
+        description: "PJM region"
+        tests:
+          - not_null
+          - accepted_values:
+              values:
+                - 'MIDATL'
+                - 'RTO'
+                - 'SOUTH'
+                - 'WEST'
+      - name: observation_generation_mw
+        description: "Observed generation (MW)"
+
+  # ===========================
+  # DA Price Observation
+  # ===========================
+
+  - name: staging_v1_meteologica_pjm_da_price_observation
+    description: "Meteologica PJM day-ahead price observation, 13 hubs unified"
+    columns:
+      - name: update_rank
+        description: "Dense rank of observation update by issue time (earliest = 1)"
+        tests:
+          - not_null
+      - name: update_datetime
+        description: "When Meteologica published this observation (EPT)"
+        tests:
+          - not_null
+      - name: update_date
+        description: "Date portion of update_datetime"
+        tests:
+          - not_null
+      - name: observation_datetime
+        description: "Observation hour slot (EPT)"
+      - name: observation_date
+        description: "Date of the observation"
+        tests:
+          - not_null
+      - name: hour_ending
+        description: "Hour ending 1-24 (EPT)"
+        tests:
+          - not_null
+      - name: hub
+        description: "PJM pricing hub"
+        tests:
+          - not_null
+          - accepted_values:
+              values:
+                - 'SYSTEM'
+                - 'AEP DAYTON'
+                - 'AEP GEN'
+                - 'ATSI GEN'
+                - 'CHICAGO GEN'
+                - 'CHICAGO'
+                - 'DOMINION'
+                - 'EASTERN'
+                - 'NEW JERSEY'
+                - 'N ILLINOIS'
+                - 'OHIO'
+                - 'WESTERN'
+                - 'WEST INT'
+      - name: observation_da_price
+        description: "Observed day-ahead price ($/MWh)"
+
+  # ===========================
+  # Demand Projection
+  # ===========================
+
+  - name: staging_v1_meteologica_pjm_demand_projection_hourly
+    description: "Meteologica PJM demand projection (normal), 33 zones unified"
+    columns:
+      - name: update_rank
+        description: "Dense rank of projection update by issue time (earliest = 1)"
+        tests:
+          - not_null
+      - name: update_datetime
+        description: "When Meteologica published this projection (EPT)"
+        tests:
+          - not_null
+      - name: update_date
+        description: "Date portion of update_datetime"
+        tests:
+          - not_null
+      - name: projection_datetime
+        description: "Projection hour slot (EPT)"
+      - name: projection_date
+        description: "Date of the projection"
+        tests:
+          - not_null
+      - name: hour_ending
+        description: "Hour ending 1-24 (EPT)"
+        tests:
+          - not_null
+      - name: region
+        description: "PJM demand zone"
+        tests:
+          - not_null
+          - accepted_values:
+              values:
+                - 'RTO'
+                - 'MIDATL_AE'
+                - 'MIDATL_BC'
+                - 'MIDATL_DPL'
+                - 'MIDATL_DPL_DPLCO'
+                - 'MIDATL_DPL_EASTON'
+                - 'MIDATL_JC'
+                - 'MIDATL_ME'
+                - 'MIDATL_PE'
+                - 'MIDATL_PEP'
+                - 'MIDATL_PEP_PEPCO'
+                - 'MIDATL_PEP_SMECO'
+                - 'MIDATL_PL'
+                - 'MIDATL_PL_PLCO'
+                - 'MIDATL_PL_UGI'
+                - 'MIDATL_PN'
+                - 'MIDATL_PS'
+                - 'MIDATL_RECO'
+                - 'SOUTH_DOM'
+                - 'WEST_AEP'
+                - 'WEST_AEP_AEPAPT'
+                - 'WEST_AEP_AEPIMP'
+                - 'WEST_AEP_AEPKPT'
+                - 'WEST_AEP_AEPOPT'
+                - 'WEST_AP'
+                - 'WEST_ATSI'
+                - 'WEST_ATSI_OE'
+                - 'WEST_ATSI_PAPWR'
+                - 'WEST_CE'
+                - 'WEST_DAY'
+                - 'WEST_DEOK'
+                - 'WEST_DUQ'
+                - 'WEST_EKPC'
+      - name: projection_load_mw
+        description: "Projected demand normal (MW)"
+
+  # ===========================
+  # Generation Normal
+  # ===========================
+
+  - name: staging_v1_meteologica_pjm_gen_normal_hourly
+    description: "Meteologica PJM generation normal (solar, wind, hydro), 9 tables unified"
+    columns:
+      - name: update_rank
+        description: "Dense rank of normal update by issue time (earliest = 1)"
+        tests:
+          - not_null
+      - name: update_datetime
+        description: "When Meteologica published this normal (EPT)"
+        tests:
+          - not_null
+      - name: update_date
+        description: "Date portion of update_datetime"
+        tests:
+          - not_null
+      - name: normal_datetime
+        description: "Normal hour slot (EPT)"
+      - name: normal_date
+        description: "Date of the normal"
+        tests:
+          - not_null
+      - name: hour_ending
+        description: "Hour ending 1-24 (EPT)"
+        tests:
+          - not_null
+      - name: source
+        description: "Generation source type"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['solar', 'wind', 'hydro']
+      - name: region
+        description: "PJM region"
+        tests:
+          - not_null
+          - accepted_values:
+              values:
+                - 'MIDATL'
+                - 'RTO'
+                - 'SOUTH'
+                - 'WEST'
+      - name: normal_generation_mw
+        description: "Normal generation (MW)"

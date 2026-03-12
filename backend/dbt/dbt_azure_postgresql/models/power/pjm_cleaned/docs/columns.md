@@ -24,8 +24,8 @@ Time-of-day aggregation period for daily models:
 {% enddocs %}
 
 {% docs col_forecast_rank %}
-Recency rank of the forecast revision. `1` = most recent forecast for a given
-`forecast_date`. Computed via `ROW_NUMBER()` ordered by `forecast_execution_datetime DESC`.
+Issue-time rank of the forecast revision. `1` = first-issued forecast for a given
+`forecast_date`. Computed via `DENSE_RANK()` ordered by `forecast_execution_datetime ASC`.
 Only complete forecasts (all hours and regions present) are ranked.
 {% enddocs %}
 

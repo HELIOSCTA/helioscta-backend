@@ -1,6 +1,6 @@
 # Meteologica
 
-Independent power demand, generation, and DA price forecasts from the xTraders API. Covers all 7 ISOs plus L48 aggregate (374 scripts total). Traders compare these against ISO-issued forecasts and actuals to identify opportunities.
+Independent power demand, generation, and DA price forecasts from the xTraders API. Covers all 7 ISOs plus L48 aggregate (533 scripts total). Traders compare these against ISO-issued forecasts and actuals to identify opportunities.
 
 **Use this page** to understand Meteologica's data types, script organization, and API details.
 
@@ -9,7 +9,7 @@ Independent power demand, generation, and DA price forecasts from the xTraders A
 - **API:** Meteologica xTraders REST API
 - **Authentication:** JWT token auth, two accounts:
   - **L48 account** (`helios_cta_us48`): 35 scripts for US48 aggregate forecasts
-  - **ISO account** (`helios_cta`): ~339 scripts for ISO-level and sub-regional forecasts
+  - **ISO account** (`helios_cta`): ~498 scripts for ISO-level and sub-regional forecasts
 - **Auth module:** `backend/src/meteologica/auth.py`
 - **Rate limits:** ~3 minute cooldown after burst of ~34 requests
 
@@ -18,7 +18,7 @@ Independent power demand, generation, and DA price forecasts from the xTraders A
 | Subfolder | ISO | Script Count | Coverage |
 |-----------|-----|-------------|----------|
 | `l48/` | US48 (aggregate) | 35 | National demand, generation, price forecasts |
-| `pjm/` | PJM | 75 | RTO + 3 regions + ~35 utility-level forecasts |
+| `pjm/` | PJM | 234 | RTO + 3 regions + ~35 utility-level forecasts, observations, normals, projections, ECMWF-ENS |
 | `ercot/` | ERCOT | 49 | RTO + zones + regional generation |
 | `miso/` | MISO | 45 | RTO + zones + regional generation |
 | `caiso/` | CAISO | 40 | RTO + sub-regions + renewables |
@@ -53,20 +53,26 @@ Independent power demand, generation, and DA price forecasts from the xTraders A
 
 ## dbt Views
 
-Three cleaned mart views in `meteologica_cleaned` schema. See [dbt views detail](dbt-views/meteologica-cleaned.md).
+Nine cleaned mart views in `meteologica_cleaned` schema. See [dbt views detail](dbt-views/meteologica-cleaned.md).
 
 | View | Description |
 |------|-------------|
-| `meteologica_pjm_demand_forecast_hourly` | Cleaned PJM demand forecasts across all regions |
+| `meteologica_pjm_demand_forecast_hourly` | Cleaned PJM demand forecasts across all 36 regions |
 | `meteologica_pjm_generation_forecast_hourly` | Cleaned PJM generation forecasts (solar, wind, hydro) |
-| `meteologica_pjm_da_price_forecast_hourly` | Cleaned PJM DA price forecasts across all hubs |
+| `meteologica_pjm_da_price_forecast_hourly` | Cleaned PJM DA price forecasts across all 13 hubs |
+| `meteologica_pjm_demand_forecast_ecmwf_ens_hourly` | ECMWF-ENS ensemble demand forecasts across all 36 regions |
+| `meteologica_pjm_demand_observation` | Observed demand actuals across all 36 regions |
+| `meteologica_pjm_generation_observation` | Observed generation actuals (solar, wind, hydro) |
+| `meteologica_pjm_da_price_observation` | Observed DA prices across all 13 hubs |
+| `meteologica_pjm_demand_projection_hourly` | Extended demand projections across 33 regions |
+| `meteologica_pjm_generation_normal_hourly` | Historical generation normals (solar, wind, hydro) |
 
 ## Known Caveats
 
 - API rate limits require ~3 min cooldown after bursts; scripts are sequenced accordingly
 - Model run columns are stored as VARCHAR strings because `azure_postgresql_utils` does `df.fillna(0)` on insert
 - DST fall-back handling: normals/projections need `forecast_period_end` in the primary key to avoid duplicate-key conflicts
-- Only PJM forecasts currently have dbt cleaning views; other ISOs are raw-only
+- Only PJM currently has dbt cleaning views (forecasts, observations, normals, and projections); other ISOs are raw-only
 
 ## Owner
 

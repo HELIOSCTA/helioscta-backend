@@ -1,0 +1,14 @@
+dbt_azure_sql:
+  target: azure_sql
+  outputs:
+
+    azure_sql:
+      type: sqlserver
+      driver: "ODBC Driver 18 for SQL Server"
+      server: "{{ env_var('AZURE_SQL_SERVER') }}"
+      user: "{{ env_var('AZURE_SQL_USER') }}"
+      password: "{{ env_var('AZURE_SQL_PASSWORD') }}"
+      port: 1433
+      database: "{{ env_var('AZURE_SQL_DATABASE') }}"
+      schema: natgas
+      threads: 4

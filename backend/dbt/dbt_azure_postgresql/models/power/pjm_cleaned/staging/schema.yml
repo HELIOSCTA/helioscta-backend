@@ -267,7 +267,7 @@ models:
         description: "Forecasted load aggregate for the period (MW)"
 
   - name: staging_v1_gridstatus_pjm_load_forecast_hourly
-    description: "PJM 7-day hourly load forecast (from GridStatus). Complete forecasts only, ranked by recency. Grain: forecast_rank × forecast_date × hour_ending × region."
+    description: "PJM 7-day hourly load forecast (from GridStatus). Complete forecasts only, ranked by issue time (earliest first). Grain: forecast_rank × forecast_date × hour_ending × region."
     columns:
       - name: forecast_rank
         tests:
@@ -341,7 +341,7 @@ models:
         description: "Forced outage MW"
 
   - name: staging_v1_pjm_outages_forecast_daily
-    description: "PJM 7-day outage forecast by region, ranked by recency. Complete forecasts only. Grain: forecast_rank × forecast_execution_date × forecast_date × region."
+    description: "PJM 7-day outage forecast by region, ranked by issue time (earliest first). Complete forecasts only. Grain: forecast_rank × forecast_execution_date × forecast_date × region."
     columns:
       - name: forecast_rank
         tests:
@@ -421,7 +421,7 @@ models:
         description: "Behind-the-meter solar forecast (MW)"
 
   - name: staging_v1_pjm_wind_forecast_hourly
-    description: "PJM 2-day hourly wind generation forecast. Complete forecasts only, ranked by recency. Grain: forecast_rank × forecast_date × hour_ending."
+    description: "PJM 2-day hourly wind generation forecast. Complete forecasts only, ranked by issue time (earliest first). Grain: forecast_rank × forecast_date × hour_ending."
     columns:
       - name: forecast_rank
         tests:

@@ -89,7 +89,8 @@ Three tiers of real-time load data, each with different latency and accuracy:
 ## Load Forecast
 
 7-day hourly load forecasts from both PJM API and GridStatus. Multiple forecast
-revisions are issued per day; models retain all revisions ranked by recency.
+revisions are issued per day; models retain all revisions ranked by issue time
+(earliest first).
 
 ### Data Sources
 - **PJM API** — `seven_day_load_forecast_v1_2025_08_13`
@@ -97,7 +98,7 @@ revisions are issued per day; models retain all revisions ranked by recency.
 
 ### Key Transformations
 - Only **complete forecasts** are kept (all 24 hours × all regions present)
-- `forecast_rank = 1` is the most recent forecast for a given `forecast_date`
+- `forecast_rank = 1` is the first-issued forecast for a given `forecast_date`
 - Daily models aggregate to holiday-aware OnPeak/OffPeak periods
 
 ### Models
@@ -153,7 +154,7 @@ Planned, maintenance, and forced generation outage data from PJM's 7-day outage 
 | Model | Description | Grain |
 |-------|-------------|-------|
 | `staging_v1_pjm_outages_actual_daily` | Actuals only (`execution_date = forecast_date`) | date × region |
-| `staging_v1_pjm_outages_forecast_daily` | Full 7-day forecast, ranked by recency | forecast_rank × execution_date × forecast_date × region |
+| `staging_v1_pjm_outages_forecast_daily` | Full 7-day forecast, ranked by issue time (earliest first) | forecast_rank × execution_date × forecast_date × region |
 
 ### Outage Categories
 - **Total** — all outage types combined
@@ -203,7 +204,7 @@ neighboring systems.
 
 ### Key Transformations
 - Only complete forecasts are retained (all hours present)
-- `forecast_rank = 1` is the most recent forecast for a given date
+- `forecast_rank = 1` is the first-issued forecast for a given date
 
 ### Models
 

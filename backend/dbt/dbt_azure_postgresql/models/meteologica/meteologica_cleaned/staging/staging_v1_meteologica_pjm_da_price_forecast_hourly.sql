@@ -7,7 +7,7 @@
 ---------------------------
 -- Meteologica PJM Day-Ahead Price Forecast (Hourly)
 -- UNIONs 13 raw tables (system + 12 hubs), normalizes to EPT date + hour_ending,
--- filters to complete 24h forecasts, ranks by recency
+-- filters to complete 24h forecasts, ranks by issue time (earliest first)
 -- Grain: 1 row per forecast_rank × forecast_date × hour_ending × hub
 ---------------------------
 
@@ -185,7 +185,7 @@ NORMALIZED AS (
 ),
 
 --------------------------------
--- Rank forecasts per (forecast_date, hub) by recency
+-- Rank forecasts per (forecast_date, hub) by issue time (earliest first)
 --------------------------------
 
 FORECAST_RANK AS (
@@ -196,7 +196,7 @@ FORECAST_RANK AS (
 
         ,DENSE_RANK() OVER (
             PARTITION BY forecast_date, hub
-            ORDER BY forecast_execution_datetime DESC
+            ORDER BY forecast_execution_datetime ASC
         ) AS forecast_rank
 
     FROM (
@@ -231,3 +231,5 @@ FINAL AS (
 
 SELECT * FROM FINAL
 ORDER BY forecast_date DESC, forecast_execution_datetime DESC, hour_ending, hub
+
+

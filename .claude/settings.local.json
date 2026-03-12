@@ -67,7 +67,10 @@
       "Bash(git for-each-ref:*)",
       "Bash(git add:*)",
       "Bash(find /c/Users/AidanKeaveny/Documents/github/helioscta-backend/documentation/docs -type f \\\\\\( -name \"*.md\" -o -name \"*.mdx\" \\\\\\) 2>/dev/null | head -30)",
-      "Bash(find /c/Users/AidanKeaveny/Documents/github/helioscta-backend/documentation/docs -type f \\\\\\( -name \"*.md\" -o -name \"*.mdx\" \\\\\\) 2>/dev/null | grep -i wsi)"
+      "Bash(find /c/Users/AidanKeaveny/Documents/github/helioscta-backend/documentation/docs -type f \\\\\\( -name \"*.md\" -o -name \"*.mdx\" \\\\\\) 2>/dev/null | grep -i wsi)",
+      "Bash(cd \"C:\\\\Users\\\\AidanKeaveny\\\\Documents\\\\github\\\\helioscta-backend\\\\documentation\" && npx docusaurus build 2>&1 | tail -20)",
+      "Bash(cd \"C:\\\\Users\\\\AidanKeaveny\\\\Documents\\\\github\\\\helioscta-backend\\\\backend\\\\dbt\\\\dbt_azure_sql\\\\models\\\\natgas\\\\natgas_cleaned\\\\marts\" && mv natgas_genscape_noms.sql genscape_noms.sql && mv natgas_lng_facilities.sql lng_facilities.sql && mv natgas_salt_facilities_bcf.sql salt_facilities_bcf.sql && mv natgas_salt_inventories.sql salt_inventories.sql && ls)",
+      "Bash(cd \"C:\\\\Users\\\\AidanKeaveny\\\\Documents\\\\github\\\\helioscta-backend\\\\backend\\\\dbt\\\\dbt_azure_sql\" && set -a && source .env && set +a && dbt run 2>&1)"
     ]
   }
 }

@@ -24,6 +24,7 @@ Documentation for all data pipelines, raw tables, and dbt views in the HeliosCTA
 | [Meteologica](domains/meteologica/overview.md) | Independent demand, generation, and price forecasts (374 scripts) |
 | [Weather (WSI)](domains/wsi/overview.md) | Temperature forecasts, degree days, observations |
 | [EIA](domains/eia/overview.md) | Government energy data -- generation mix, gas storage |
+| [NatGas (WM DataFeed)](domains/natgas/overview.md) | Gas nominations, LNG terminal flows, salt cavern storage (Azure SQL) |
 | [Genscape](domains/genscape/overview.md) | Natural gas production and pipeline data |
 | [Positions & Trades](domains/positions-and-trades/overview.md) | Trading positions and trade confirmations |
 

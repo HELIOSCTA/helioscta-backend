@@ -6,7 +6,7 @@
 
 ---------------------------
 -- PJM Load Forecast Performance (Hourly)
--- Compares PJM 7-day forecast (rank=1) vs RT metered actuals
+-- Compares PJM 7-day first-issued forecast (rank=1) vs RT metered actuals
 -- Grain: 1 row per date × hour_ending × region
 ---------------------------
 

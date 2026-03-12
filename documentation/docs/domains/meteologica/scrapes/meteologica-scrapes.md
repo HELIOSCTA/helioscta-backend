@@ -2,39 +2,49 @@
 
 ## Overview
 
-With 374 scripts, Meteologica is far too large to document individually. Scripts follow a consistent pattern within each ISO subfolder, so this page documents the **patterns** and provides representative examples.
+With 533 scripts, Meteologica is far too large to document individually. Scripts follow a consistent pattern within each ISO subfolder, so this page documents the **patterns** and provides representative examples.
 
 ## Standard Script Pattern
 
 Every Meteologica script:
 1. Authenticates via `backend/src/meteologica/auth.py` (JWT token)
-2. Pulls forecast data from the xTraders API for a specific content ID
+2. Pulls data from the xTraders API for a specific content ID (forecasts, observations, normals, projections, etc.)
 3. Formats the response into a standardized DataFrame
 4. Upserts to a table in the `meteologica` schema
 
 ## Naming Convention
 
 ```
-usa_{iso}_{region}_{type}_power_{category}_forecast_hourly.py
+usa_{iso}_{region}_{type}_power_{category}_{schema_type}.py
 ```
 
 - `{iso}` = pjm, ercot, miso, caiso, nyiso, isone, spp, us48
 - `{region}` = optional sub-region (e.g., `midatlantic`, `west_aep`)
 - `{type}` = optional fuel type (e.g., `pv`, `wind`, `hydro`)
 - `{category}` = `demand`, `generation`, `price`
+- `{schema_type}` = `forecast_hourly`, `forecast_ecmwf_ens_hourly`, `observation`, `projection_hourly`, `normal_hourly`, `long_term_hourly`, `forecast_daily`
 
 ## Scripts by ISO and Data Type
 
-### PJM (75 scripts)
+### PJM (234 scripts)
 
 | Category | Count | Scope |
 |----------|-------|-------|
 | Demand Forecasts | 36 | RTO + 3 regions + 32 utility-level |
+| Demand Forecasts (ECMWF-ENS) | 36 | RTO + 3 regions + 32 utility-level (ensemble model) |
+| Demand Observations | 36 | RTO + 3 regions + 32 utility-level |
+| Demand Projections | 33 | RTO + 32 utility-level (no macro aggregates) |
+| Demand Long-Term | 1 | RTO |
 | Generation Forecasts (Solar) | 4 | RTO + 3 regions |
 | Generation Forecasts (Wind) | 12 | RTO + 3 regions + 8 utility-level |
 | Generation Forecasts (Hydro) | 1 | RTO |
+| Generation Forecasts (Daily) | 1 | RTO hydro |
+| Generation Forecasts (ECMWF-ENS) | 17 | Solar, wind, hydro at RTO + regional + utility-level |
+| Generation Observations | 9 | Solar (4: RTO/MIDATL/WEST/SOUTH), Wind (4: RTO/MIDATL/SOUTH/WEST), Hydro (1: RTO) |
+| Generation Normals | 9 | Solar (4: RTO/MIDATL/SOUTH/WEST), Wind (4: RTO/MIDATL/SOUTH/WEST), Hydro (1: RTO) |
 | DA Price Forecasts | 13 | System + 12 hubs |
-| Other (observations, etc.) | 9 | Various |
+| DA Price Forecasts (ECMWF-ENS) | 13 | System + 12 hubs (ensemble model) |
+| DA Price Observations | 13 | System + 12 hubs |
 
 ### ERCOT (49 scripts)
 

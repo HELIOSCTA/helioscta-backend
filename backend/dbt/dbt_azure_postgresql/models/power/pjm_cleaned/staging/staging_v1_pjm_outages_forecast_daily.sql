@@ -6,7 +6,7 @@
 
 ---------------------------
 -- PJM 7-Day Outage Forecast (normalized)
--- Ranked by recency
+-- Ranked by issue time (earliest first)
 -- Grain: 1 row per forecast_execution_date × forecast_date × region
 ---------------------------
 
@@ -26,19 +26,21 @@ WITH FORECAST AS (
 ),
 
 ---------------------------
--- RANK FORECASTS BY RECENCY
+-- RANK FORECASTS BY ISSUE TIME (EARLIEST FIRST)
 ---------------------------
 
 FORECAST_RANK AS (
     SELECT
         forecast_execution_date
+        ,forecast_date
 
         ,DENSE_RANK() OVER (
-            ORDER BY forecast_execution_date DESC
+            PARTITION BY forecast_date
+            ORDER BY forecast_execution_date ASC
         ) AS forecast_rank
 
     FROM (
-        SELECT DISTINCT forecast_execution_date
+        SELECT DISTINCT forecast_execution_date, forecast_date
         FROM FORECAST
     ) sub
 ),
@@ -65,8 +67,11 @@ FINAL AS (
     FROM FORECAST f
     JOIN FORECAST_RANK r
         ON f.forecast_execution_date = r.forecast_execution_date
+        AND f.forecast_date = r.forecast_date
 )
 
 SELECT * FROM FINAL
 ORDER BY forecast_date DESC, forecast_execution_date DESC, region
+
+
 

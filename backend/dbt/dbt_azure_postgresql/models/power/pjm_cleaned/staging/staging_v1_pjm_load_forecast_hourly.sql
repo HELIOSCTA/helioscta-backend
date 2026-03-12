@@ -6,7 +6,7 @@
 
 ---------------------------
 -- PJM 7-Day Load Forecast (from PJM API, by forecast area)
--- All revisions, ranked by recency
+-- All revisions, ranked by issue time (earliest first)
 -- Grain: 1 row per forecast_execution_datetime × forecast_date × hour_ending × region
 ---------------------------
 
@@ -22,7 +22,7 @@ WITH FORECAST AS (
 ),
 
 --------------------------------
--- Rank forecasts per forecast_date by recency
+-- Rank forecasts per forecast_date by issue time (earliest first)
 --------------------------------
 
 FORECAST_RANK AS (
@@ -32,7 +32,7 @@ FORECAST_RANK AS (
 
         ,DENSE_RANK() OVER (
             PARTITION BY forecast_date
-            ORDER BY forecast_execution_datetime DESC
+            ORDER BY forecast_execution_datetime ASC
         ) AS forecast_rank
 
     FROM (
@@ -66,3 +66,5 @@ FINAL AS (
 
 SELECT * FROM FINAL
 ORDER BY forecast_date DESC, forecast_execution_datetime DESC, hour_ending, region
+
+

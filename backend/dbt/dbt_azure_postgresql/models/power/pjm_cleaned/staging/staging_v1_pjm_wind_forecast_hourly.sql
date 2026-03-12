@@ -6,7 +6,7 @@
 
 ---------------------------
 -- PJM 2-Day Wind Forecast (all revisions)
--- Ranked by recency
+-- Ranked by issue time (earliest first)
 -- Grain: 1 row per forecast_execution_datetime × forecast_date × hour_ending
 ---------------------------
 
@@ -21,7 +21,7 @@ WITH FORECAST AS (
 ),
 
 ---------------------------
--- RANK FORECASTS BY RECENCY (per forecast_date)
+-- RANK FORECASTS BY ISSUE TIME (EARLIEST FIRST, per forecast_date)
 ---------------------------
 
 FORECAST_RANK AS (
@@ -31,7 +31,7 @@ FORECAST_RANK AS (
 
         ,DENSE_RANK() OVER (
             PARTITION BY forecast_date
-            ORDER BY forecast_execution_datetime DESC
+            ORDER BY forecast_execution_datetime ASC
         ) AS forecast_rank
 
     FROM (
@@ -65,3 +65,5 @@ FINAL AS (
 
 SELECT * FROM FINAL
 ORDER BY forecast_date DESC, forecast_execution_datetime DESC, hour_ending
+
+

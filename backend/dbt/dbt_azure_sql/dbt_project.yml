@@ -1,0 +1,33 @@
+name: 'dbt_azure_sql'
+version: '1.0.0'
+
+profile: 'dbt_azure_sql'
+
+model-paths: ["models"]
+test-paths: ["tests"]
+analysis-paths: ["analyses"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+#-------------------------------------
+# models
+#-------------------------------------
+
+models:
+  dbt_azure_sql:
+    natgas:
+      natgas_cleaned:
+        +schema: natgas_cleaned
+        utils:
+          +materialized: ephemeral
+        source:
+          +materialized: ephemeral
+        staging:
+          +materialized: ephemeral
+        marts:
+          +materialized: view

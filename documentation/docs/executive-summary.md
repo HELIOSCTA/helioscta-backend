@@ -10,6 +10,7 @@ One-page overview of what HeliosCTA ingests, how it flows, and how fresh it is. 
 | **Power Forecasts** -- demand, generation, DA price forecasts | Meteologica xTraders API | ~374 |
 | **Weather** -- temp forecasts, HDD/CDD, observations | WSI Trader API | ~15 |
 | **Natural Gas** -- production forecasts, pipeline flows, storage | Genscape API, EIA API | ~4 |
+| **NatGas DataFeed** -- nominations, LNG terminals, salt storage | WM DataFeed (Azure SQL) | ~6 raw |
 | **EIA** -- hourly generation by fuel type, gas storage | EIA Open Data API | ~2 |
 | **ICE** -- next-day gas, BALMO swaps, NG & power futures | ICE Python API | ~3 |
 | **Positions & Trades** -- daily positions, trade confirmations | SFTP (Marex, NAV, Clear Street) | ~8 |
@@ -33,12 +34,14 @@ One-page overview of what HeliosCTA ingests, how it flows, and how fresh it is. 
 | Trades (Clear Street) | Intraday + end-of-day | Intraday + T+1 |
 | EIA generation mix | ~1 hour lag | Hourly |
 | ICE gas/power derivatives | End-of-day settle | Daily |
+| NatGas nominations (WM) | 20-40 min lag | Every 20/30/40 min |
 | Gas storage | Weekly (Thursday) | Weekly |
 
 ## dbt View Summary
 
 | Schema | Views | Coverage |
 |--------|-------|----------|
+| `natgas_cleaned` | 4 | Gas nominations, LNG terminals, salt storage (Azure SQL) |
 | `pjm_cleaned` | 21 | PJM load, LMPs, fuel mix, outages, forecasts |
 | `meteologica_cleaned` | 3 | PJM demand, generation, DA price forecasts |
 | `wsi_cleaned` | 4 | Degree day observations, normals, forecasts |
@@ -47,7 +50,7 @@ One-page overview of what HeliosCTA ingests, how it flows, and how fresh it is. 
 | `trades_cleaned` | 6 | Clear Street + Marex trade confirmations |
 | `eia_cleaned` | 2 | EIA-930 hourly + daily generation |
 | `ice_python_cleaned` | 3 | BALMO, next-day gas hourly + daily |
-| **Total** | **49** | |
+| **Total** | **53** | |
 
 ## Next Steps
 

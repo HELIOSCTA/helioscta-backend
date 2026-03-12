@@ -41,8 +41,14 @@ Click any link in the Source Scrape or dbt View columns for details.
 | `meteologica_pjm_demand_forecast_hourly` | Hourly demand forecast for PJM (RTO + all sub-regions) from an independent model | "What does Meteologica's model say PJM demand will be tomorrow?" | [Meteologica Scrapes](domains/meteologica/scrapes/meteologica-scrapes.md) (36 PJM demand scripts) | [meteologica_pjm_demand_forecast_hourly](domains/meteologica/dbt-views/meteologica-cleaned.md#meteologica_pjm_demand_forecast_hourly) | Multiple times/day | TBD |
 | `meteologica_pjm_generation_forecast_hourly` | Hourly solar, wind, and hydro generation forecast for PJM | "How much renewable generation does Meteologica expect in PJM?" | [Meteologica Scrapes](domains/meteologica/scrapes/meteologica-scrapes.md) (14 PJM gen scripts) | [meteologica_pjm_generation_forecast_hourly](domains/meteologica/dbt-views/meteologica-cleaned.md#meteologica_pjm_generation_forecast_hourly) | Multiple times/day | TBD |
 | `meteologica_pjm_da_price_forecast_hourly` | Hourly day-ahead price forecast for PJM system and 12 trading hubs | "What does Meteologica predict DA prices will be at Western Hub?" | [Meteologica Scrapes](domains/meteologica/scrapes/meteologica-scrapes.md) (13 PJM price scripts) | [meteologica_pjm_da_price_forecast_hourly](domains/meteologica/dbt-views/meteologica-cleaned.md#meteologica_pjm_da_price_forecast_hourly) | Multiple times/day | TBD |
+| `meteologica_pjm_demand_forecast_ecmwf_ens_hourly` | ECMWF-ENS ensemble hourly demand forecast for PJM (RTO + all sub-regions) | "What does the ECMWF ensemble model say about PJM demand?" | [Meteologica Scrapes](domains/meteologica/scrapes/meteologica-scrapes.md) (36 PJM ECMWF-ENS demand scripts) | [meteologica_pjm_demand_forecast_ecmwf_ens_hourly](domains/meteologica/dbt-views/meteologica-cleaned.md#meteologica_pjm_demand_forecast_ecmwf_ens_hourly) | Multiple times/day | TBD |
+| `meteologica_pjm_demand_observation` | Actual observed hourly demand for PJM across all sub-regions | "What was actual demand at each PJM region this hour?" | [Meteologica Scrapes](domains/meteologica/scrapes/meteologica-scrapes.md) (36 PJM demand observation scripts) | [meteologica_pjm_demand_observation](domains/meteologica/dbt-views/meteologica-cleaned.md#meteologica_pjm_demand_observation) | Multiple times/day | TBD |
+| `meteologica_pjm_generation_observation` | Actual observed hourly generation for PJM solar, wind, and hydro | "What was actual renewable generation in PJM?" | [Meteologica Scrapes](domains/meteologica/scrapes/meteologica-scrapes.md) (9 PJM generation observation scripts) | [meteologica_pjm_generation_observation](domains/meteologica/dbt-views/meteologica-cleaned.md#meteologica_pjm_generation_observation) | Multiple times/day | TBD |
+| `meteologica_pjm_da_price_observation` | Actual observed hourly DA prices for PJM system and 12 hubs | "What were actual DA prices at each PJM hub?" | [Meteologica Scrapes](domains/meteologica/scrapes/meteologica-scrapes.md) (13 PJM DA price observation scripts) | [meteologica_pjm_da_price_observation](domains/meteologica/dbt-views/meteologica-cleaned.md#meteologica_pjm_da_price_observation) | Multiple times/day | TBD |
+| `meteologica_pjm_demand_projection_hourly` | Extended hourly demand projections for PJM based on blended models | "What is the extended demand outlook for PJM sub-regions?" | [Meteologica Scrapes](domains/meteologica/scrapes/meteologica-scrapes.md) (33 PJM demand projection scripts) | [meteologica_pjm_demand_projection_hourly](domains/meteologica/dbt-views/meteologica-cleaned.md#meteologica_pjm_demand_projection_hourly) | Multiple times/day | TBD |
+| `meteologica_pjm_generation_normal_hourly` | Historical average (normal) hourly generation for PJM solar, wind, and hydro | "How does current generation compare to historical norms?" | [Meteologica Scrapes](domains/meteologica/scrapes/meteologica-scrapes.md) (9 PJM generation normal scripts) | [meteologica_pjm_generation_normal_hourly](domains/meteologica/dbt-views/meteologica-cleaned.md#meteologica_pjm_generation_normal_hourly) | Multiple times/day | TBD |
 
-> **Note:** Meteologica covers all 7 ISOs (PJM, ERCOT, MISO, CAISO, NYISO, ISO-NE, SPP) plus a national aggregate (L48), totaling 374 scrape scripts. Only PJM forecasts currently have dbt cleaned views. Other ISOs are available as raw tables.
+> **Note:** Meteologica covers all 7 ISOs (PJM, ERCOT, MISO, CAISO, NYISO, ISO-NE, SPP) plus a national aggregate (L48), totaling 533 scrape scripts. Only PJM currently has dbt cleaned views (forecasts, observations, normals, projections). Other ISOs are available as raw tables.
 
 ---
 
@@ -58,6 +64,19 @@ Click any link in the Source Scrape or dbt View columns for details.
 | `temp_forecast_hourly` | Hourly temperature forecast by weather station with normal and feels-like | "What is the forecast temperature at each station for today?" | [WSI Scrapes](domains/wsi/scrapes/wsi-scrapes.md#hourly-forecasts) | [temp_forecast_hourly](domains/wsi/dbt-views/wsi-cleaned.md#temp_forecast_hourly) | 2-4x daily | TBD |
 
 > **Note:** WSI also provides city-level forecasts and natural gas BCF forecasts as raw tables. See the [WSI overview](domains/wsi/overview.md) for the full inventory.
+
+---
+
+## NatGas -- WM DataFeed (Azure SQL)
+
+| Model / Table | Plain-English Purpose | Business Question Answered | Source Scrape(s) | Related dbt View(s) | Refresh Frequency | Owner |
+|---|---|---|---|---|---|---|
+| `genscape_noms` | Denormalized gas nominations with pipeline, location, cycle, and no-notice data | "What is the scheduled capacity at this pipeline location today?" | WM DataFeed (gasdatafeed_import.ps1) | [genscape_noms](domains/natgas/dbt-views/natgas-cleaned.md#genscape_noms) | Delta: every 20/30/40 min | TBD |
+| `lng_facilities` | LNG terminal nomination flows for 9 US export facilities with multi-pipeline aggregation | "How much gas is flowing to Cameron LNG today?" | Same as above | [lng_facilities](domains/natgas/dbt-views/natgas-cleaned.md#lng_facilities) | Delta: every 20/30/40 min | TBD |
+| `salt_facilities_bcf` | Daily salt cavern storage flows in BCF pivoted by facility with regional subtotals | "What is total salt storage injection/withdrawal in TX today?" | Same as above | [salt_facilities_bcf](domains/natgas/dbt-views/natgas-cleaned.md#salt_facilities_bcf) | Delta: every 20/30/40 min | TBD |
+| `salt_inventories` | Daily salt cavern inventory levels and capacity metrics by facility | "What is the current inventory at Pine Prairie vs design capacity?" | Same as above | [salt_inventories](domains/natgas/dbt-views/natgas-cleaned.md#salt_inventories) | Delta: every 20/30/40 min | TBD |
+
+> **Note:** NatGas views live on Azure SQL Server (`GenscapeDataFeed.natgas_cleaned`), not Azure PostgreSQL. This dbt project uses `dbt-sqlserver`.
 
 ---
 
@@ -134,8 +153,9 @@ Click any link in the Source Scrape or dbt View columns for details.
 
 | Domain | Schema | View Count | Status |
 |--------|--------|------------|--------|
+| NatGas (WM DataFeed) | `natgas_cleaned` | 4 | Noms, LNG, SALTS (Azure SQL) |
 | Power (PJM) | `pjm_cleaned` | 21 | Fully cleaned |
-| Meteologica | `meteologica_cleaned` | 3 | PJM only; other ISOs raw |
+| Meteologica | `meteologica_cleaned` | 9 | PJM forecasts, observations, normals, projections; other ISOs raw |
 | WSI (Weather) | `wsi_cleaned` | 6 | Degree days + hourly temps cleaned |
 | Genscape | `genscape_cleaned` | 2 | Fully cleaned |
 | Positions | `positions_cleaned` | 8 | Fully cleaned |
@@ -143,7 +163,7 @@ Click any link in the Source Scrape or dbt View columns for details.
 | EIA | `eia_cleaned` | 3 | EIA-930 hourly + daily, NG consumption by end use; storage raw |
 | ICE | `ice_python_cleaned` | 3 | BALMO, next-day gas hourly + daily |
 | Utils | `dbt` | 2 | Date spines; NERC holidays pending |
-| **Total** | | **54 views + 1 raw** | |
+| **Total** | | **64 views + 1 raw** | |
 
 ---
 

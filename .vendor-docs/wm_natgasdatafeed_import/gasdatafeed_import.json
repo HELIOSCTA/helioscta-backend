@@ -1,0 +1,18 @@
+{
+    "db_conf": {
+        "host": "heliosazuresql.database.windows.net",
+        "port": "1433",
+        "db": "GenscapeDataFeed",
+        "login": "heliosadmin",
+        "pass": "admin!2024",
+        "TrustServerCertificate":"true"	
+    },
+    "http_conf": {
+        "login": "aidan.keaveny@helioscta.com",
+        "pass": "dup#Ed5P"
+    },
+    "working_path": "C:\\Datafeed\\",
+    "batch_size": 100000,
+    "base_url": "https://api.genscape.com/natgas/datafeed/v1",
+    "api_key":"d083ccc69d8047dca688288d30ead568"
+}

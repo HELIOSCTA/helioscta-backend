@@ -242,6 +242,23 @@ const sidebars = {
     },
     {
       type: "category",
+      label: "NatGas (WM DataFeed)",
+      collapsed: true,
+      items: [
+        {
+          type: "doc",
+          id: "domains/natgas/overview",
+          label: "Overview",
+        },
+        {
+          type: "doc",
+          id: "domains/natgas/dbt-views/natgas-cleaned",
+          label: "dbt Views",
+        },
+      ],
+    },
+    {
+      type: "category",
       label: "Genscape",
       collapsed: true,
       items: [
