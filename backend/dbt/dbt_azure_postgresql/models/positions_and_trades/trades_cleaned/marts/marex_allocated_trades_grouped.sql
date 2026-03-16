@@ -1,6 +1,8 @@
 {{
   config(
-    materialized='view'
+    materialized='incremental',
+    unique_key='sftp_date',
+    incremental_strategy='delete+insert'
   )
 }}
 
@@ -54,6 +56,9 @@ WITH TRADES AS (
         ,qty
 
     FROM {{ ref('marex_allocated_trades') }}
+    {% if is_incremental() %}
+    WHERE sftp_date >= (SELECT MAX(sftp_date) - INTERVAL '14 days' FROM {{ this }})
+    {% endif %}
 ),
 
 -- SELECT * FROM TRADES

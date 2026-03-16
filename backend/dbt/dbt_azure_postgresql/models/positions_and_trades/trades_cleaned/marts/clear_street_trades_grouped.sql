@@ -1,6 +1,8 @@
 {{
   config(
-    materialized='view'
+    materialized='incremental',
+    unique_key='sftp_date',
+    incremental_strategy='delete+insert'
   )
 }}
 
@@ -62,6 +64,9 @@ WITH TRADES AS (
     WHERE
       -- NOTE: WE NEED TO FILTER OUT TRADES WITH NO ACCOUNT NAME
       account_name IS NOT NULL
+      {% if is_incremental() %}
+      AND sftp_date >= (SELECT MAX(sftp_date) - INTERVAL '14 days' FROM {{ this }})
+      {% endif %}
 ),
 
 -- SELECT * FROM TRADES

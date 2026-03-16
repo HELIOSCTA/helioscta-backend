@@ -17,7 +17,7 @@ WITH latest_snapshot AS (
         symbol,
         MAX(snapshot_at) AS max_snapshot_at
     FROM ice_python.intraday_quotes
-    WHERE trade_date = CURRENT_DATE
+    WHERE trade_date = CURRENT_DATE - 1
     GROUP BY symbol
 ),
 
@@ -31,7 +31,7 @@ latest_quotes AS (
     INNER JOIN latest_snapshot ls
         ON iq.symbol = ls.symbol
         AND iq.snapshot_at = ls.max_snapshot_at
-    WHERE iq.trade_date = CURRENT_DATE
+    WHERE iq.trade_date = CURRENT_DATE - 1
 ),
 
 pivoted AS (
@@ -70,7 +70,7 @@ SELECT
 FROM pivoted p
 LEFT JOIN ice_python.contract_dates cd
     ON cd.symbol = p.symbol
-    AND cd.trade_date = CURRENT_DATE
+    AND cd.trade_date = CURRENT_DATE - 1
 WHERE p.symbol IN (
     -- PJM Power Daily
     'PDP D0-IUS',   -- Bal Day
