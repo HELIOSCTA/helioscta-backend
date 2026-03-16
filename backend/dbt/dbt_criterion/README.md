@@ -76,6 +76,11 @@ Regions: NE, MW, ROX, SC, SE, WST. Sub-regions: ROX.SW, ROX.UPPER, SE.FL, SE.OTH
 | `criterion_long_term_sd.sql` | L48 demand/production/trade + regional demand & production breakdowns | 40 |
 | `criterion_storage_forecasts.sql` | Storage forecasts by EIA region, salt/non-salt, end-of-season targets | 18 |
 
+### `pipelines/` — Pipeline Metadata & Regional Mappings
+| Script | Description | Source |
+|--------|-------------|--------|
+| `criterion_pipeline_regional_mappings.sql` | Explore how nomination points map to EIA regions, states, pipelines, storage | `pipelines.*` |
+
 ### `pipeline_flows/` — Inter-Regional Flow Aggregations
 | Script | Description | Tickers |
 |--------|-------------|---------|

@@ -1,7 +1,7 @@
 # Gas EBBs — Status & Next Steps (Mar 16, 2026)
 
 > Context: Refactor is DONE (15 adapters, 165+ pipelines, YAML configs, Prefect flows).
-> Current focus: **Harden scrapers → Outage extraction → Impact analysis → Dashboard.**
+> Current focus: **Stabilize & validate (Phase 1.5) → Outage extraction → Impact analysis → Dashboard.**
 
 ---
 
@@ -48,11 +48,72 @@
 
 ---
 
-## Phase 2: Notice Classification & Outage Extraction
+## Phase 1.5: Stabilize & Validate
 
-- [ ] **Improve `notice_classifier.py`** — better separation of planned outages vs OFOs vs force majeures vs routine
-  - Current: regex-only, no feedback loop or override mechanism
-  - Consider: YAML-driven rules, detail-page override (if detail says "Force Majeure", upgrade classification)
+> Bridge between "scrapers work" and "extract structured data". High value, moderate effort.
+
+### 1. Data Quality Audit ✓
+- [x] **Query classification breakdown** — 7,276 notices. Before tuning: 60.7% "other", 20.5% capacity_reduction, 12.6% maintenance, 5.4% ofo, 0.7% FM, 0.1% critical_alert
+- [x] **Identified reclassifiable patterns** — "Market and Production Constraints" (341), weather alerts (38), standalone outage (90), operations advisories (82), unauthorized receipts/hourly takes (25)
+- [x] **Remaining "other" breakdown** — timely cycle volumes (~1,462), billing (121), confirmations (136), regulatory (76), IT/admin (96) — genuinely informational
+- [x] **No duplicates found** — PK constraint (`source_family, pipeline_name, notice_identifier`) is enforced
+- [x] **Freshness check** — all 7 active source families scraped within last hour; northern_natural data is stale (newest posted Sep 2024) but scraper is running
+- [x] **Missing fields** — `end_datetime` empty for: bhegts (100%), williams (75%), piperiv (33%), gasnom (78%). Open-ended notices use 14-day fallback heuristic
+- [x] **Fixed API date parsing** — was only parsing 4 formats (62% coverage). Added ISO 8601 (bhegts), `Mon DD, YYYY` (gasnom), `Mon DD YYYY` (northern_natural), `MM/DD/YYYY HH:MM:SS TZ` (williams). Now **100% parse rate** across all 7,286 notices
+- [x] **Validated active/upcoming heuristics** — 575 active, 39 upcoming, 0 unknown timing (was 2,746 unknown before date fix), 248 deactivated
+
+### 2. Classifier Tuning ✓
+- [x] **Improved `notice_classifier.py`** — 6 categories + other (was 5 + other)
+  - Expanded `ofo`: +unauthorized receipts, hourly takes advisory
+  - Expanded `critical_alert`: +weather alert, high wind, winter weather, cold weather, ice storm
+  - Expanded `capacity_reduction`: +market/production constraints, limited flexibility
+  - NEW `operations_advisory` (sev 3): operations advisory, system operating conditions, line pack, location performance
+  - Expanded `maintenance`: +standalone "outage", "pigging"
+  - 658 notices reclassified, "other" dropped 60.7% → 51.7%
+- [x] **Updated DB** — 658 rows in `gas_ebbs.notices`, 20,089 rows in `gas_ebbs.notice_snapshots`
+- [x] **Final breakdown**: other 51.7%, capacity_reduction 25.3%, maintenance 13.8%, ofo 5.7%, operations_advisory 2.1%, FM 0.7%, critical_alert 0.6%
+
+### 3. Failure Monitoring ✓
+- [x] **Built `monitor.py`** — queries `logging.pipeline_runs`, classifies pipelines as HEALTHY/FLAKY/DEGRADED/DEAD
+  - Usage: `python monitor.py`, `--failures` (failures only), `--hours 6` (custom window)
+  - Current state (24h): 70 healthy, 21 flaky, 16 degraded, 18 dead
+  - 10 of 18 "dead" are disabled pipelines (pre-fix runs still in window); 8 are infra issues (503/timeout)
+- [ ] **Add scheduled alert delivery** — Slack webhook or email when a previously-healthy pipeline goes DEAD/DEGRADED
+- [ ] **Add scraper health dashboard** — simple view of pass/fail rates by source family over last 7 days
+
+### 4. Dashboard Validation ✓
+- [x] **Fixed API date parsing** — `parseTimestampSql()` only handled 4 date formats (62% of notices). Added 4 new formats:
+  - ISO 8601 with fractional seconds (bhegts): `2025-12-04T15:15:22.632`
+  - Month name with comma (gasnom): `Dec 1, 2025 08:59:45 AM`
+  - Month name without comma (northern_natural): `Aug 13 2024 2:00 PM`
+  - 24h with timezone abbreviation (williams): `01/01/2024 08:20:43 CST`
+  - **100% parse rate** (was 62.2%) → 575 active, 39 upcoming, 0 unknown (was 2,746 unknown)
+- [ ] **Visual smoke test** — open dashboard in browser and verify KPIs/charts render correctly with full data
+- [ ] **Check `notice_snapshots` timeline chart** — does the 120-day line chart show meaningful scrape-over-scrape history?
+
+### 5. Parallel Scraping ✓
+- [x] **`runs.py` now runs families concurrently** via `ThreadPoolExecutor(max_workers=10)`
+  - Pipelines within same source family run sequentially (rate-limit courtesy)
+  - Different families run in parallel (e.g. PipeRiv, Enbridge, KM all at once)
+  - `--sequential` flag to force old behavior
+  - Thread-safe output with `_print_lock`, atomic counter with `_counter_lock`
+
+### 6. TCE / Tallgrass ✓
+- [x] **TCE adapter rewritten** — discovered jqGrid JSON endpoints behind the SPA
+  - Critical: `webmethods/SSRS_ListCriticalNotices.aspx?assetid={id}&page=1&rows=500`
+  - Non-critical: `webmethods/SSRS_ListNonCriticalNotices.aspx?assetid={id}&page=1&rows=500`
+  - Added `assetid` to all 11 pipelines in `tce.yaml`
+  - **11/11 passing, 476 notices upserted** (was 0 across all 11)
+  - Note: the endpoint without `page`/`rows` params returns 500 (server overflow bug)
+- [x] **Tallgrass: blocked by Incapsula WAF** — entire site behind Imperva bot challenge
+  - All 4 pipelines disabled with `disabled_reason`
+  - Requires Playwright with browser automation to solve challenge (not installed)
+  - Revisit if Playwright is added or if Tallgrass changes EBB platform
+
+---
+
+## Phase 2: Outage Extraction & Detail Enrichment
+
 - [ ] **Implement `_fetch_detail()` enrichment** — base class has the stub, adapters need detail-page parsing
   - Extract: full notice text, gas_day_start/end, capacity values, affected receipt/delivery points
   - Cap detail fetches per run (e.g., 100) to avoid rate-limiting
@@ -86,15 +147,17 @@
 
 ## Gaps & Risks
 
-| # | Item | Severity | Notes |
-|---|------|----------|-------|
-| 1 | Adapters not yet live-tested end-to-end | **High** | Everything downstream depends on stable scrapes |
-| 2 | Detail enrichment (`_fetch_detail`) is stubbed | Medium | Most adapters only scrape listing pages — detail content not captured |
-| 3 | No impact analysis layer | High (for dashboard goal) | No pipeline-to-region mapping, capacity data, or pricing impact |
-| 4 | Tallgrass may need Selenium | Medium | Comment in code; plain HTML may return empty |
-| 5 | Standalone adapter is best-effort | Medium | 30+ pipelines on heuristic parsing — fragile |
-| 6 | `scrape_runs` table from design doc | Low | `PipelineRunLogger` may serve this role; explicit table not created |
-| 7 | Classifier is regex-only | Low | Works for common patterns; may misclassify edge cases |
+| # | Item | Severity | Phase | Notes |
+|---|------|----------|-------|-------|
+| 1 | No failure monitoring / alerting | **High** | 1.5 | `PipelineRunLogger` writes to DB but nothing watches it — silent overnight failures |
+| 2 | Data quality unvalidated | **High** | 1.5 | ~7K notices in DB but classification breakdown, dedup, and active heuristics untested |
+| 3 | Dashboard untested with real data | Medium | 1.5 | 7 SQL queries, KPIs, timeline exist but not validated against actual notice corpus |
+| 4 | Sequential scraping is slow | Medium | 1.5 | 100+ pipelines × 30s timeout = 50+ min worst case in hourly window |
+| 5 | ~~TCE/Tallgrass return 0 notices~~ | ~~Medium~~ | ~~1.5~~ | TCE fixed (476 notices). Tallgrass blocked by Incapsula WAF (4 pipelines disabled) |
+| 6 | Classifier is regex-only | Medium | 1.5 | Works for common patterns; may misclassify edge cases. Tunable with existing data |
+| 7 | Detail enrichment (`_fetch_detail`) stubbed | Medium | 2 | Most adapters only scrape listing pages — detail content not captured |
+| 8 | No impact analysis layer | High (for dashboard) | 3 | No pipeline-to-region mapping, capacity data, or pricing impact |
+| 9 | Standalone adapter is best-effort | Medium | — | 18 active pipelines on heuristic parsing — fragile |
 
 ---
 

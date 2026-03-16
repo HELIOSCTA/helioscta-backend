@@ -5,13 +5,14 @@
 }}
 
 ---------------------------
--- LATEST REVISION ONLY
+-- LATEST REVISION PER SECURITY
 -- data_type is always PX_LAST
 ---------------------------
 
 WITH LATEST AS (
     SELECT
         date,
+        snapshot_at,
         security,
         value
     FROM {{ ref('staging_v1_bbg_historical_with_tickers') }}
@@ -20,12 +21,13 @@ WITH LATEST AS (
 
 ---------------------------
 -- PIVOT: LONG → WIDE
--- One row per date, one column per security
+-- One row per date; snapshot_at = latest across all securities
 ---------------------------
 
 PIVOTED AS (
     SELECT
         date,
+        MAX(snapshot_at)::TIMESTAMP AS snapshot_at,
 
         -- production
         MAX(CASE WHEN security = 'GSPRODUS Index' THEN value END)::NUMERIC AS production,
@@ -85,35 +87,52 @@ PIVOTED AS (
         MAX(CASE WHEN security = 'HISTCNEC Index' THEN value END)::NUMERIC AS elec_cdd,
         MAX(CASE WHEN security = 'HISTCNEH Index' THEN value END)::NUMERIC AS elec_hdd,
         MAX(CASE WHEN security = 'HISTCNGC Index' THEN value END)::NUMERIC AS gas_cdd,
-        MAX(CASE WHEN security = 'HISTCNGH Index' THEN value END)::NUMERIC AS gas_hdd,
-
-        -- spot prices
-        MAX(CASE WHEN security = 'NGNEZN5S BNGC Index' THEN value END)::NUMERIC AS z5_spot,
-        MAX(CASE WHEN security = 'NGNEAGNG BNGC Index' THEN value END)::NUMERIC AS m3_spot,
-        MAX(CASE WHEN security = 'NGGCTR85 BNGC Index' THEN value END)::NUMERIC AS st85_spot,
-        MAX(CASE WHEN security = 'NGUSHHUB BNGC Index' THEN value END)::NUMERIC AS henry_spot,
-        MAX(CASE WHEN security = 'NGGCHOUS BNGC Index' THEN value END)::NUMERIC AS hsc_spot,
-        MAX(CASE WHEN security = 'NGTXOASI BNGC Index' THEN value END)::NUMERIC AS waha_spot,
-        MAX(CASE WHEN security = 'NAGANGPL BNGC Index' THEN value END)::NUMERIC AS chicago_spot,
-        MAX(CASE WHEN security = 'NGRMNWRM BNGC Index' THEN value END)::NUMERIC AS rox_spot,
-        MAX(CASE WHEN security = 'NGWCPGSP BNGC Index' THEN value END)::NUMERIC AS malin_spot,
-        MAX(CASE WHEN security = 'NGWCPGNE BNGC Index' THEN value END)::NUMERIC AS pge_spot,
-        MAX(CASE WHEN security = 'NGWCSCAL BNGC Index' THEN value END)::NUMERIC AS socal_border_spot,
-        MAX(CASE WHEN security = 'NGWCSCCG BNGC Index' THEN value END)::NUMERIC AS socal_city_spot,
-        MAX(CASE WHEN security = 'NGCGBOST BNGC Index' THEN value END)::NUMERIC AS agt_spot,
-        MAX(CASE WHEN security = 'NGCGNYNY Index' THEN value END)::NUMERIC AS nyc_spot
+        MAX(CASE WHEN security = 'HISTCNGH Index' THEN value END)::NUMERIC AS gas_hdd
 
     FROM LATEST
     GROUP BY date
 ),
 
 ---------------------------
+-- REVISION TRACKING
+-- Count distinct snapshots per date from full (unfiltered) history
+---------------------------
+
+SNAPSHOT_COUNTS AS (
+    SELECT
+        date,
+        COUNT(DISTINCT snapshot_at)::INTEGER AS max_revision
+    FROM {{ ref('staging_v1_bbg_historical_with_tickers') }}
+    GROUP BY date
+),
+
+PIVOTED_WITH_REVISIONS AS (
+    SELECT
+        p.*,
+        COALESCE(sc.max_revision, 1)::INTEGER AS max_revision,
+        COALESCE(sc.max_revision, 1)::INTEGER AS revision
+    FROM PIVOTED AS p
+    LEFT JOIN SNAPSHOT_COUNTS AS sc
+        ON p.date = sc.date
+),
+
+---------------------------
 -- LNG: ABS (Bloomberg reports as negative)
+-- COMPUTED SUPPLY & DEMAND
 ---------------------------
 
 DAILY AS (
     SELECT
         date,
+        snapshot_at,
+        revision,
+        max_revision,
+
+        -- weather
+        elec_cdd,
+        elec_hdd,
+        gas_cdd,
+        gas_hdd,
 
         -- supply
         (COALESCE(production, 0) + COALESCE(cad_imports, 0))::NUMERIC AS total_supply,
@@ -171,31 +190,9 @@ DAILY AS (
 
         -- storage
         storage,
-        salt,
+        salt
 
-        -- weather
-        elec_cdd,
-        elec_hdd,
-        gas_cdd,
-        gas_hdd,
-
-        -- spot prices
-        z5_spot,
-        m3_spot,
-        st85_spot,
-        henry_spot,
-        hsc_spot,
-        waha_spot,
-        chicago_spot,
-        rox_spot,
-        malin_spot,
-        pge_spot,
-        socal_border_spot,
-        socal_city_spot,
-        agt_spot,
-        nyc_spot
-
-    FROM PIVOTED
+    FROM PIVOTED_WITH_REVISIONS
 ),
 
 ---------------------------

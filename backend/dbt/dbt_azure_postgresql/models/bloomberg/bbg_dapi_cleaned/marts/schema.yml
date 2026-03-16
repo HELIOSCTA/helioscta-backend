@@ -47,6 +47,26 @@ models:
         tests:
           - not_null
           - unique
+      - name: snapshot_at
+        description: "Latest snapshot timestamp for this date across all securities."
+        tests:
+          - not_null
+      - name: revision
+        description: "Number of distinct snapshots recorded for this date (equals max_revision since view shows consolidated latest)."
+        tests:
+          - not_null
+      - name: max_revision
+        description: "Total number of distinct snapshots recorded for this date."
+        tests:
+          - not_null
+      - name: elec_cdd
+        description: "Electric CDD. Ticker: HISTCNEC."
+      - name: elec_hdd
+        description: "Electric HDD. Ticker: HISTCNEH."
+      - name: gas_cdd
+        description: "Gas CDD. Ticker: HISTCNGC."
+      - name: gas_hdd
+        description: "Gas HDD. Ticker: HISTCNGH."
       - name: total_supply
         description: "Total supply = production + cad_imports (BCF/d)."
       - name: production
@@ -141,39 +161,3 @@ models:
         description: "Balancing item = implied_storage - storage (BCF/d)."
       - name: salt
         description: "Salt storage (BCF/d). Ticker: GSTMSMPL."
-      - name: elec_cdd
-        description: "Electric CDD. Ticker: HISTCNEC."
-      - name: elec_hdd
-        description: "Electric HDD. Ticker: HISTCNEH."
-      - name: gas_cdd
-        description: "Gas CDD. Ticker: HISTCNGC."
-      - name: gas_hdd
-        description: "Gas HDD. Ticker: HISTCNGH."
-      - name: z5_spot
-        description: "Transco Zone 5 spot price ($/MMBtu). Ticker: NGNEZN5S."
-      - name: m3_spot
-        description: "Transco Zone 3 / Algonquin spot price ($/MMBtu). Ticker: NGNEAGNG."
-      - name: st85_spot
-        description: "Transco Station 85 spot price ($/MMBtu). Ticker: NGGCTR85."
-      - name: henry_spot
-        description: "Henry Hub spot price ($/MMBtu). Ticker: NGUSHHUB."
-      - name: hsc_spot
-        description: "Houston Ship Channel spot price ($/MMBtu). Ticker: NGGCHOUS."
-      - name: waha_spot
-        description: "Waha spot price ($/MMBtu). Ticker: NGTXOASI."
-      - name: chicago_spot
-        description: "Chicago/NGPL spot price ($/MMBtu). Ticker: NAGANGPL."
-      - name: rox_spot
-        description: "Rockies/Opal spot price ($/MMBtu). Ticker: NGRMNWRM."
-      - name: malin_spot
-        description: "Malin spot price ($/MMBtu). Ticker: NGWCPGSP."
-      - name: pge_spot
-        description: "PG&E Citygate spot price ($/MMBtu). Ticker: NGWCPGNE."
-      - name: socal_border_spot
-        description: "SoCal Border spot price ($/MMBtu). Ticker: NGWCSCAL."
-      - name: socal_city_spot
-        description: "SoCal Citygate spot price ($/MMBtu). Ticker: NGWCSCCG."
-      - name: agt_spot
-        description: "Algonquin/AGT spot price ($/MMBtu). Ticker: NGCGBOST."
-      - name: nyc_spot
-        description: "New York Citygate spot price ($/MMBtu). Ticker: NGCGNYNY."

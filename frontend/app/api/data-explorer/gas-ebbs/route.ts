@@ -13,12 +13,28 @@ const TIMELINE_RECENT_ENDED_DAYS = 7;
 function parseTimestampSql(column: string): string {
   return `
     CASE
+      -- ISO 8601: 2025-12-04T15:15:22.632 (bhegts)
+      WHEN ${column} ~ '^\\d{4}-\\d{2}-\\d{2}T'
+        THEN regexp_replace(${column}, '\\.\\d+$', '')::timestamp
+      -- MM/DD/YYYY HH:MM:SS AM/PM (enbridge, kindermorgan)
       WHEN ${column} ~ '^\\d{2}/\\d{2}/\\d{4}\\s+\\d{1,2}:\\d{2}:\\d{2}\\s?(AM|PM)$'
         THEN to_timestamp(regexp_replace(${column}, '\\s*(AM|PM)$', ' \\1'), 'MM/DD/YYYY HH12:MI:SS AM')
+      -- MM/DD/YY HH:MM:SS AM/PM
       WHEN ${column} ~ '^\\d{2}/\\d{2}/\\d{2}\\s+\\d{1,2}:\\d{2}:\\d{2}\\s?(AM|PM)$'
         THEN to_timestamp(regexp_replace(${column}, '\\s*(AM|PM)$', ' \\1'), 'MM/DD/YY HH12:MI:SS AM')
+      -- MM/DD/YYYY HH:MM:SS TZ — 24h with 3-4 char timezone abbrev (williams)
+      WHEN ${column} ~ '^\\d{2}/\\d{2}/\\d{4}\\s+\\d{2}:\\d{2}:\\d{2}\\s+[A-Z]{3,4}$'
+        THEN to_timestamp(regexp_replace(${column}, '\\s+[A-Z]{3,4}$', ''), 'MM/DD/YYYY HH24:MI:SS')
+      -- Mon DD, YYYY HH:MM:SS AM/PM (gasnom)
+      WHEN ${column} ~ '^[A-Z][a-z]{2}\\s+\\d{1,2},\\s*\\d{4}\\s+\\d{1,2}:\\d{2}:\\d{2}\\s?(AM|PM)$'
+        THEN to_timestamp(regexp_replace(${column}, '\\s*(AM|PM)$', ' \\1'), 'Mon DD, YYYY HH12:MI:SS AM')
+      -- Mon DD YYYY H:MM AM/PM — no comma (northern_natural)
+      WHEN ${column} ~ '^[A-Z][a-z]{2}\\s+\\d{1,2}\\s+\\d{4}\\s+\\d{1,2}:\\d{2}\\s?(AM|PM)$'
+        THEN to_timestamp(regexp_replace(${column}, '\\s*(AM|PM)$', ' \\1'), 'Mon DD YYYY HH12:MI AM')
+      -- MM/DD/YYYY (date only)
       WHEN ${column} ~ '^\\d{2}/\\d{2}/\\d{4}$'
         THEN to_date(${column}, 'MM/DD/YYYY')::timestamp
+      -- MM/DD/YY (date only)
       WHEN ${column} ~ '^\\d{2}/\\d{2}/\\d{2}$'
         THEN to_date(${column}, 'MM/DD/YY')::timestamp
       ELSE NULL

@@ -8,17 +8,27 @@ defaults:
     - "%m/%d/%Y %I:%M %p"
     - "%m/%d/%Y %H:%M:%S"
     - "%m/%d/%Y"
-  # NOTE: Tallgrass likely requires Selenium for JS rendering.
+  # BLOCKED: Entire site behind Incapsula/Imperva WAF (bot challenge).
+  # Plain HTTP returns Incapsula challenge page. Requires Playwright with
+  # browser automation to solve challenge, or alternate data source.
 
 pipelines:
   rockies_express:
     pipeline_label: "REX"
+    disabled: true
+    disabled_reason: "Incapsula WAF bot challenge — requires Playwright"
 
   ruby:
     pipeline_label: "Ruby"
+    disabled: true
+    disabled_reason: "Incapsula WAF bot challenge — requires Playwright"
 
   tallgrass_interstate:
     pipeline_label: "Tallgrass Interstate"
+    disabled: true
+    disabled_reason: "Incapsula WAF bot challenge — requires Playwright"
 
   trailblazer:
     pipeline_label: "Trailblazer"
+    disabled: true
+    disabled_reason: "Incapsula WAF bot challenge — requires Playwright"

@@ -44,7 +44,18 @@ models:
         description: "Observation date."
         tests:
           - not_null
-          - unique
+      - name: snapshot_at
+        description: '{{ doc("bbg_dapi_col_snapshot_at") }}'
+        tests:
+          - not_null
+      - name: revision
+        description: "Snapshot revision number within each date."
+        tests:
+          - not_null
+      - name: max_revision
+        description: "Total snapshots for this date."
+        tests:
+          - not_null
       - name: production
         description: "Total Lower 48 dry gas production (BCF/d). Ticker: GSPRODUS."
       - name: total_supply
@@ -57,5 +68,3 @@ models:
         description: "Implied storage = total_supply - total_demand."
       - name: balancing_item
         description: "Balancing item = implied_storage - storage."
-      - name: henry_spot
-        description: "Henry Hub spot price ($/MMBtu). Ticker: NGUSHHUB."

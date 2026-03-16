@@ -12,6 +12,15 @@ WITH FINAL AS (
     SELECT
         -- date
         date
+        ,snapshot_at
+        ,revision
+        ,max_revision
+
+        -- weather
+        ,elec_cdd
+        ,elec_hdd
+        ,gas_cdd
+        ,gas_hdd
 
         -- supply
         ,total_supply
@@ -78,30 +87,8 @@ WITH FINAL AS (
         -- salt
         ,salt
 
-        -- weather
-        ,elec_cdd
-        ,elec_hdd
-        ,gas_cdd
-        ,gas_hdd
-
-        -- spot prices
-        ,z5_spot
-        ,m3_spot
-        ,st85_spot
-        ,henry_spot
-        ,hsc_spot
-        ,waha_spot
-        ,chicago_spot
-        ,rox_spot
-        ,malin_spot
-        ,pge_spot
-        ,socal_border_spot
-        ,socal_city_spot
-        ,agt_spot
-        ,nyc_spot
-
     FROM {{ ref('staging_v1_bbg_gas_supply_demand') }}
 )
 
 SELECT * FROM FINAL
-ORDER BY date DESC
+ORDER BY date DESC, snapshot_at DESC
