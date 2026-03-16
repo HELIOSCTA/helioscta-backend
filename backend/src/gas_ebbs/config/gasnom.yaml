@@ -1,8 +1,8 @@
 source_family: gasnom
 
 defaults:
-  base_url: "http://www.gasnom.com/ip"
-  listing_url: "http://www.gasnom.com/ip"
+  base_url: "http://www.gasnom.com"
+  listing_url: "http://www.gasnom.com"
   datetime_formats:
     - "%m/%d/%Y %I:%M:%S %p"
     - "%m/%d/%Y %I:%M %p"

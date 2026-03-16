@@ -13,43 +13,15 @@ defaults:
     - "%Y-%m-%dT%H:%M:%S"
 
 pipelines:
+  # ── Active ──────────────────────────────────────────────────────────────
   iroquois:
     listing_url: "https://iol.iroquois.com/Infopost/Pages/Default.php"
 
   gulf_south:
     listing_url: "https://www.gasquest.com/informational-posting"
 
-  southern_star:
-    listing_url: "https://csimain.southernstar.com/dashboard"
-    notes: "Requires login"
-
   texas_gas:
     listing_url: "http://infopost.txgt.com"
-
-  sabine:
-    listing_url: "http://www.sabinepipeline.com"
-
-  empire:
-    listing_url: "https://informationalpostings.natfuel.com/empire/infopost/"
-
-  national_fuel:
-    listing_url: "https://informationalpostings.natfuel.com/supply/infopost/"
-
-  enable_gas:
-    listing_url: "http://pipelines.enablemidstream.com/EGT.html"
-
-  enable_mrt:
-    listing_url: "http://pipelines.enablemidstream.com/MRT.html"
-
-  enterprise_hios:
-    listing_url: "http://ebb.starwebgas.com/ebbSTG/EbbMain.asp?sPipelineCode=HIOS"
-
-  enterprise_petal:
-    listing_url: "http://ebb.starwebgas.com/ebbSTG/EbbMain.asp?sPipelineCode=PGS"
-
-  kern_river:
-    listing_url: "http://www.services.kernrivergas.com"
-    notes: "DNS issues reported"
 
   wbi_energy:
     listing_url: "http://transmission.wbienergy.com"
@@ -57,47 +29,95 @@ pipelines:
   alliance:
     listing_url: "http://ips.alliance-pipeline.com"
 
-  florida_southeast:
-    listing_url: "https://fsc.nexteraenergyresources.com/ptms"
-    notes: "Trellis-based"
-
-  black_marlin:
-    listing_url: "http://www.blackmarlin.williamsenergy.com"
-    notes: "Williams-related"
-
-  mountainwest:
-    listing_url: "http://www.questarpipeline.com/index.php"
-
-  mountainwest_overthrust:
-    listing_url: "http://www.questarpipeline.com/indexOTP.php"
-
   paiute:
     listing_url: "http://www.paiutepipeline.com/"
 
   boardwalk_storage:
     listing_url: "https://www.bwpipelines.com/"
-    notes: "Boardwalk/GasQuest"
-
-  dcp_cimarron:
-    listing_url: "http://ebb.dcpmidstream.com/Cimarron"
-
-  dcp_dauphin:
-    listing_url: "http://ebb.dcpmidstream.com/DIGP"
 
   vector:
     listing_url: "http://www.vector-pipeline.com/informational-postings/"
-
-  stingray:
-    listing_url: "http://stingray.mcpoperating.com/informational-postings/notices/"
-
-  ko_transmission:
-    listing_url: "http://www.kotransmission.com/"
-
-  westgas:
-    listing_url: "http://www1.xcelenergy.com/webebb/html/wgis.asp"
 
   white_river_hub:
     listing_url: "http://www.whiteriverhub.com/InformationalPostings/"
 
   oneok_oktex:
     listing_url: "http://www.oneok.com/okt"
+
+  southern_star:
+    listing_url: "https://csimain.southernstar.com/dashboard"
+
+  # ── Temporarily down (503) — keep enabled, may recover ─────────────────
+  dcp_cimarron:
+    listing_url: "https://ebb.dcpmidstream.com/Cimarron"
+
+  dcp_dauphin:
+    listing_url: "https://ebb.dcpmidstream.com/DIGP"
+
+  florida_southeast:
+    listing_url: "https://fsc.nexteraenergyresources.com/ptms"
+
+  mountainwest:
+    listing_url: "https://www.questarpipeline.com/index.php"
+
+  mountainwest_overthrust:
+    listing_url: "https://www.questarpipeline.com/indexOTP.php"
+
+  # ── Timeouts — keep enabled, may be intermittent ───────────────────────
+  enable_gas:
+    listing_url: "http://pipelines.enablemidstream.com/EGT.html"
+
+  enable_mrt:
+    listing_url: "http://pipelines.enablemidstream.com/MRT.html"
+
+  # ── Disabled: DNS dead / domain decommissioned (Mar 2026) ──────────────
+  black_marlin:
+    listing_url: "http://www.blackmarlin.williamsenergy.com"
+    disabled: true
+    disabled_reason: "DNS resolution failure — domain decommissioned"
+
+  enterprise_hios:
+    listing_url: "http://ebb.starwebgas.com/ebbSTG/EbbMain.asp?sPipelineCode=HIOS"
+    disabled: true
+    disabled_reason: "DNS resolution failure — ebb.starwebgas.com decommissioned"
+
+  enterprise_petal:
+    listing_url: "http://ebb.starwebgas.com/ebbSTG/EbbMain.asp?sPipelineCode=PGS"
+    disabled: true
+    disabled_reason: "DNS resolution failure — ebb.starwebgas.com decommissioned"
+
+  kern_river:
+    listing_url: "http://www.services.kernrivergas.com"
+    disabled: true
+    disabled_reason: "DNS resolution failure — domain decommissioned"
+
+  ko_transmission:
+    listing_url: "http://www.kotransmission.com/"
+    disabled: true
+    disabled_reason: "DNS resolution failure — domain decommissioned"
+
+  westgas:
+    listing_url: "https://gidx-lc.xcelenergy.com/webebb/html/wgis.asp"
+    disabled: true
+    disabled_reason: "DNS resolution failure — domain decommissioned"
+
+  # ── Disabled: 403/404 — blocked or page removed ────────────────────────
+  empire:
+    listing_url: "https://informationalpostings.natfuel.com/empire/infopost/"
+    disabled: true
+    disabled_reason: "403 Forbidden — requires auth or IP whitelist"
+
+  national_fuel:
+    listing_url: "https://informationalpostings.natfuel.com/supply/infopost/"
+    disabled: true
+    disabled_reason: "403 Forbidden — requires auth or IP whitelist"
+
+  sabine:
+    listing_url: "http://www.sabinepipeline.com/"
+    disabled: true
+    disabled_reason: "404 Not Found — page removed"
+
+  stingray:
+    listing_url: "http://stingray.mcpoperating.com/informational-postings/notices/"
+    disabled: true
+    disabled_reason: "404 Not Found — page removed"

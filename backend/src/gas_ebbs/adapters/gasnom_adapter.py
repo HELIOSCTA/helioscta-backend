@@ -37,15 +37,24 @@ class GasNomAdapter(EBBScraper):
     """
 
     def _get_listing_sources(self) -> list[dict]:
-        """Return the listing URL for the pipeline."""
+        """Return listing URLs for critical and non-critical notices.
+
+        GasNom serves notices at /ip/{path}/notices.cfm?type=1 (Critical)
+        and /ip/{path}/notices.cfm?type=2 (Non-Critical).
+        """
         path = self.config["path"]
         base = self.config.get("base_url", BASE_URL)
+        notice_types = self.config.get("notice_types", [
+            {"code": "1", "label": "Critical"},
+            {"code": "2", "label": "Non-Critical"},
+        ])
 
         return [
             {
-                "url": f"{base}/ip/{path}/",
-                "label": f"{self.pipeline_name}",
+                "url": f"{base}/ip/{path}/notices.cfm?type={nt['code']}",
+                "label": f"{self.pipeline_name} ({nt['label']})",
             }
+            for nt in notice_types
         ]
 
     def _parse_listing(self, html: str, **kwargs) -> list[dict]:

@@ -402,12 +402,16 @@ def create_scraper(source_family: str, pipeline_name: str) -> EBBScraper:
 def discover_all_pipelines() -> list[tuple[str, str, Path]]:
     """Discover all configured pipelines across all YAML configs.
 
+    Skips pipelines with ``disabled: true`` in their config.
+
     Returns a sorted list of (pipeline_name, source_family, config_path) tuples.
     """
     pipelines = []
     for yaml_file in sorted(CONFIG_DIR.glob("*.yaml")):
         family_config = load_family_config(yaml_file)
         source_family = family_config["source_family"]
-        for name in sorted(family_config.get("pipelines", {}).keys()):
+        for name, pconfig in sorted(family_config.get("pipelines", {}).items()):
+            if isinstance(pconfig, dict) and pconfig.get("disabled"):
+                continue
             pipelines.append((name, source_family, yaml_file))
     return pipelines

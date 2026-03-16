@@ -2,16 +2,16 @@
 Williams 1Line source-family adapter.
 
 Handles all pipelines hosted on the Williams 1Line platform:
-  - Transco          (1line.williams.com/Transco)
-  - Northwest        (1line.williams.com/Northwest)
-  - Gulfstream       (1line.gulfstreamgas.com)
-  - Discovery        (discovery.williams.com)
-  - Pine Needle LNG  (pineneedle.williams.com)
+  - Transco          (BUID=80)
+  - Gulfstream       (BUID=205)
+  - Pine Needle LNG  (BUID=82)
+  - Northwest        (decommissioned/unavailable)
+  - Discovery        (decommissioned/unavailable)
 
-Williams uses a frame-based HTML system. Notices are served at
-``{base_url}/info-postings/notices/{type}-notices.html`` for both
-critical and non-critical notice types. The actual notice data may be
-rendered inside iframes or loaded via ``ebbCode/LoadPortalResource.jsp``.
+Williams serves notice data via JSF at:
+    https://www.1line.williams.com/xhtml/notice_list.jsf?buid={BUID}&...
+
+The JSF endpoint returns HTML tables directly (no JavaScript rendering needed).
 
 EBB: https://www.1line.williams.com
 """
@@ -22,14 +22,17 @@ from backend.src.gas_ebbs.base_scraper import EBBScraper, register_adapter
 from backend.src.gas_ebbs.ebb_utils import clean_text, extract_numeric_id
 
 
+JSF_BASE = "https://www.1line.williams.com/xhtml/notice_list.jsf"
+
+
 @register_adapter("williams")
 class WilliamsAdapter(EBBScraper):
     """Adapter for Williams 1Line EBB pages.
 
-    Williams serves notices in HTML tables embedded within their
-    info-postings section. Each pipeline has its own base URL.
+    Williams serves notices via a JSF endpoint that returns server-rendered
+    HTML tables. Each pipeline is identified by a BUID.
 
-    Expected table columns (critical notices, 7 columns):
+    Expected table columns (8 columns):
         0: Notice Type
         1: Posted Date/Time
         2: Effective Date/Time
@@ -37,18 +40,27 @@ class WilliamsAdapter(EBBScraper):
         4: Notice ID (numeric)
         5: Subject (may be linked)
         6: Response Date/Time
-
-    Non-critical notices may have 6 columns (no Response Date/Time).
+        7: Download link (ignored)
     """
 
     def _get_listing_sources(self) -> list[dict]:
-        """Return one source per configured notice type (critical, non-critical)."""
-        base_url = self.config["base_url"]
+        """Return JSF URLs for critical and non-critical notices."""
+        buid = self.config.get("buid", "")
+        if not buid or self.config.get("disabled"):
+            return []
+
+        jsf_base = self.config.get("jsf_base_url", JSF_BASE)
         notice_types = self.config.get("notice_types", ["critical", "non-critical"])
 
         sources = []
         for nt in notice_types:
-            url = f"{base_url}/info-postings/notices/{nt}-notices.html"
+            critical_ind = "Y" if nt == "critical" else "N"
+            url = (
+                f"{jsf_base}?buid={buid}"
+                f"&type=-1&type2=-1&archive=N"
+                f"&critical_ind={critical_ind}"
+                f"&hfSortField=posted_date&hfSortDir=DESC"
+            )
             sources.append(
                 {
                     "url": url,
@@ -60,18 +72,12 @@ class WilliamsAdapter(EBBScraper):
 
     def _parse_listing(self, html: str, **kwargs) -> list[dict]:
         notice_type_code = kwargs.get("notice_type_code", "critical")
-        base_url = self.config["base_url"]
+        base_url = self.config.get("base_url", "https://www.1line.williams.com")
 
         soup = BeautifulSoup(html, "html.parser")
 
-        # Williams may serve content in iframes. If the page contains an
-        # iframe with notice data, attempt to identify the src for logging,
-        # but we parse whatever HTML tables are present on the page itself.
         tables = soup.find_all("table")
         if not tables:
-            # Check for iframe src — the actual data might be loaded separately.
-            # Return empty for now; the URL structure is set up correctly for
-            # when the page is fetched directly.
             return []
 
         # Find the data table — pick the table with the most rows
@@ -94,20 +100,16 @@ class WilliamsAdapter(EBBScraper):
             if len(cells) < 5:
                 continue
 
-            # Attempt to detect the notice ID column. Williams tables may
-            # vary; try column 4 first (standard layout), then scan for
-            # a cell containing a purely numeric value.
+            # Try column 4 first (standard layout), then scan
             notice_id = None
             notice_id_idx = None
 
-            # Standard layout: column 4 is Notice ID
             if len(cells) > 4:
                 candidate = clean_text(cells[4])
                 if extract_numeric_id(candidate):
                     notice_id = candidate
                     notice_id_idx = 4
 
-            # Fallback: scan cells for a numeric ID
             if notice_id is None:
                 for i, cell in enumerate(cells):
                     candidate = clean_text(cell)
@@ -119,8 +121,7 @@ class WilliamsAdapter(EBBScraper):
             if notice_id is None:
                 continue
 
-            # Build field mapping based on detected layout
-            # Standard 7-column layout: Type, Posted, Effective, End, ID, Subject, Response
+            # Standard 7-8 column layout: Type, Posted, Effective, End, ID, Subject, Response, [Download]
             if notice_id_idx == 4 and len(cells) >= 6:
                 notice_type_val = clean_text(cells[0])
                 posted_dt = clean_text(cells[1])
@@ -129,12 +130,10 @@ class WilliamsAdapter(EBBScraper):
                 subject_cell = cells[5]
                 response_dt = clean_text(cells[6]) if len(cells) >= 7 else ""
             else:
-                # Non-standard layout — extract what we can
                 notice_type_val = clean_text(cells[0]) if len(cells) > 0 else ""
                 posted_dt = clean_text(cells[1]) if len(cells) > 1 else ""
                 effective_dt = clean_text(cells[2]) if len(cells) > 2 else ""
                 end_dt = clean_text(cells[3]) if len(cells) > 3 else ""
-                # Subject is the cell after the ID
                 subj_idx = notice_id_idx + 1 if notice_id_idx + 1 < len(cells) else notice_id_idx
                 subject_cell = cells[subj_idx]
                 resp_idx = notice_id_idx + 2
@@ -143,14 +142,12 @@ class WilliamsAdapter(EBBScraper):
             subject_text = clean_text(subject_cell)
             subject_link = subject_cell.find("a")
 
-            # Build detail URL from link or construct one
             detail_url = ""
             if subject_link and subject_link.get("href"):
                 href = subject_link["href"]
                 if href.startswith("http"):
                     detail_url = href
                 elif href.startswith("/"):
-                    # Absolute path — combine with base URL host
                     detail_url = f"{base_url}{href}"
                 else:
                     detail_url = f"{base_url}/{href}"

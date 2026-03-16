@@ -116,8 +116,11 @@ class TCEAdapter(EBBScraper):
         except requests.RequestException:
             pass
 
-        # Fallback: fetch HTML page
-        response = requests.get(target, headers=DEFAULT_HEADERS, timeout=30)
+        # Fallback: fetch HTML page using the MobileInfoPost endpoint
+        # The API URL path /api/notices doesn't have an HTML equivalent,
+        # so swap to the known HTML endpoint which shares the same query params.
+        fallback_url = target.replace("/api/notices", "/MobileInfoPost.aspx")
+        response = requests.get(fallback_url, headers=DEFAULT_HEADERS, timeout=30)
         response.raise_for_status()
         return response.text
 
