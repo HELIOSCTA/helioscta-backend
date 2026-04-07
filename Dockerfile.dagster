@@ -1,0 +1,28 @@
+FROM python:3.12-slim
+
+WORKDIR /app
+
+# Install system dependencies for pyodbc
+RUN apt-get update && apt-get install -y \
+    unixodbc-dev \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install pendulum binary wheel first to avoid build issues
+RUN pip install --no-cache-dir pendulum --only-binary :all:
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Install dagster packages
+RUN pip install --no-cache-dir \
+    dagster \
+    dagster-webserver \
+    dagster-postgres \
+    dagster-dbt \
+    dbt-core \
+    dbt-postgres
+
+COPY . .
+
+RUN pip install -e . --no-deps

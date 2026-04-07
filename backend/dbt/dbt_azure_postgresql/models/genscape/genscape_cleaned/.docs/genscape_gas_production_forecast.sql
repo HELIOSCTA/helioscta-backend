@@ -105,4 +105,5 @@ select
   ,united_states_dry_gas_production_yoy
   ,united_states_oil_rig_count
   ,united_states_gas_rig_count
-from genscape_cleaned.genscape_gas_production_forecast
+from genscape_cleaned.genscape_gas_production_forecast_weekly
+-- or: from genscape_cleaned.genscape_gas_production_forecast_monthly

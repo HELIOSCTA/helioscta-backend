@@ -50,3 +50,50 @@ sources:
           (HISTORICAL_HOURLY_OBSERVED). One row per date x hour x station with
           temperature, dewpoint, cloud cover, wind, heat index, wind chill,
           relative humidity, and precipitation. PK: (date, hour, region, site_id, station_name).
+
+      # ── Daily Observed Temperatures ─────────────────────────────
+      - name: daily_observed_temp_v3_2025_09_08
+        description: >
+          Daily observed temperature data from WSI GetHistoricalObservations.
+          One row per date x region x station with avg/min/max temperature and
+          CDD/HDD degree days. PK: (date, region, site_id, station_name).
+
+      # ── WSI Homepage Forecast Tables ────────────────────────────
+      - name: wsi_homepage_forecast_table_avg_v1_2026_jan_12
+        description: >
+          WSI homepage daily temperature forecast — average temperature and normals.
+          One row per forecast_datetime x forecast_date x site_id with avg temp and
+          normal values. PK: (forecast_datetime, forecast_date, site_id).
+
+      - name: wsi_homepage_forecast_table_hddcdd_v1_2026_jan_12
+        description: >
+          WSI homepage daily temperature forecast — HDD/CDD degree days and normals.
+          One row per forecast_datetime x forecast_date x site_id with CDD, HDD,
+          and normal values. PK: (forecast_datetime, forecast_date, site_id).
+
+      - name: wsi_homepage_forecast_table_minmax_v1_2026_jan_12
+        description: >
+          WSI homepage daily temperature forecast — min/max temperatures and normals.
+          One row per forecast_datetime x forecast_date x site_id with min/max temp
+          and normal values. PK: (forecast_datetime, forecast_date, site_id).
+
+      # ── Weighted Daily Forecast Temperatures ────────────────────
+      - name: weighted_temp_daily_forecast_city_v2_2026_jan_12
+        description: >
+          City-level daily temperature forecast from WSI weighted temp API.
+          One row per initdate_utc x forecast_date x station with min/max/avg
+          temperature and CDD/HDD degree days. PK: (initdate_utc, validdate, icao).
+
+      - name: weighted_temp_daily_forecast_iso_models_v2_2026_jan_12
+        description: >
+          ISO-region daily temperature forecast from NWP models (GFS_OP, GFS_ENS,
+          ECMWF_OP, ECMWF_ENS). One row per forecast_execution_date x forecast_date x
+          model x cycle x region with temperature and degree day metrics.
+          PK: (forecast_execution_date, forecast_date, model, cycle, bias_corrected, region).
+
+      - name: weighted_temp_daily_forecast_iso_wsi_v2_2026_jan_12
+        description: >
+          ISO-region daily temperature forecast from WSI proprietary blend model.
+          One row per forecast_execution_date x forecast_date x region with temperature,
+          degree days, diffs, DFN, and heat index metrics.
+          PK: (forecast_execution_date, forecast_date, model, bias_corrected, region).

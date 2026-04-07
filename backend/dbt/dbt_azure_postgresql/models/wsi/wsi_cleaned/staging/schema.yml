@@ -151,3 +151,51 @@ models:
         description: 'Observed relative humidity percentage.'
       - name: precipitation
         description: 'Observed precipitation amount.'
+
+  - name: staging_v1_wsi_homepage_forecast_table_current
+    description: >
+      Joins WSI homepage forecast tables (avg, hddcdd, minmax) to produce
+      a combined daily temperature forecast for the current forecast execution.
+      Filters to rows where all three tables have the Current Forecast label.
+      Grain: forecast_execution_datetime x forecast_date x site_id.
+    columns:
+      - name: rank_forecast_execution_timestamps
+        description: 'Execution rank (always 1 — current forecast only).'
+      - name: labelled_forecast_execution_timestamp
+        description: 'Always Current Forecast after filtering.'
+      - name: forecast_execution_datetime
+        description: 'Forecast model initialization timestamp.'
+        tests:
+          - not_null
+      - name: forecast_execution_date
+        description: 'Forecast initialization date.'
+        tests:
+          - not_null
+      - name: forecast_date
+        description: 'Target forecast date.'
+        tests:
+          - not_null
+      - name: count_forecast_days
+        description: 'Day number within the forecast horizon.'
+      - name: max_forecast_days
+        description: 'Maximum forecast days in this execution.'
+      - name: region
+        description: 'WSI geographic region.'
+        tests:
+          - not_null
+      - name: site_id
+        description: 'WSI station identifier.'
+        tests:
+          - not_null
+      - name: station_name
+        description: 'Human-readable station name.'
+      - name: min_temp
+        description: 'Forecast minimum temperature (°F).'
+      - name: max_temp
+        description: 'Forecast maximum temperature (°F).'
+      - name: avg_temp
+        description: 'Forecast average temperature (°F).'
+      - name: cdd
+        description: 'Forecast cooling degree days.'
+      - name: hdd
+        description: 'Forecast heating degree days.'

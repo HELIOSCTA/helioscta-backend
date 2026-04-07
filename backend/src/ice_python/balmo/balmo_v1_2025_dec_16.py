@@ -8,6 +8,7 @@ import pandas as pd
 from backend.utils import logging_utils, pipeline_run_logger
 
 from backend.src.ice_python import utils
+from backend.src.ice_python.symbols.balmo_symbols import get_balmo_symbols
 
 API_SCRAPE_NAME = "balmo_v1_2025_dec_16"
 
@@ -19,46 +20,42 @@ logger = logging_utils.init_logging(
 )
 
 
-# NOTE: NG Swing GDD Futures
-ICE_SYMBOLS: dict = {
-    'HH_BALMO': {'symbol': 'HHD B0-IUS'},
+# ---------------------------------------------------------------------------
+# Symbol loading & validation
+# ---------------------------------------------------------------------------
 
-    # SOUTHEAST
-    'TRANSCO_ST85': {'symbol': 'TRW B0-IUS'},
-    'FGT_Z3': {'symbol': 'FTS B0-IUS'},
-    'COLUMBIA_GULF (MAINLINE)': {'symbol': 'CGR B0-IUS'},
-    'ANR_SE_T': {'symbol': 'APS B0-IUS'},
-    'PINE_PRARIE': {'symbol': 'CVK B0-IUS'},
-    'TETCO_WLA': {'symbol': 'CVP B0-IUS'},
+_REQUIRED_KEYS = {"symbol", "description"}
 
-    # EAST TEXAS
-    'HSC': {'symbol': 'UCS B0-IUS'},
-    'WAHA': {'symbol': 'WAS B0-IUS'},
-    'NGPL_TXOK': {'symbol': 'NTS B0-IUS'},
-    
-    # Northeast
-    'AGT': {'symbol': 'ALS B0-IUS'},
-    'TETCO_M3': {'symbol': 'TSS B0-IUS'},
-    'TRANSCO_Z5': {'symbol': 'DKS B0-IUS'},
-    'TRANSCO_Z5_SOUTH': {'symbol': 'T5C B0-IUS'},
-    'IROQUOIS_Z2': {'symbol': 'IZS B0-IUS'},
-    'TRANSCO_Z6_NY': {'symbol': 'ZSS B0-IUS'},
-    'DOMINION_SOUTH (EASTERN GAS-SOUTH)': {'symbol': 'DSS B0-IUS'},
 
-    # Southwest
-    'SOCAL_CG': {'symbol': 'SCS B0-IUS'},
-    'PG&E_CG': {'symbol': 'PIG B0-IUS'},
+def _load_symbols() -> list[dict]:
+    """Load BALMO symbols from the central registry and validate."""
+    symbols = get_balmo_symbols()
 
-    # Rockies/Northwest
-    'CIG_MAINLINE': {'symbol': 'CRS B0-IUS'},  # NOTE: Colorado Interstate Gas Company - Mainline (sellers' choice non-lateral from Muddy Creek to Cheyenne, excluding pool gas) 
+    if not symbols:
+        raise ValueError(
+            "No BALMO symbols returned from symbol registry. "
+            "Check backend/src/ice_python/symbols/balmo_symbols.py"
+        )
 
-    # Midwest
-    'NGPL_MIDCON': {'symbol': 'MTS B0-IUS'},
-    'MICHCON': {'symbol': 'NMS B0-IUS'},
-}
+    for idx, entry in enumerate(symbols):
+        missing = _REQUIRED_KEYS - set(entry.keys())
+        if missing:
+            raise ValueError(
+                f"Symbol entry [{idx}] is missing required keys: {missing}. "
+                f"Entry: {entry}"
+            )
+        if not entry["symbol"] or not entry["symbol"].strip():
+            raise ValueError(
+                f"Symbol entry [{idx}] has an empty 'symbol' value. "
+                f"Description: {entry.get('description', 'N/A')}"
+            )
 
-"""
-"""
+    return symbols
+
+
+# ---------------------------------------------------------------------------
+# Pipeline steps
+# ---------------------------------------------------------------------------
 
 def _pull(
     symbol: str,
@@ -117,6 +114,8 @@ def main(
     start_date = start_date or utils.default_start_date()
     end_date = end_date or utils.default_end_date()
 
+    symbols = _load_symbols()
+
     run = pipeline_run_logger.PipelineRunLogger(
         pipeline_name=API_SCRAPE_NAME,
         source="ice_python",
@@ -131,9 +130,17 @@ def main(
     processed_symbols = 0
     try:
         logger.header(API_SCRAPE_NAME)
-        for market_name, config in ICE_SYMBOLS.items():
-            symbol = config["symbol"]
-            logger.section(f"Pulling {market_name}: {symbol}")
+        logger.info(f"Loaded {len(symbols)} symbols from registry:")
+        for entry in symbols:
+            logger.info(
+                f"  {entry['symbol']:<16} | {entry['description']:<45} | {entry.get('region', 'unknown')}"
+            )
+
+        for entry in symbols:
+            symbol = entry["symbol"]
+            description = entry["description"]
+            region = entry.get("region", "unknown")
+            logger.section(f"Pulling {description} ({region}): {symbol}")
 
             df = _pull(
                 symbol=symbol,
@@ -147,7 +154,7 @@ def main(
             df = _format(df=df, date_col=date_col, date_format=date_format)
 
             if df.empty:
-                logger.warning(f"No data returned for {market_name} ({symbol})")
+                logger.warning(f"No data returned for {description} ({symbol})")
                 continue
 
             _upsert(df=df, table_name=API_SCRAPE_NAME)
@@ -159,7 +166,7 @@ def main(
             rows_processed=total_rows,
             metadata={
                 "symbols_processed": processed_symbols,
-                "symbols_requested": len(ICE_SYMBOLS),
+                "symbols_requested": len(symbols),
             },
         )
         return utils.combine_frames(frames, date_col=date_col)
@@ -175,4 +182,3 @@ def main(
 
 if __name__ == "__main__":
     main()
-

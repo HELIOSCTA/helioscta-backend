@@ -36,4 +36,3 @@ FINAL AS (
 )
 
 SELECT * FROM FINAL
-ORDER BY date DESC, hour_ending, region, site_id

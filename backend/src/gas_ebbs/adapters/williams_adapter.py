@@ -16,10 +16,13 @@ The JSF endpoint returns HTML tables directly (no JavaScript rendering needed).
 EBB: https://www.1line.williams.com
 """
 
+import re
+
 from bs4 import BeautifulSoup
 
 from backend.src.gas_ebbs.base_scraper import EBBScraper, register_adapter
 from backend.src.gas_ebbs.ebb_utils import clean_text, extract_numeric_id
+from backend.src.gas_ebbs import outage_extractor
 
 
 JSF_BASE = "https://www.1line.williams.com/xhtml/notice_list.jsf"
@@ -42,6 +45,47 @@ class WilliamsAdapter(EBBScraper):
         6: Response Date/Time
         7: Download link (ignored)
     """
+
+    def _parse_detail(self, html: str, notice: dict) -> dict:
+        """Parse Williams 1Line detail page.
+
+        Williams detail pages are JSF-rendered with table-based layouts.
+        The notice body is typically in the main content area of the page.
+        """
+        soup = BeautifulSoup(html, "html.parser")
+
+        # Remove scripts, styles, and navigation elements
+        for tag in soup(["script", "style", "nav", "header", "footer"]):
+            tag.decompose()
+
+        body_text = ""
+
+        # Williams JSF pages often have a content panel or form with the notice text
+        content = soup.find("div", id=re.compile(r"content|notice|detail", re.IGNORECASE))
+        if not content:
+            content = soup.find("div", class_=re.compile(r"content|notice|detail", re.IGNORECASE))
+
+        if content:
+            body_text = content.get_text(separator=" ", strip=True)
+        else:
+            # Fallback: find the largest table (JSF table-based layout) and
+            # extract text from it
+            tables = soup.find_all("table")
+            longest = ""
+            for table in tables:
+                text = table.get_text(separator=" ", strip=True)
+                if len(text) > len(longest):
+                    longest = text
+            body_text = longest if len(longest) > 100 else soup.get_text(separator=" ", strip=True)
+
+        body_text = " ".join(body_text.split())
+
+        extraction = outage_extractor.extract_outage(
+            subject=notice.get("subject", ""),
+            detail_text=body_text,
+        )
+        extraction["detail_text"] = body_text[:5000]
+        return extraction
 
     def _get_listing_sources(self) -> list[dict]:
         """Return JSF URLs for critical and non-critical notices."""

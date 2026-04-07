@@ -25,7 +25,7 @@ ACCOUNTS_LOOKUP_TABLE AS (
         ,account
         ,source
 
-    FROM {{ ref('source_v1_positions_and_trades_accounts_lookup') }}
+    FROM {{ ref('utils_v1_positions_and_trades_accounts_lookup') }}
 ),
 
 COMBINED_WITH_ACCOUNT_NAMES AS (

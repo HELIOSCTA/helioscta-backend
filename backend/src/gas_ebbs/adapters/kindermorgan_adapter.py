@@ -16,6 +16,7 @@ from bs4 import BeautifulSoup
 
 from backend.src.gas_ebbs.base_scraper import EBBScraper, register_adapter
 from backend.src.gas_ebbs.ebb_utils import clean_text, extract_numeric_id
+from backend.src.gas_ebbs import outage_extractor
 
 
 BASE_URL = "https://pipeline2.kindermorgan.com"
@@ -49,6 +50,41 @@ class KinderMorganAdapter(EBBScraper):
     Detail URL pattern:
         /Notices/NoticeDetail.aspx?code={pipe_code}&NoticeId={notice_id}
     """
+
+    def _parse_detail(self, html: str, notice: dict) -> dict:
+        """Parse Kinder Morgan detail page (NoticeDetail.aspx).
+
+        KM detail pages render the notice body in a panel with
+        structured fields and a text body area.
+        """
+        soup = BeautifulSoup(html, "html.parser")
+
+        for tag in soup(["script", "style"]):
+            tag.decompose()
+
+        # KM detail pages often have a content panel or span with the notice text
+        body_text = ""
+        content = soup.find("div", id=re.compile(r"ContentPlaceHolder|pnlNotice", re.IGNORECASE))
+        if content:
+            body_text = content.get_text(separator=" ", strip=True)
+        else:
+            # Fallback: find the largest text block on the page
+            divs = soup.find_all("div")
+            longest = ""
+            for div in divs:
+                text = div.get_text(separator=" ", strip=True)
+                if len(text) > len(longest):
+                    longest = text
+            body_text = longest if len(longest) > 100 else soup.get_text(separator=" ", strip=True)
+
+        body_text = " ".join(body_text.split())
+
+        extraction = outage_extractor.extract_outage(
+            subject=notice.get("subject", ""),
+            detail_text=body_text,
+        )
+        extraction["detail_text"] = body_text[:5000]
+        return extraction
 
     def _get_listing_sources(self) -> list[dict]:
         """Return one source per configured notice type (C, N)."""

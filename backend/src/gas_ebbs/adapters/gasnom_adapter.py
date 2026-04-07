@@ -10,10 +10,13 @@ Pipelines: Southern Pines, Cameron Interstate, Golden Pass,
 EBB: http://www.gasnom.com/
 """
 
+import re
+
 from bs4 import BeautifulSoup
 
 from backend.src.gas_ebbs.base_scraper import EBBScraper, register_adapter
 from backend.src.gas_ebbs.ebb_utils import clean_text, extract_numeric_id
+from backend.src.gas_ebbs import outage_extractor
 
 
 BASE_URL = "http://www.gasnom.com"
@@ -35,6 +38,50 @@ class GasNomAdapter(EBBScraper):
         5: Subject (may be linked)
         6: Response Date/Time (if present)
     """
+
+    def _parse_detail(self, html: str, notice: dict) -> dict:
+        """Parse GasNom detail page.
+
+        GasNom detail pages (notices.cfm or notice detail links) render
+        notice content in standard HTML tables and divs. The adapter
+        extracts text from the main content area.
+        """
+        soup = BeautifulSoup(html, "html.parser")
+
+        for tag in soup(["script", "style", "nav", "header", "footer"]):
+            tag.decompose()
+
+        body_text = ""
+
+        # GasNom uses ColdFusion (notices.cfm) — look for content containers
+        content = soup.find("div", class_=re.compile(r"notice|content|detail|body", re.IGNORECASE))
+        if not content:
+            content = soup.find("div", id=re.compile(r"notice|content|detail|body", re.IGNORECASE))
+
+        if content:
+            body_text = content.get_text(separator=" ", strip=True)
+        else:
+            # Fallback: find the largest table (GasNom is table-based)
+            tables = soup.find_all("table")
+            longest = ""
+            for table in tables:
+                text = table.get_text(separator=" ", strip=True)
+                if len(text) > len(longest):
+                    longest = text
+            if len(longest) > 100:
+                body_text = longest
+            else:
+                # Last resort: full page text
+                body_text = soup.get_text(separator=" ", strip=True)
+
+        body_text = " ".join(body_text.split())
+
+        extraction = outage_extractor.extract_outage(
+            subject=notice.get("subject", ""),
+            detail_text=body_text,
+        )
+        extraction["detail_text"] = body_text[:5000]
+        return extraction
 
     def _get_listing_sources(self) -> list[dict]:
         """Return listing URLs for critical and non-critical notices.

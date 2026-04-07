@@ -193,6 +193,96 @@ neighboring systems.
 {% enddocs %}
 
 
+{% docs pjm_ancillary_services %}
+
+## Ancillary Services Prices
+
+Hourly ancillary services prices pivoted from long format into wide columns.
+
+### Data Source
+- PJM Data Miner 2 `ancillary_services` — SR, non-SR, secondary reserve, regulation prices and mileage ratio
+
+### Key Transformations
+- Long-to-wide pivot: one row per `date × hour_ending` with named price columns
+- Deduplication via `row_is_current` and `version_nbr` (prefer current, latest version)
+- **Scarcity flag**: `scarcity_adder_active = TRUE` when MAD Synchronized Reserve price > $0
+
+### Models
+
+| Model | Grain |
+|-------|-------|
+| `staging_v1_pjm_ancillary_services_hourly` | date × hour_ending |
+
+### Columns
+- **sr_price** — MAD Synchronized Reserve clearing price ($/MWh). > $0 = scarcity adder active
+- **non_sr_price** — MAD Non-Synchronized Reserve price ($/MWh)
+- **secondary_reserve_price** — MAD Secondary Reserve price ($/MWh)
+- **regulation_price** — RTO Regulation Capability price ($/MWh)
+- **mileage_ratio** — RTO Mileage Ratio (dimensionless)
+
+{% enddocs %}
+
+
+{% docs pjm_reserves %}
+
+## Dispatched Reserves
+
+Hourly dispatched reserve data with clearing price, shortage indicator, and reserve margin.
+
+### Data Sources
+- PJM Data Miner 2 `dispatched_reserves` — 5-min updates, aggregated to hourly (primary)
+- PJM Data Miner 2 `operational_reserves` — 15-sec real-time snapshots
+- PJM Data Miner 2 `real_time_dispatched_reserves` — daily archival with deficit MW
+
+### Key Transformations
+- 5-minute `dispatched_reserves` aggregated to hourly: AVG for MW, MAX for clearing price, `BOOL_OR` for shortage
+- **Reserve margin** computed as `reserve_quantity_mw - reserve_requirement_mw` (negative = deficit)
+
+### Models
+
+| Model | Grain |
+|-------|-------|
+| `staging_v1_pjm_reserves_hourly` | date × hour_ending × area × reserve_type |
+
+### Key Columns
+- **reserve_quantity_mw** — reserve MW available
+- **reserve_requirement_mw** — reserve MW required
+- **reserve_margin_mw** — quantity minus requirement (negative = deficit)
+- **market_clearing_price** — reserve clearing price ($/MWh)
+- **shortage_indicator** — TRUE if shortage pricing fired in any 5-min interval
+
+{% enddocs %}
+
+
+{% docs pjm_five_min_lmps %}
+
+## 5-Minute Real-Time LMPs
+
+Sub-hourly LMP data revealing intra-hour price spike severity masked by hourly averages.
+
+### Data Source
+- PJM Data Miner 2 `unverified_five_min_lmps` — filtered to `type = hub` at ingestion
+
+### Key Transformations
+- 5-minute intervals aggregated to hourly: AVG, MAX, MIN, and range per hub
+- **Spike ratio** computed as `MAX / AVG` — values >> 1 indicate masked spikes
+
+### Models
+
+| Model | Grain |
+|-------|-------|
+| `staging_v1_pjm_five_min_lmps_hourly` | date × hour_ending × hub |
+
+### Key Columns
+- **rt_lmp_avg** — hourly average of 5-min intervals
+- **rt_lmp_max** — maximum 5-min LMP in the hour (spike severity)
+- **rt_lmp_min** — minimum 5-min LMP in the hour
+- **rt_lmp_range** — max minus min (intra-hour volatility)
+- **spike_ratio** — max / avg (>> 1 = masked spike)
+
+{% enddocs %}
+
+
 {% docs pjm_solar_wind_forecast %}
 
 ## Solar & Wind Generation Forecasts

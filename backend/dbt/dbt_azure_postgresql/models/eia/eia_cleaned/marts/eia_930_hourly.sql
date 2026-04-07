@@ -1,6 +1,8 @@
 {{
   config(
-    materialized='view'
+    materialized='incremental',
+    unique_key=['datetime_utc', 'respondent'],
+    incremental_strategy='delete+insert'
   )
 }}
 
@@ -13,4 +15,7 @@ WITH FINAL AS (
 )
 
 SELECT * FROM FINAL
-ORDER BY date DESC, hour_ending DESC, respondent
+
+{% if is_incremental() %}
+WHERE date >= (SELECT MAX(date) - INTERVAL '10 days' FROM {{ this }})
+{% endif %}

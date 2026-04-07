@@ -1,62 +1,49 @@
 services:
-  postgres:
-    image: postgres:15
+  # ── Dagster ────────────────────────────────────────────────────────
+  dagster-db:
+    image: postgres:16
+    restart: unless-stopped
     environment:
-      POSTGRES_USER: prefect
-      POSTGRES_PASSWORD: prefect
-      POSTGRES_DB: prefect
+      POSTGRES_USER: dagster
+      POSTGRES_PASSWORD: dagster
+      POSTGRES_DB: dagster
     volumes:
-      - postgres-data:/var/lib/postgresql/data
+      - dagster-db-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U prefect"]
+      test: ["CMD-SHELL", "pg_isready -U dagster"]
       interval: 5s
       timeout: 5s
       retries: 5
 
-  prefect-server:
-    image: prefecthq/prefect:3-latest
-    command: prefect server start --host 0.0.0.0
-    ports:
-      - "4322:4322"
-    environment:
-    - PREFECT_API_DATABASE_CONNECTION_URL=postgresql+asyncpg://prefect:prefect@postgres:5432/prefect
-    - PREFECT_SERVER_API_PORT=4322
-    depends_on:
-      postgres:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:4322/api/health')"]
-      interval: 5s
-      timeout: 5s
-      retries: 30
-
-  prefect-worker:
+  dagster-webserver:
     build:
       context: .
-      dockerfile: Dockerfile.prefect
-    command:
-      - bash
-      - -c
-      - |
-        prefect work-pool create default-agent-pool --type process || true
-
-        # Deploy all prefect.yaml files
-        find /app -name 'prefect.yaml' -type f | while read -r yaml_file; do
-          echo "========================================="
-          echo "Deploying from: $$yaml_file"
-          echo "========================================="
-          prefect deploy --all --prefect-file "$$yaml_file" || echo "WARNING: Failed to deploy from $$yaml_file"
-        done
-
-        # Start worker
-        cd /app
-        prefect worker start --pool default-agent-pool --work-queue default
+      dockerfile: Dockerfile.dagster
+    command: dagster-webserver -w backend/orchestration/workspace.yaml -h 0.0.0.0 -p 4321
+    ports:
+      - "4321:4321"
     environment:
-      - PREFECT_API_URL=http://prefect-server:4322/api
+      - DAGSTER_HOME=/app/backend/orchestration
+      - DAGSTER_PG_URL=postgresql://dagster:dagster@dagster-db:5432/dagster
+    env_file:
+      - .env
     depends_on:
-      prefect-server:
+      dagster-db:
+        condition: service_healthy
+
+  dagster-daemon:
+    build:
+      context: .
+      dockerfile: Dockerfile.dagster
+    command: dagster-daemon run -w backend/orchestration/workspace.yaml
+    environment:
+      - DAGSTER_HOME=/app/backend/orchestration
+      - DAGSTER_PG_URL=postgresql://dagster:dagster@dagster-db:5432/dagster
+    env_file:
+      - .env
+    depends_on:
+      dagster-db:
         condition: service_healthy
 
 volumes:
-  postgres-data:
-  dbt-logs:
+  dagster-db-data:

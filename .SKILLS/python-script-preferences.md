@@ -85,7 +85,7 @@ def _upsert(
 | File type | Required name | Example |
 |-----------|--------------|---------|
 | Runner | `runs.py` (plural, **not** `run.py`) | `backend/src/power/ercot/runs.py` |
-| Flows | `flows.py` | `backend/src/power/ercot/flows.py` |
+| Flows | `flows.py` | `backend/prefect_orchestration/power/ercot/flows.py` |
 | API helpers / utilities | `{source}_api_utils.py` | `ercot_api_utils.py`, `genscape_api_utils.py` |
 | General utilities | `{source}_utils.py` or `{domain}_utils.py` | `wsi_utils.py`, `ice_utils.py` |
 
@@ -97,12 +97,15 @@ def _upsert(
 
 ## Folder Orchestration Files
 
-Every source subfolder should include both:
+Every source subfolder in `backend/src/` should include:
 
 - `runs.py` - manual runner that always calls each script's `main()` function
-- `flows.py` - Prefect flow wrappers for those scripts (using lazy `importlib` loading)
 
-Use `backend/src/power/ercot/` as the canonical structure for both files.
+Prefect `flows.py` wrappers live in the matching path under `backend/prefect_orchestration/` (not `backend/src/`):
+
+- `backend/prefect_orchestration/<domain>/flows.py` - Prefect flow wrappers (using lazy `importlib` loading to call scripts in `backend/src/`)
+
+Use `backend/prefect_orchestration/power/ercot/flows.py` as the canonical structure for flows.
 
 ### `runs.py` must use `run_script_main_only`
 
@@ -126,12 +129,13 @@ Do **not** rely on `detect_adapter()` auto-detection, which may pick `run_script
 
 ### WSI structure
 
-Each WSI domain subfolder (e.g. `weighted_degree_day/`) has its own `runs.py` and `flows.py`.
+Each WSI domain subfolder (e.g. `weighted_degree_day/`) has its own `runs.py`.
+Prefect wrappers are in `backend/prefect_orchestration/wsi/<domain>/flows.py`.
 A top-level `backend/src/wsi/runs.py` also exists to run all scripts across subfolders.
 
 ## No Prefect in Scripts
 
-Do not add `from prefect import flow` or `@flow` decorators to individual scripts. Scripts must be pure Python. Prefect wrappers live in a separate `flows.py` per folder, using lazy `importlib` loading. See `.markdowns/Mar-03/runners_without_prefect.md`.
+Do not add `from prefect import flow` or `@flow` decorators to individual scripts. Scripts must be pure Python. Prefect wrappers live in `backend/prefect_orchestration/` (not `backend/src/`), using lazy `importlib` loading to call back into `backend/src/`. See `.markdowns/Mar-03/runners_without_prefect.md`.
 
 ## No Slack
 

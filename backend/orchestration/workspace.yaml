@@ -1,0 +1,5 @@
+# Dagster workspace — points to the code location
+load_from:
+  - python_file:
+      relative_path: definitions.py
+      working_directory: ../../  # repo root, so "backend.*" imports resolve

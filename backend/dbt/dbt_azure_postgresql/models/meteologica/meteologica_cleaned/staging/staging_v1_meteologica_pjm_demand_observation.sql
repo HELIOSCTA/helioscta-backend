@@ -6,9 +6,9 @@
 
 ---------------------------
 -- Meteologica PJM Demand Observation
--- UNIONs 36 raw tables (RTO + 3 macro regions + 32 sub-regions), normalizes to EPT date + hour_ending,
+-- UNIONs 36 raw tables (RTO + 3 macro regions + 32 sub-regions), normalizes to EPT,
 -- ranks by issue time (earliest first)
--- Grain: 1 row per update_rank x observation_date x hour_ending x region
+-- Grain: 1 row per update_rank x observation_datetime x region  (5-min intervals)
 ---------------------------
 
 WITH UNIONED AS (
@@ -454,8 +454,8 @@ NORMALIZED AS (
         region
         ,(issue_date::TIMESTAMP AT TIME ZONE 'UTC' AT TIME ZONE 'America/New_York') AS update_datetime
         ,(issue_date::TIMESTAMP AT TIME ZONE 'UTC' AT TIME ZONE 'America/New_York')::DATE AS update_date
-        ,forecast_period_start::DATE AS observation_date
-        ,EXTRACT(HOUR FROM forecast_period_start)::INT + 1 AS hour_ending
+        ,(forecast_period_start::TIMESTAMP AT TIME ZONE 'UTC' AT TIME ZONE 'America/New_York') AS observation_datetime
+        ,(forecast_period_start::TIMESTAMP AT TIME ZONE 'UTC' AT TIME ZONE 'America/New_York')::DATE AS observation_date
         ,observation_mw::NUMERIC AS observation_mw
     FROM UNIONED
 ),
@@ -491,9 +491,8 @@ FINAL AS (
         ,n.update_datetime
         ,n.update_date
 
-        ,(n.observation_date + INTERVAL '1 hour' * (n.hour_ending - 1)) AS observation_datetime
+        ,n.observation_datetime
         ,n.observation_date
-        ,n.hour_ending
 
         ,n.region
         ,n.observation_mw AS observation_load_mw
@@ -506,4 +505,4 @@ FINAL AS (
 )
 
 SELECT * FROM FINAL
-ORDER BY observation_date DESC, update_datetime DESC, hour_ending, region
+ORDER BY observation_date DESC, update_datetime DESC, observation_datetime, region

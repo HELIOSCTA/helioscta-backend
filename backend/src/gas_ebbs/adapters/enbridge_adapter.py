@@ -8,10 +8,13 @@ Supports multiple notice types per pipeline (CRI, NON, OUT, etc.).
 EBB: https://infopost.enbridge.com/infopost/
 """
 
+import re
+
 from bs4 import BeautifulSoup
 
 from backend.src.gas_ebbs.base_scraper import EBBScraper, register_adapter
 from backend.src.gas_ebbs.ebb_utils import clean_text, extract_numeric_id
+from backend.src.gas_ebbs import outage_extractor
 
 
 BASE_URL = "https://infopost.enbridge.com/infopost"
@@ -43,6 +46,36 @@ class EnbridgeAdapter(EBBScraper):
     Detail URL pattern:
         NoticeListDetail.asp?strKey1={id}&type={type_code}&Embed=2&pipe={pipe_code}
     """
+
+    def _parse_detail(self, html: str, notice: dict) -> dict:
+        """Parse Enbridge InfoPost detail page.
+
+        Enbridge detail pages (NoticeListDetail.asp) render the notice body
+        in a structured HTML layout with tables for metadata.
+        """
+        soup = BeautifulSoup(html, "html.parser")
+
+        for tag in soup(["script", "style"]):
+            tag.decompose()
+
+        # Enbridge detail pages use tables — look for the largest text block
+        body_text = ""
+        # Try <td> cells that contain the main notice body
+        tds = soup.find_all("td")
+        longest = ""
+        for td in tds:
+            text = td.get_text(separator=" ", strip=True)
+            if len(text) > len(longest):
+                longest = text
+        body_text = longest if len(longest) > 100 else soup.get_text(separator=" ", strip=True)
+        body_text = " ".join(body_text.split())
+
+        extraction = outage_extractor.extract_outage(
+            subject=notice.get("subject", ""),
+            detail_text=body_text,
+        )
+        extraction["detail_text"] = body_text[:5000]
+        return extraction
 
     def _get_listing_sources(self) -> list[dict]:
         """Return one source per configured notice type (CRI, NON, etc.)."""

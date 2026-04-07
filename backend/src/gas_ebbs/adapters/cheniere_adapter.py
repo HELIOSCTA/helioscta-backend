@@ -17,6 +17,7 @@ from bs4 import BeautifulSoup
 
 from backend.src.gas_ebbs.base_scraper import EBBScraper, register_adapter
 from backend.src.gas_ebbs.ebb_utils import clean_text, extract_numeric_id, DEFAULT_HEADERS
+from backend.src.gas_ebbs import outage_extractor
 
 
 BASE_URL = "https://lngconnection.cheniere.com"
@@ -30,6 +31,97 @@ class CheniereAdapter(EBBScraper):
     attempts to find and call the underlying JSON API for notice data.
     Falls back to HTML table parsing.
     """
+
+    def _parse_detail(self, html: str, notice: dict) -> dict:
+        """Parse Cheniere LNG Connection detail page.
+
+        Cheniere uses a React SPA, so detail pages may return JSON from
+        an API endpoint or an HTML shell with embedded data. The adapter
+        tries JSON parsing first, then looks for embedded React state,
+        then falls back to generic HTML extraction.
+        """
+        # Try JSON parsing first (API response)
+        try:
+            data = json.loads(html)
+            text_parts = []
+            # Handle direct notice object
+            notice_data = data
+            if isinstance(data, dict):
+                for key in ("data", "notice", "result", "posting"):
+                    if key in data and isinstance(data[key], dict):
+                        notice_data = data[key]
+                        break
+            if isinstance(notice_data, dict):
+                for key in ("subject", "body", "content", "text",
+                            "noticeText", "description", "detail"):
+                    val = notice_data.get(key, "")
+                    if val and isinstance(val, str):
+                        text_parts.append(val)
+            if text_parts:
+                body_text = " ".join(text_parts)
+                body_text = " ".join(body_text.split())
+                extraction = outage_extractor.extract_outage(
+                    subject=notice.get("subject", ""),
+                    detail_text=body_text,
+                )
+                extraction["detail_text"] = body_text[:5000]
+                return extraction
+        except (json.JSONDecodeError, ValueError):
+            pass
+
+        # HTML parsing
+        soup = BeautifulSoup(html, "html.parser")
+
+        # Check for React/Next.js embedded state
+        body_text = ""
+        for script in soup.find_all("script"):
+            script_text = script.string or ""
+            if "notice" in script_text.lower() and len(script_text) > 100:
+                # Try to extract JSON from the script
+                for pattern in [r'__INITIAL_STATE__\s*=\s*({.*?});',
+                                r'window\.__data\s*=\s*({.*?});',
+                                r'"notice"\s*:\s*({.*?})\s*[,}]']:
+                    match = re.search(pattern, script_text, re.DOTALL)
+                    if match:
+                        try:
+                            obj = json.loads(match.group(1))
+                            if isinstance(obj, dict):
+                                for key in ("body", "content", "text",
+                                            "description", "detail"):
+                                    val = obj.get(key, "")
+                                    if val and isinstance(val, str) and len(val) > 20:
+                                        body_text = val
+                                        break
+                        except (json.JSONDecodeError, ValueError):
+                            continue
+                if body_text:
+                    break
+
+        if not body_text:
+            # Remove scripts/styles for HTML extraction
+            for tag in soup(["script", "style", "nav", "header", "footer"]):
+                tag.decompose()
+
+            # Look for React app root or content containers
+            content = soup.find("div", id=re.compile(r"root|app|content|notice|detail", re.IGNORECASE))
+            if not content:
+                content = soup.find("div", class_=re.compile(r"notice|content|detail", re.IGNORECASE))
+            if not content:
+                content = soup.find("main") or soup.find("article")
+
+            if content:
+                body_text = content.get_text(separator=" ", strip=True)
+            else:
+                body_text = soup.get_text(separator=" ", strip=True)
+
+        body_text = " ".join(body_text.split())
+
+        extraction = outage_extractor.extract_outage(
+            subject=notice.get("subject", ""),
+            detail_text=body_text,
+        )
+        extraction["detail_text"] = body_text[:5000]
+        return extraction
 
     def _get_listing_sources(self) -> list[dict]:
         """Return the API/page URL for the pipeline."""

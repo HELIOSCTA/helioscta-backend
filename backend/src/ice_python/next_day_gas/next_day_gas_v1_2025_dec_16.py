@@ -8,6 +8,9 @@ import pandas as pd
 from backend.utils import logging_utils, pipeline_run_logger
 
 from backend.src.ice_python import utils
+from backend.src.ice_python.symbols.next_day_gas_symbols import (
+    get_next_day_gas_symbols,
+)
 
 API_SCRAPE_NAME = "next_day_gas_v1_2025_dec_16"
 
@@ -18,49 +21,43 @@ logger = logging_utils.init_logging(
     delete_if_no_errors=True,
 )
 
-# NOTE: NG Firm Phys, FP
-ICE_SYMBOLS: dict = {
-    # LOUISIANA
-    'HENRY_HUB': {'symbol': 'XGF D1-IPG'},
-    
-    # SOUTHEAST
-    'TRANSCO_ST85': {'symbol': 'XVA D1-IPG'},
-    'FGT_Z3': {'symbol': 'YHV D1-IPG'},
-    'COLUMBIA_GULF (MAINLINE)': {'symbol': 'XLA D1-IPG'},
-    'ANR_SE_T': {'symbol': 'XTA D1-IPG'},
-    'PINE_PRARIE': {'symbol': 'YV7 D1-IPG'},
-    'TETCO_WLA': {'symbol': 'XT6 D1-IPG'},
 
-    # EAST TEXAS
-    'HSC': {'symbol': 'XYZ D1-IPG'},
-    'WAHA': {'symbol': 'XT6 D1-IPG'},
-    'NGPL_TXOK': {'symbol': 'XIT D1-IPG'},
+# ---------------------------------------------------------------------------
+# Symbol loading & validation
+# ---------------------------------------------------------------------------
 
-    # NORTHEAST
-    ### TODO: not working from ICE
-    ### 'AGT_CG': {'symbol': 'YI0 D1-IPG'},       # NOTE: Algonquin Citygates Algonquin Citygates (Excluding J-Lateral deliveries)
-    'AGT_CG (non-G)': {'symbol': 'X7F D1-IPG'},   # NOTE: Algonquin Citygates (Excluding J-Lateral and G-Lateral deliveries and Brookfield)
-    'TETCO_M3': {'symbol': 'XZR D1-IPG'},
-    'TRANSCO_Z5_SOUTH': {'symbol': 'YFF D1-IPG'},
-    'TRANSCO_Z5_NORTH': {'symbol': 'Z2Y D1-IPG'},
-    'IROQUOIS_Z2': {'symbol': 'YP8 D1-IPG'},
-    'TRANSCO_Z6_NY': {'symbol': 'XWK D1-IPG'},
-    'DOMINION_SOUTH (EASTERN GAS-SOUTH)': {'symbol': 'XJL D1-IPG'},
+_REQUIRED_KEYS = {"symbol", "description"}
 
-    # Southwest
-    'SOCAL_CG': {'symbol': 'XKF D1-IPG'},
-    'PG&E_CG': {'symbol': 'XGV D1-IPG'},
 
-    # Rockies/Northwest
-    'CIG_MAINLINE': {'symbol': 'YKL D1-IPG'},  # NOTE: Colorado Interstate Gas Company - Mainline (sellers' choice non-lateral from Muddy Creek to Cheyenne, excluding pool gas) 
-    
-    # Midwest
-    'NGPL_MIDCON': {'symbol': 'XJR D1-IPG'},
-    'MICHCON': {'symbol': 'XJZ D1-IPG'},
-}
+def _load_symbols() -> list[dict]:
+    """Load next-day gas symbols from the central registry and validate."""
+    symbols = get_next_day_gas_symbols()
 
-"""
-"""
+    if not symbols:
+        raise ValueError(
+            "No next-day gas symbols returned from symbol registry. "
+            "Check backend/src/ice_python/symbols/next_day_gas_symbols.py"
+        )
+
+    for idx, entry in enumerate(symbols):
+        missing = _REQUIRED_KEYS - set(entry.keys())
+        if missing:
+            raise ValueError(
+                f"Symbol entry [{idx}] is missing required keys: {missing}. "
+                f"Entry: {entry}"
+            )
+        if not entry["symbol"] or not entry["symbol"].strip():
+            raise ValueError(
+                f"Symbol entry [{idx}] has an empty 'symbol' value. "
+                f"Description: {entry.get('description', 'N/A')}"
+            )
+
+    return symbols
+
+
+# ---------------------------------------------------------------------------
+# Pipeline steps
+# ---------------------------------------------------------------------------
 
 def _pull(
     symbol: str,
@@ -119,6 +116,8 @@ def main(
     start_date = start_date or utils.default_start_date()
     end_date = end_date or utils.default_end_date()
 
+    symbols = _load_symbols()
+
     run = pipeline_run_logger.PipelineRunLogger(
         pipeline_name=API_SCRAPE_NAME,
         source="ice_python",
@@ -133,9 +132,17 @@ def main(
     processed_symbols = 0
     try:
         logger.header(API_SCRAPE_NAME)
-        for market_name, config in ICE_SYMBOLS.items():
-            symbol = config["symbol"]
-            logger.section(f"Pulling {market_name}: {symbol}")
+        logger.info(f"Loaded {len(symbols)} symbols from registry:")
+        for entry in symbols:
+            logger.info(
+                f"  {entry['symbol']:<16} | {entry['description']:<40} | {entry.get('region', 'unknown')}"
+            )
+
+        for entry in symbols:
+            symbol = entry["symbol"]
+            description = entry["description"]
+            region = entry.get("region", "unknown")
+            logger.section(f"Pulling {description} ({region}): {symbol}")
 
             df = _pull(
                 symbol=symbol,
@@ -149,7 +156,7 @@ def main(
             df = _format(df=df, date_col=date_col, date_format=date_format)
 
             if df.empty:
-                logger.warning(f"No data returned for {market_name} ({symbol})")
+                logger.warning(f"No data returned for {description} ({symbol})")
                 continue
 
             _upsert(df=df, table_name=API_SCRAPE_NAME)
@@ -161,7 +168,7 @@ def main(
             rows_processed=total_rows,
             metadata={
                 "symbols_processed": processed_symbols,
-                "symbols_requested": len(ICE_SYMBOLS),
+                "symbols_requested": len(symbols),
             },
         )
         return utils.combine_frames(frames, date_col=date_col)
@@ -178,3 +185,8 @@ def main(
 if __name__ == "__main__":
     main()
 
+    # from datetime import datetime, timedelta
+    # start_date = datetime(2013, 1, 1) - timedelta(days=1)
+    # end_date = datetime.now() + timedelta(days=1)
+
+    # main(start_date=start_date, end_date=end_date)

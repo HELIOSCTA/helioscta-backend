@@ -56,7 +56,7 @@ PRODUCT_LOOKUP_TABLE AS (
         ,nav_product
         ,marex_product
 
-    FROM {{ ref('source_v1_positions_and_trades_product_lookup') }}
+    FROM {{ ref('utils_v1_positions_and_trades_product_lookup') }}
 ),
 
 -- SELECT * FROM PRODUCT_LOOKUP_TABLE

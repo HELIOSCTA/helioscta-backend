@@ -15,11 +15,14 @@ EBB: https://www.tceconnects.com/infopost/
 """
 
 import json
+import re
 
 import requests
+from bs4 import BeautifulSoup
 
 from backend.src.gas_ebbs.base_scraper import EBBScraper, register_adapter
 from backend.src.gas_ebbs.ebb_utils import DEFAULT_HEADERS
+from backend.src.gas_ebbs import outage_extractor
 
 
 BASE_URL = "https://www.tceconnects.com/infopost"
@@ -52,6 +55,79 @@ class TCEAdapter(EBBScraper):
             ...
         ]}
     """
+
+    def _parse_detail(self, html: str, notice: dict) -> dict:
+        """Parse TC Energy (TCE Connects) detail page.
+
+        TCE detail pages (MobileInfoPost.aspx) may return JSON data
+        or an HTML page with the notice body. The adapter tries JSON
+        parsing first, then falls back to HTML extraction.
+        """
+        # Try JSON parsing first — TCE detail endpoints may return JSON
+        try:
+            data = json.loads(html)
+            # Extract text fields from JSON response
+            text_parts = []
+            if isinstance(data, dict):
+                for key in ("subject", "body", "content", "text",
+                            "noticeText", "description", "detail"):
+                    val = data.get(key, "")
+                    if val and isinstance(val, str):
+                        text_parts.append(val)
+                # Also check nested structures
+                for key in ("notice", "data", "result"):
+                    nested = data.get(key, {})
+                    if isinstance(nested, dict):
+                        for nk in ("subject", "body", "content", "text",
+                                    "noticeText", "description"):
+                            val = nested.get(nk, "")
+                            if val and isinstance(val, str):
+                                text_parts.append(val)
+            if text_parts:
+                body_text = " ".join(text_parts)
+                body_text = " ".join(body_text.split())
+                extraction = outage_extractor.extract_outage(
+                    subject=notice.get("subject", ""),
+                    detail_text=body_text,
+                )
+                extraction["detail_text"] = body_text[:5000]
+                return extraction
+        except (json.JSONDecodeError, ValueError):
+            pass
+
+        # HTML parsing fallback
+        soup = BeautifulSoup(html, "html.parser")
+
+        for tag in soup(["script", "style", "nav", "header", "footer"]):
+            tag.decompose()
+
+        body_text = ""
+
+        # TCE pages use ASP.NET panels — look for content containers
+        content = soup.find("div", id=re.compile(r"content|notice|detail|pnl", re.IGNORECASE))
+        if not content:
+            content = soup.find("div", class_=re.compile(r"content|notice|detail", re.IGNORECASE))
+
+        if content:
+            body_text = content.get_text(separator=" ", strip=True)
+        else:
+            # Fallback: largest text block
+            divs = soup.find_all("div")
+            longest = ""
+            for div in divs:
+                text = div.get_text(separator=" ", strip=True)
+                if len(text) > len(longest):
+                    longest = text
+            body_text = longest if len(longest) > 100 else soup.get_text(separator=" ", strip=True)
+
+        body_text = " ".join(body_text.split())
+
+        extraction = outage_extractor.extract_outage(
+            subject=notice.get("subject", ""),
+            detail_text=body_text,
+        )
+        extraction["detail_text"] = body_text[:5000]
+        return extraction
 
     def _get_listing_sources(self) -> list[dict]:
         """Return jqGrid JSON URLs for critical and non-critical notices."""

@@ -10,6 +10,11 @@ into Azure PostgreSQL.
 - Hourly load (metered, preliminary, instantaneous)
 - Day-ahead demand bids (cleared load)
 - Day-ahead and real-time LMPs (verified and unverified)
+- 5-minute real-time LMPs (unverified, hub-only)
+- Ancillary services prices (synchronized reserve, regulation, mileage ratio)
+- Dispatched reserves (quantity, requirement, clearing price, shortage indicator)
+- Operational reserves (real-time reserve MW by product)
+- Real-time dispatched reserves (archival with deficit MW)
 - 7-day load forecast
 - 7-day outage forecast
 - 5-minute tie flows

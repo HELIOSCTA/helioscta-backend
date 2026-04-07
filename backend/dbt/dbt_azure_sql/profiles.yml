@@ -2,13 +2,27 @@ dbt_azure_sql:
   target: azure_sql
   outputs:
 
+    # azure_sql:
+    #   type: sqlserver
+    #   driver: "ODBC Driver 18 for SQL Server"
+    #   server: "{{ env_var('AZURE_SQL_SERVER') }}"
+    #   user: "{{ env_var('AZURE_SQL_USER') }}"
+    #   password: "{{ env_var('AZURE_SQL_PASSWORD') }}"
+    #   port: 1433
+    #   database: "{{ env_var('AZURE_SQL_DATABASE') }}"
+    #   schema: natgas
+    #   threads: 4
+
     azure_sql:
       type: sqlserver
       driver: "ODBC Driver 18 for SQL Server"
-      server: "{{ env_var('AZURE_SQL_SERVER') }}"
-      user: "{{ env_var('AZURE_SQL_USER') }}"
-      password: "{{ env_var('AZURE_SQL_PASSWORD') }}"
+      server: heliosazuresql.database.windows.net
+      user: heliosadmin
+      password: admin!2024
       port: 1433
-      database: "{{ env_var('AZURE_SQL_DATABASE') }}"
+      # optional, defaults are secure with driver 18:
+      # encrypt: true
+      # trust_cert: false
+      database: GenscapeDataFeed
       schema: natgas
       threads: 4

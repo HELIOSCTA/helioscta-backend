@@ -92,6 +92,24 @@ models:
         description: "NGPL Midcontinent next-day cash, forward-filled ($/MMBtu)."
       - name: michcon_cash
         description: "MichCon next-day cash, forward-filled ($/MMBtu)."
+      - name: columbia_tco_cash
+        description: "Columbia TCO Pool next-day cash, forward-filled ($/MMBtu)."
+      - name: transco_z6_ny_cash
+        description: "Transco Zone 6 NY next-day cash, forward-filled ($/MMBtu)."
+      - name: dominion_south_cash
+        description: "Dominion South (Eastern Gas-South) next-day cash, forward-filled ($/MMBtu)."
+      - name: transco_z5_north_cash
+        description: "Transco Zone 5 North (non-WGL) next-day cash, forward-filled ($/MMBtu)."
+      - name: tetco_m2_cash
+        description: "Tetco M2 (Receipt) next-day cash, forward-filled ($/MMBtu)."
+      - name: tenn_z4_marcellus_cash
+        description: "Tennessee Z4 Marcellus next-day cash, forward-filled ($/MMBtu)."
+      - name: transco_leidy_cash
+        description: "Transco Leidy next-day cash, forward-filled ($/MMBtu)."
+      - name: nng_ventura_cash
+        description: "Northern Natural Gas Ventura next-day cash, forward-filled ($/MMBtu)."
+      - name: chicago_cg_cash
+        description: "Chicago CityGate (NGPL-Nicor) next-day cash, forward-filled ($/MMBtu)."
 
   - name: ice_python_next_day_gas_daily
     description: '{{ doc("ice_python_mart_next_day_gas_daily") }}'
@@ -134,3 +152,138 @@ models:
         description: "NGPL Midcontinent daily cash price ($/MMBtu)."
       - name: michcon_cash
         description: "MichCon daily cash price ($/MMBtu)."
+      - name: columbia_tco_cash
+        description: "Columbia TCO Pool daily cash price ($/MMBtu)."
+      - name: transco_z6_ny_cash
+        description: "Transco Zone 6 NY daily cash price ($/MMBtu)."
+      - name: dominion_south_cash
+        description: "Dominion South (Eastern Gas-South) daily cash price ($/MMBtu)."
+      - name: transco_z5_north_cash
+        description: "Transco Zone 5 North (non-WGL) daily cash price ($/MMBtu)."
+      - name: tetco_m2_cash
+        description: "Tetco M2 (Receipt) daily cash price ($/MMBtu)."
+      - name: tenn_z4_marcellus_cash
+        description: "Tennessee Z4 Marcellus daily cash price ($/MMBtu)."
+      - name: transco_leidy_cash
+        description: "Transco Leidy daily cash price ($/MMBtu)."
+      - name: nng_ventura_cash
+        description: "Northern Natural Gas Ventura daily cash price ($/MMBtu)."
+      - name: chicago_cg_cash
+        description: "Chicago CityGate (NGPL-Nicor) daily cash price ($/MMBtu)."
+
+  - name: options_greeks
+    description: >
+      Full options chain view from the latest snapshot per day. Contains
+      all Greeks, market data, and computed fields (mid_price,
+      days_to_expiry) for every option symbol. Grain: one row per
+      trade_date x symbol.
+    columns:
+      - name: trade_date
+        description: "Date of the snapshot."
+        tests:
+          - not_null
+      - name: symbol
+        description: "ICE option symbol (e.g. HNG J26C3-IUS)."
+        tests:
+          - not_null
+      - name: product
+        description: "Parsed product prefix (e.g. HNG, PMI)."
+      - name: expiry_code
+        description: "Parsed expiration code (e.g. J26 = April 2026)."
+      - name: underlying
+        description: "Underlying futures symbol."
+      - name: underlying_price
+        description: "Current underlying futures price."
+      - name: strike
+        description: "Option strike price."
+      - name: expiration
+        description: "Option expiration date."
+      - name: option_type
+        description: "call or put."
+        tests:
+          - accepted_values:
+              values: ['call', 'put']
+      - name: days_to_expiry
+        description: "Calendar days from trade_date to expiration."
+      - name: mid_price
+        description: "Mid-market price: (bid + ask) / 2."
+      - name: settle
+        description: "Settlement price."
+      - name: bid
+        description: "Best bid price."
+      - name: ask
+        description: "Best ask price."
+      - name: last
+        description: "Last traded price."
+      - name: volume
+        description: "Daily traded volume."
+      - name: open_interest
+        description: "Open interest."
+      - name: delta
+        description: "Exchange delta."
+      - name: gamma
+        description: "Exchange gamma."
+      - name: theta
+        description: "Exchange theta (daily time decay)."
+      - name: vega
+        description: "Exchange vega (sensitivity to implied vol)."
+      - name: rho
+        description: "Exchange rho (sensitivity to interest rates)."
+      - name: pct_in_out_of_money
+        description: "Percentage in/out of the money."
+
+  - name: options_greeks_daily
+    description: >
+      Aggregated daily options summary per underlying and expiration.
+      Includes ATM Greeks, put/call volume and OI ratios, and
+      OI-weighted average strike. Grain: one row per trade_date x
+      underlying x expiry_code.
+    columns:
+      - name: trade_date
+        description: "Date of the snapshot."
+        tests:
+          - not_null
+      - name: underlying
+        description: "Underlying futures symbol."
+        tests:
+          - not_null
+      - name: expiry_code
+        description: "Expiration code (e.g. J26)."
+        tests:
+          - not_null
+      - name: expiration
+        description: "Option expiration date."
+      - name: underlying_price
+        description: "Underlying futures price."
+      - name: days_to_expiry
+        description: "Calendar days to expiration."
+      - name: atm_strike
+        description: "Strike of the nearest-to-ATM call (delta closest to 0.50)."
+      - name: atm_call_delta
+        description: "Delta of the ATM call."
+      - name: atm_call_settle
+        description: "Settlement price of the ATM call."
+      - name: atm_gamma
+        description: "Gamma of the ATM call."
+      - name: atm_theta
+        description: "Theta of the ATM call."
+      - name: atm_vega
+        description: "Vega of the ATM call."
+      - name: call_volume
+        description: "Total call volume across all strikes."
+      - name: put_volume
+        description: "Total put volume across all strikes."
+      - name: total_volume
+        description: "Total volume (puts + calls)."
+      - name: pc_volume_ratio
+        description: "Put/call volume ratio."
+      - name: call_oi
+        description: "Total call open interest."
+      - name: put_oi
+        description: "Total put open interest."
+      - name: total_oi
+        description: "Total open interest (puts + calls)."
+      - name: pc_oi_ratio
+        description: "Put/call open interest ratio."
+      - name: oi_weighted_avg_strike
+        description: "Open-interest-weighted average strike price."

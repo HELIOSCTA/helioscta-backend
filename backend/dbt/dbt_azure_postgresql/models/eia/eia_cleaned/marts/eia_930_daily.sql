@@ -1,6 +1,8 @@
 {{
   config(
-    materialized='view'
+    materialized='incremental',
+    unique_key=['date', 'respondent'],
+    incremental_strategy='delete+insert'
   )
 }}
 
@@ -114,4 +116,7 @@ FINAL AS (
 )
 
 SELECT * FROM FINAL
-ORDER BY date DESC, respondent
+
+{% if is_incremental() %}
+WHERE date >= (SELECT MAX(date) - INTERVAL '10 days' FROM {{ this }})
+{% endif %}

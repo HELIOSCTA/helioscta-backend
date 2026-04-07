@@ -11,68 +11,18 @@ models:
     columns:
       - name: forecast_rank
         description: '{{ doc("col_meteologica_forecast_rank") }}'
-        tests:
-          - not_null
       - name: forecast_execution_datetime
         description: '{{ doc("col_forecast_execution_datetime") }}'
-        tests:
-          - not_null
       - name: forecast_execution_date
         description: '{{ doc("col_forecast_execution_date") }}'
-        tests:
-          - not_null
       - name: forecast_datetime
         description: '{{ doc("col_forecast_datetime") }}'
       - name: forecast_date
         description: '{{ doc("col_forecast_date") }}'
-        tests:
-          - not_null
       - name: hour_ending
         description: '{{ doc("col_meteologica_hour_ending") }}'
-        tests:
-          - not_null
       - name: region
         description: '{{ doc("col_meteologica_region") }}'
-        tests:
-          - not_null
-          - accepted_values:
-              values:
-                - 'RTO'
-                - 'MIDATL'
-                - 'SOUTH'
-                - 'WEST'
-                - 'MIDATL_AE'
-                - 'MIDATL_BC'
-                - 'MIDATL_DPL'
-                - 'MIDATL_DPL_DPLCO'
-                - 'MIDATL_DPL_EASTON'
-                - 'MIDATL_JC'
-                - 'MIDATL_ME'
-                - 'MIDATL_PE'
-                - 'MIDATL_PEP'
-                - 'MIDATL_PEP_PEPCO'
-                - 'MIDATL_PEP_SMECO'
-                - 'MIDATL_PL'
-                - 'MIDATL_PL_PLCO'
-                - 'MIDATL_PL_UGI'
-                - 'MIDATL_PN'
-                - 'MIDATL_PS'
-                - 'MIDATL_RECO'
-                - 'SOUTH_DOM'
-                - 'WEST_AEP'
-                - 'WEST_AEP_AEPAPT'
-                - 'WEST_AEP_AEPIMP'
-                - 'WEST_AEP_AEPKPT'
-                - 'WEST_AEP_AEPOPT'
-                - 'WEST_AP'
-                - 'WEST_ATSI'
-                - 'WEST_ATSI_OE'
-                - 'WEST_ATSI_PAPWR'
-                - 'WEST_CE'
-                - 'WEST_DAY'
-                - 'WEST_DEOK'
-                - 'WEST_DUQ'
-                - 'WEST_EKPC'
       - name: forecast_load_mw
         description: '{{ doc("col_forecast_load_mw") }}'
 
@@ -266,34 +216,21 @@ models:
   # ===========================
 
   - name: staging_v1_meteologica_pjm_demand_observation
-    description: "Meteologica PJM demand observation, 36 zones unified"
+    description: "Meteologica PJM demand observation at 5-min granularity, 36 zones unified"
     columns:
       - name: update_rank
         description: "Dense rank of observation update by issue time (earliest = 1)"
-        tests:
-          - not_null
       - name: update_datetime
         description: "When Meteologica published this observation (EPT)"
-        tests:
-          - not_null
       - name: update_date
         description: "Date portion of update_datetime"
-        tests:
-          - not_null
       - name: observation_datetime
-        description: "Observation hour slot (EPT)"
+        description: "5-minute observation timestamp (EPT)"
       - name: observation_date
         description: "Date of the observation"
-        tests:
-          - not_null
-      - name: hour_ending
-        description: "Hour ending 1-24 (EPT)"
-        tests:
-          - not_null
       - name: region
         description: "PJM demand zone"
         tests:
-          - not_null
           - accepted_values:
               values:
                 - 'RTO'

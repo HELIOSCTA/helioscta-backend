@@ -101,3 +101,15 @@ Daily PJM date dimension mart with year, month, summer/winter season, EIA week, 
 {% docs pjm_mart_dates_hourly %}
 Hourly PJM date dimension mart with year, month, summer/winter season, EIA week, hour ending, peak/off-peak period, weekend and NERC holiday indicators.
 {% enddocs %}
+
+{% docs pjm_mart_ancillary_services_hourly %}
+Hourly PJM ancillary services mart by `date x hour_ending` with pivoted SR, non-SR, secondary reserve, regulation prices and scarcity adder flag.
+{% enddocs %}
+
+{% docs pjm_mart_reserves_hourly %}
+Hourly PJM dispatched reserves mart by `date x hour_ending x area x reserve_type` with clearing price, shortage indicator, and reserve margin.
+{% enddocs %}
+
+{% docs pjm_mart_five_min_lmps_hourly %}
+Hourly PJM 5-minute RT LMP mart by `date x hour_ending x hub` with max/min/avg and spike ratio revealing intra-hour price spikes.
+{% enddocs %}

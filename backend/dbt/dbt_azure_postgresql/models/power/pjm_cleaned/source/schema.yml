@@ -152,3 +152,57 @@ models:
         description: "Target operating date in the forecast horizon."
       - name: region
         description: "PJM outage forecast region."
+
+  - name: source_v1_pjm_ancillary_services
+    description: "Normalized PJM ancillary services prices (SR, non-SR, secondary reserve, regulation, mileage ratio) at hourly grain."
+    columns:
+      - name: date
+        description: '{{ doc("col_date") }}'
+      - name: hour_ending
+        description: '{{ doc("col_hour_ending") }}'
+      - name: ancillary_service
+        description: "Ancillary service name (e.g., MAD Synchronized Reserve)."
+
+  - name: source_v1_pjm_dispatched_reserves
+    description: "Normalized PJM dispatched reserves aggregated to hourly. Includes clearing price, shortage indicator, and requirement vs. quantity."
+    columns:
+      - name: date
+        description: '{{ doc("col_date") }}'
+      - name: hour_ending
+        description: '{{ doc("col_hour_ending") }}'
+      - name: area
+        description: "PJM reserve zone (e.g., Mid-Atlantic/Dominion, PJM_RTO)."
+      - name: reserve_type
+        description: "Reserve product type (Synchronized Reserve, Primary Reserve, etc.)."
+
+  - name: source_v1_pjm_operational_reserves
+    description: "Normalized PJM operational reserves aggregated to hourly. Real-time snapshot of reserve MW by product."
+    columns:
+      - name: date
+        description: '{{ doc("col_date") }}'
+      - name: hour_ending
+        description: '{{ doc("col_hour_ending") }}'
+      - name: reserve_name
+        description: "Reserve product name (e.g., Mid-Atlantic/Dominion Contingency (Primary) Reserve Total)."
+
+  - name: source_v1_pjm_rt_dispatched_reserves
+    description: "Normalized PJM real-time dispatched reserves. Archival feed with deficit MW and extended requirements."
+    columns:
+      - name: date
+        description: '{{ doc("col_date") }}'
+      - name: hour_ending
+        description: '{{ doc("col_hour_ending") }}'
+      - name: area
+        description: "PJM reserve zone."
+      - name: reserve_type
+        description: "Reserve product type."
+
+  - name: source_v1_pjm_unverified_five_min_lmps
+    description: "Normalized PJM 5-minute real-time LMPs by hub."
+    columns:
+      - name: date
+        description: '{{ doc("col_date") }}'
+      - name: hour_ending
+        description: '{{ doc("col_hour_ending") }}'
+      - name: hub
+        description: "PJM pricing hub name."

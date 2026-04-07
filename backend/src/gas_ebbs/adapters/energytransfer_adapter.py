@@ -18,10 +18,13 @@ Each pipeline has its own subdomain and code:
 EBB: https://energytransfer.com
 """
 
+import re
+
 from bs4 import BeautifulSoup
 
 from backend.src.gas_ebbs.base_scraper import EBBScraper, register_adapter
 from backend.src.gas_ebbs.ebb_utils import clean_text, extract_numeric_id
+from backend.src.gas_ebbs import outage_extractor
 
 
 @register_adapter("energytransfer")
@@ -43,6 +46,47 @@ class EnergyTransferAdapter(EBBScraper):
 
     Non-critical notices may omit the Response Date/Time column (6 columns).
     """
+
+    def _parse_detail(self, html: str, notice: dict) -> dict:
+        """Parse Energy Transfer (Quorum-based) detail page.
+
+        ET detail pages use a div-based layout with the notice body
+        rendered in a content panel. The structure mirrors the Quorum
+        platform used across all ET subsidiaries.
+        """
+        soup = BeautifulSoup(html, "html.parser")
+
+        # Remove scripts, styles, and navigation
+        for tag in soup(["script", "style", "nav", "header", "footer"]):
+            tag.decompose()
+
+        body_text = ""
+
+        # ET/Quorum detail pages often use a content div or main area
+        content = soup.find("div", class_=re.compile(r"notice|content|detail|body", re.IGNORECASE))
+        if not content:
+            content = soup.find("div", id=re.compile(r"notice|content|detail|body", re.IGNORECASE))
+
+        if content:
+            body_text = content.get_text(separator=" ", strip=True)
+        else:
+            # Fallback: find the largest text block among divs
+            divs = soup.find_all("div")
+            longest = ""
+            for div in divs:
+                text = div.get_text(separator=" ", strip=True)
+                if len(text) > len(longest):
+                    longest = text
+            body_text = longest if len(longest) > 100 else soup.get_text(separator=" ", strip=True)
+
+        body_text = " ".join(body_text.split())
+
+        extraction = outage_extractor.extract_outage(
+            subject=notice.get("subject", ""),
+            detail_text=body_text,
+        )
+        extraction["detail_text"] = body_text[:5000]
+        return extraction
 
     def _get_base_url(self) -> str:
         """Build the base URL for a pipeline from subdomain and code."""

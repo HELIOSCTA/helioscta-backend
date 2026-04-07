@@ -2,7 +2,11 @@
   config(
     materialized='incremental',
     unique_key='forecast_date',
-    incremental_strategy='delete+insert'
+    incremental_strategy='delete+insert',
+    indexes=[
+      {'columns': ['region', 'forecast_date', 'forecast_rank'], 'type': 'btree'},
+      {'columns': ['region', 'forecast_execution_datetime'], 'type': 'btree'},
+    ]
   )
 }}
 

@@ -10,10 +10,13 @@ Pipelines: GTN, Great Lakes, Tuscarora, North Baja
 EBB: http://www.tcplus.com/
 """
 
+import re
+
 from bs4 import BeautifulSoup
 
 from backend.src.gas_ebbs.base_scraper import EBBScraper, register_adapter
 from backend.src.gas_ebbs.ebb_utils import clean_text, extract_numeric_id
+from backend.src.gas_ebbs import outage_extractor
 
 
 BASE_URL = "http://www.tcplus.com"
@@ -63,6 +66,49 @@ class TCPlusAdapter(EBBScraper):
     Detail URL pattern:
         /{path}/Notice/View/{notice_id}
     """
+
+    def _parse_detail(self, html: str, notice: dict) -> dict:
+        """Parse TC Plus detail page (Notice/View/{id}).
+
+        TC Plus detail pages render the notice body in an HTML page
+        with well-defined CSS classes. The main content is typically
+        in a notice-detail or content container.
+        """
+        soup = BeautifulSoup(html, "html.parser")
+
+        for tag in soup(["script", "style", "nav", "header", "footer"]):
+            tag.decompose()
+
+        body_text = ""
+
+        # TC Plus uses CSS classes for structure — look for notice content
+        content = soup.find("div", class_=re.compile(r"notice-detail|notice-content|content-area|detail", re.IGNORECASE))
+        if not content:
+            content = soup.find("div", id=re.compile(r"notice|content|detail", re.IGNORECASE))
+        if not content:
+            # Look for the main element
+            content = soup.find("main") or soup.find("article")
+
+        if content:
+            body_text = content.get_text(separator=" ", strip=True)
+        else:
+            # Fallback: largest text block
+            divs = soup.find_all("div")
+            longest = ""
+            for div in divs:
+                text = div.get_text(separator=" ", strip=True)
+                if len(text) > len(longest):
+                    longest = text
+            body_text = longest if len(longest) > 100 else soup.get_text(separator=" ", strip=True)
+
+        body_text = " ".join(body_text.split())
+
+        extraction = outage_extractor.extract_outage(
+            subject=notice.get("subject", ""),
+            detail_text=body_text,
+        )
+        extraction["detail_text"] = body_text[:5000]
+        return extraction
 
     def _get_listing_sources(self) -> list[dict]:
         """Return one source per configured notice type (Critical, NonCritical)."""

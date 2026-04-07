@@ -14,6 +14,7 @@ from bs4 import BeautifulSoup
 
 from backend.src.gas_ebbs.base_scraper import EBBScraper, register_adapter
 from backend.src.gas_ebbs.ebb_utils import clean_text, extract_numeric_id
+from backend.src.gas_ebbs import outage_extractor
 
 
 @register_adapter("piperiv")
@@ -31,6 +32,37 @@ class PipeRivAdapter(EBBScraper):
         6: subject (may contain <a> link)
         7: response_datetime
     """
+
+    def _parse_detail(self, html: str, notice: dict) -> dict:
+        """Parse PipeRiv detail page.
+
+        PipeRiv detail pages have a structured table with notice metadata
+        and a body section with the notice text.
+        """
+        soup = BeautifulSoup(html, "html.parser")
+
+        # Remove scripts/styles
+        for tag in soup(["script", "style", "nav", "header", "footer"]):
+            tag.decompose()
+
+        # PipeRiv detail pages typically have a <div class="notice-body"> or
+        # the main content in the page body. Extract all text.
+        body_text = ""
+        # Try to find structured content areas first
+        content = soup.find("div", class_=re.compile(r"notice|content|body|detail"))
+        if content:
+            body_text = content.get_text(separator=" ", strip=True)
+        else:
+            body_text = soup.get_text(separator=" ", strip=True)
+
+        body_text = " ".join(body_text.split())
+
+        extraction = outage_extractor.extract_outage(
+            subject=notice.get("subject", ""),
+            detail_text=body_text,
+        )
+        extraction["detail_text"] = body_text[:5000]
+        return extraction
 
     def _parse_listing(self, html: str, **kwargs) -> list[dict]:
         soup = BeautifulSoup(html, "html.parser")

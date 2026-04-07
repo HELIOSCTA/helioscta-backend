@@ -2,6 +2,7 @@
 .env
 **/.env
 .mcp.json
+azure-infra/config.secrets.sh
 
 # Python build/dist directories
 dist/*
@@ -28,7 +29,9 @@ __pycache__/
 
 # misc files
 .archive/*
-.test/*
+.sql-scripts/*
+.vendor-docs/*
+TODO/*
 *.pdf
 *.csv
 *.xlsx

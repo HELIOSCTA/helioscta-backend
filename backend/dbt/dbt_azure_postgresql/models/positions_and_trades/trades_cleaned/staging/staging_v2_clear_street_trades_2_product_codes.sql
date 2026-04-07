@@ -25,7 +25,7 @@ PRODUCT_LOOKUP_TABLE AS (
         ,exchange_code_grouping as product_code_grouping
         ,exchange_code_region as product_code_region
         ,exchange_code_underlying as product_code_underlying
-    FROM {{ ref('source_v1_positions_and_trades_product_lookup') }}
+    FROM {{ ref('utils_v1_positions_and_trades_product_lookup') }}
 ),
 
 TRADES_WITH_PRODUCT_LOOKUP AS (
@@ -193,9 +193,18 @@ TRADES_WITH_BBG_CODES AS (
                     ' COMDTY'
                 )
 
+            -- HH
+            -- e.g. ZAZ6 COMDTY
+            WHEN exch_comm_cd IN ('HH') AND bbg_exchange_code = 'IW' THEN
+                CONCAT(
+                    bbg_exchange_code,
+                    futures_contract_month_y,
+                    ' COMDTY'
+                )
+
             -- NG
             -- e.g. NGG26 COMDTY
-            WHEN exch_comm_cd IN ('NG', 'PHH', 'HH', 'H') AND bbg_exchange_code = 'NG' THEN
+            WHEN exch_comm_cd IN ('NG') AND bbg_exchange_code = 'NG' THEN
                 CONCAT(
                     bbg_exchange_code,
                     futures_contract_month_yy,

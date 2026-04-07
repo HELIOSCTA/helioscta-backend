@@ -6,24 +6,39 @@
 
 ---------------------------
 -- ICE NEXT-DAY GAS SYMBOL MAPPING
+-- Ordered: Louisiana > Southeast > East Texas > Northeast > Southwest > Rockies > Midwest
 ---------------------------
 
 {% set columns = [
     {'symbol': 'XGF D1-IPG',  'col': 'hh_cash'},
     {'symbol': 'XVA D1-IPG',  'col': 'transco_st85_cash'},
+    {'symbol': 'XLM D1-IPG',  'col': 'tgp_500l_cash'},
+    {'symbol': 'YHV D1-IPG',  'col': 'fgt_z3_cash'},
+    {'symbol': 'XLA D1-IPG',  'col': 'columbia_gulf_cash'},
+    {'symbol': 'XTA D1-IPG',  'col': 'anr_se_cash'},
     {'symbol': 'YV7 D1-IPG',  'col': 'pine_prarie_cash'},
+    {'symbol': 'XVM D1-IPG',  'col': 'tetco_wla_cash'},
     {'symbol': 'XT6 D1-IPG',  'col': 'waha_cash'},
     {'symbol': 'XYZ D1-IPG',  'col': 'houston_ship_channel_cash'},
     {'symbol': 'XIT D1-IPG',  'col': 'ngpl_txok_cash'},
-    {'symbol': 'YFF D1-IPG',  'col': 'transco_zone_5_south_cash'},
-    {'symbol': 'XZR D1-IPG',  'col': 'tetco_m3_cash'},
     {'symbol': 'X7F D1-IPG',  'col': 'agt_cash'},
+    {'symbol': 'XZR D1-IPG',  'col': 'tetco_m3_cash'},
+    {'symbol': 'XIZ D1-IPG',  'col': 'columbia_tco_cash'},
+    {'symbol': 'XWK D1-IPG',  'col': 'transco_z6_ny_cash'},
+    {'symbol': 'XJL D1-IPG',  'col': 'dominion_south_cash'},
+    {'symbol': 'YFF D1-IPG',  'col': 'transco_zone_5_south_cash'},
+    {'symbol': 'Z2Y D1-IPG',  'col': 'transco_z5_north_cash'},
+    {'symbol': 'YAG D1-IPG',  'col': 'tetco_m2_cash'},
+    {'symbol': 'Z1Q D1-IPG',  'col': 'tenn_z4_marcellus_cash'},
+    {'symbol': 'YQE D1-IPG',  'col': 'transco_leidy_cash'},
     {'symbol': 'YP8 D1-IPG',  'col': 'iroquois_z2_cash'},
     {'symbol': 'XKF D1-IPG',  'col': 'socal_cg_cash'},
     {'symbol': 'XGV D1-IPG',  'col': 'pge_cg_cash'},
     {'symbol': 'YKL D1-IPG',  'col': 'cig_cash'},
     {'symbol': 'XJR D1-IPG',  'col': 'ngpl_midcon_cash'},
     {'symbol': 'XJZ D1-IPG',  'col': 'michcon_cash'},
+    {'symbol': 'XTG D1-IPG',  'col': 'nng_ventura_cash'},
+    {'symbol': 'YHF D1-IPG',  'col': 'chicago_cg_cash'},
 ] %}
 
 ---------------------------

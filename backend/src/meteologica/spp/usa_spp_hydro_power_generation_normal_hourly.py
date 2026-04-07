@@ -10,7 +10,7 @@ Account: ISO
 from pathlib import Path
 
 import pandas as pd
-from prefect import flow
+
 
 from backend import secrets
 from backend.utils import (
@@ -139,7 +139,6 @@ def _upsert(
 # main
 # --------------------------------------------------------------------------- #
 
-@flow(name=API_SCRAPE_NAME, retries=2, retry_delay_seconds=60, log_prints=True)
 def main():
     run = pipeline_run_logger.PipelineRunLogger(
         pipeline_name=API_SCRAPE_NAME,

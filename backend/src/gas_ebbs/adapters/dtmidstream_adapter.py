@@ -17,6 +17,7 @@ from bs4 import BeautifulSoup
 
 from backend.src.gas_ebbs.base_scraper import EBBScraper, register_adapter
 from backend.src.gas_ebbs.ebb_utils import clean_text, extract_numeric_id, DEFAULT_HEADERS
+from backend.src.gas_ebbs import outage_extractor
 
 
 BASE_URL = "https://dtmidstream.trellisenergy.com"
@@ -31,6 +32,66 @@ class DTMidstreamAdapter(EBBScraper):
 
     Also attempts to call a public API endpoint for structured data.
     """
+
+    def _parse_detail(self, html: str, notice: dict) -> dict:
+        """Parse DT Midstream (Trellis Energy) detail page.
+
+        Trellis detail pages may contain notice data as JSON in
+        data-noticesdata attributes, or render content in div-based
+        layouts. The adapter checks for JSON data first, then extracts
+        from HTML.
+        """
+        soup = BeautifulSoup(html, "html.parser")
+
+        # Remove scripts, styles, and navigation
+        for tag in soup(["script", "style", "nav", "header", "footer"]):
+            tag.decompose()
+
+        body_text = ""
+
+        # Try to find notice data in data attributes
+        notice_el = soup.find(attrs={"data-noticesdata": True})
+        if notice_el:
+            try:
+                data = json.loads(notice_el["data-noticesdata"])
+                if isinstance(data, dict):
+                    text_parts = []
+                    for key in ("subject", "body", "content", "text",
+                                "description", "typeDesc"):
+                        val = data.get(key, "")
+                        if val and isinstance(val, str):
+                            text_parts.append(val)
+                    if text_parts:
+                        body_text = " ".join(text_parts)
+            except (json.JSONDecodeError, ValueError):
+                pass
+
+        if not body_text:
+            # Look for Trellis content containers
+            content = soup.find("div", class_=re.compile(r"notice|content|detail|posting", re.IGNORECASE))
+            if not content:
+                content = soup.find("div", id=re.compile(r"notice|content|detail", re.IGNORECASE))
+
+            if content:
+                body_text = content.get_text(separator=" ", strip=True)
+            else:
+                # Fallback: largest text block
+                divs = soup.find_all("div")
+                longest = ""
+                for div in divs:
+                    text = div.get_text(separator=" ", strip=True)
+                    if len(text) > len(longest):
+                        longest = text
+                body_text = longest if len(longest) > 100 else soup.get_text(separator=" ", strip=True)
+
+        body_text = " ".join(body_text.split())
+
+        extraction = outage_extractor.extract_outage(
+            subject=notice.get("subject", ""),
+            detail_text=body_text,
+        )
+        extraction["detail_text"] = body_text[:5000]
+        return extraction
 
     def _get_listing_sources(self) -> list[dict]:
         """Return the info posting home page URL for the pipeline."""

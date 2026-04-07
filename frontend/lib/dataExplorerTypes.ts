@@ -71,26 +71,6 @@ export interface GasEbbHeroSummary {
   totalNotices: number;
 }
 
-export interface GasEbbNoticesOverTimePoint {
-  date: string;
-  notices: number;
-}
-
-export interface GasEbbCategoryPoint {
-  noticeCategory: string;
-  notices: number;
-}
-
-export interface GasEbbPipelinePoint {
-  pipelineName: string;
-  notices: number;
-}
-
-export interface GasEbbSourceFamilyPoint {
-  sourceFamily: string;
-  notices: number;
-}
-
 export interface GasEbbNoticeRow {
   sourceFamily: string;
   pipelineName: string;
@@ -115,28 +95,16 @@ export interface GasEbbNoticeRow {
   isUpcoming: boolean;
 }
 
-export interface GasEbbTimelineRow {
-  sourceFamily: string;
-  pipelineName: string;
-  noticeIdentifier: string;
-  subject: string;
-  noticeCategory: string;
-  severity: number;
-  effectiveTs: string | null;
-  endTs: string | null;
-  timingState: GasEbbTimingState;
+export interface GasEbbOutageKpis {
+  activeOutages: number;
+  upcomingOutages: number;
+  capacityAtRiskBcfd: number;
 }
 
 export interface GasEbbDashboardResponse {
   asOf: string;
   hero: GasEbbHeroSummary;
   kpis: GasEbbKpiSummary;
-  charts: {
-    noticesOverTime: GasEbbNoticesOverTimePoint[];
-    byCategory: GasEbbCategoryPoint[];
-    byPipeline: GasEbbPipelinePoint[];
-    bySourceFamily: GasEbbSourceFamilyPoint[];
-  };
+  outageKpis: GasEbbOutageKpis;
   notices: GasEbbNoticeRow[];
-  timeline: GasEbbTimelineRow[];
 }

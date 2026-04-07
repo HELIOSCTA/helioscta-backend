@@ -5,10 +5,15 @@ import type {
   GasEbbTimingState,
 } from "@/lib/dataExplorerTypes";
 
+type OutageKpiRow = {
+  active_outages: number;
+  upcoming_outages: number;
+  capacity_at_risk_bcfd: number;
+};
+
 const CLOSED_NOTICE_SUBJECT_REGEX =
   "(lifted|cancel|cancell|complete|completed|terminate|terminated)";
 const OPEN_ENDED_RECENCY_DAYS = 14;
-const TIMELINE_RECENT_ENDED_DAYS = 7;
 
 function parseTimestampSql(column: string): string {
   return `
@@ -42,8 +47,12 @@ function parseTimestampSql(column: string): string {
   `;
 }
 
+/* ── Deduplicated CTE ──
+   When the same (pipeline_name, notice_identifier) is scraped by multiple
+   source families (e.g. enbridge AND piperiv both scrape algonquin), keep
+   only one row.  Prefer the non-piperiv source so piperiv acts as fallback. */
 const normalizedNoticesCte = `
-  WITH normalized_notices AS (
+  WITH raw_notices AS (
     SELECT
       source_family,
       pipeline_name,
@@ -69,6 +78,13 @@ const normalizedNoticesCte = `
         OR COALESCE(notice_status, '') ~* '(terminate|supersede)'
       ) AS is_deactivated_like
     FROM gas_ebbs.notices
+  ),
+  normalized_notices AS (
+    SELECT DISTINCT ON (pipeline_name, notice_identifier) *
+    FROM raw_notices
+    ORDER BY pipeline_name, notice_identifier,
+      CASE WHEN source_family = 'piperiv' THEN 1 ELSE 0 END,
+      scraped_at_ts DESC
   )
 `;
 
@@ -99,14 +115,6 @@ type SummaryRow = {
   latest_scrape_at: string | null;
 };
 
-type TimePointRow = { date: string; notices: number };
-
-type CategoryRow = { notice_category: string; notices: number };
-
-type PipelineRow = { pipeline_name: string; notices: number };
-
-type SourceFamilyRow = { source_family: string; notices: number };
-
 type NoticeRow = {
   source_family: string;
   pipeline_name: string;
@@ -131,18 +139,6 @@ type NoticeRow = {
   is_upcoming: boolean;
 };
 
-type TimelineRow = {
-  source_family: string;
-  pipeline_name: string;
-  notice_identifier: string;
-  subject: string;
-  notice_category: string;
-  severity: number;
-  effective_ts: string | null;
-  end_ts: string | null;
-  timing_state: GasEbbTimingState;
-};
-
 const timingStateSql = `
   CASE
     WHEN ${activePredicate} THEN 'active'
@@ -157,12 +153,8 @@ export async function GET() {
   try {
     const [
       summaryResult,
-      overTimeResult,
-      categoryResult,
-      pipelineResult,
-      sourceFamilyResult,
       noticesResult,
-      timelineResult,
+      outageKpisResult,
     ] = await Promise.all([
       query<SummaryRow>(`
         ${normalizedNoticesCte}
@@ -180,50 +172,6 @@ export async function GET() {
           COUNT(*) FILTER (WHERE ${activePredicate} AND severity >= 4)::int AS high_severity_active,
           GREATEST(MAX(scraped_at_ts), (SELECT latest_snapshot_scrape FROM snapshot_meta))::text AS latest_scrape_at
         FROM normalized_notices
-      `),
-      query<TimePointRow>(`
-        WITH snapshot_points AS (
-          SELECT scraped_at::timestamptz AS scraped_at_ts
-          FROM gas_ebbs.notice_snapshots
-        )
-        SELECT
-          scraped_at_ts::date::text AS date,
-          COUNT(*)::int AS notices
-        FROM snapshot_points
-        WHERE scraped_at_ts >= now() - interval '120 days'
-        GROUP BY scraped_at_ts::date
-        ORDER BY scraped_at_ts::date
-      `),
-      query<CategoryRow>(`
-        ${normalizedNoticesCte}
-        SELECT
-          COALESCE(NULLIF(notice_category, ''), 'other') AS notice_category,
-          COUNT(*)::int AS notices
-        FROM normalized_notices
-        WHERE ${activePredicate}
-        GROUP BY notice_category
-        ORDER BY notices DESC, notice_category
-      `),
-      query<PipelineRow>(`
-        ${normalizedNoticesCte}
-        SELECT
-          pipeline_name,
-          COUNT(*)::int AS notices
-        FROM normalized_notices
-        WHERE ${activePredicate}
-        GROUP BY pipeline_name
-        ORDER BY notices DESC, pipeline_name
-        LIMIT 12
-      `),
-      query<SourceFamilyRow>(`
-        ${normalizedNoticesCte}
-        SELECT
-          source_family,
-          COUNT(*)::int AS notices
-        FROM normalized_notices
-        WHERE ${activePredicate}
-        GROUP BY source_family
-        ORDER BY notices DESC, source_family
       `),
       query<NoticeRow>(`
         ${normalizedNoticesCte}
@@ -261,38 +209,17 @@ export async function GET() {
           pipeline_name
         LIMIT 250
       `),
-      query<TimelineRow>(`
-        ${normalizedNoticesCte}
+      query<OutageKpiRow>(`
         SELECT
-          source_family,
-          pipeline_name,
-          notice_identifier,
-          subject,
-          notice_category,
-          severity,
-          effective_ts::text,
-          end_ts::text,
-          ${timingStateSql}
-        FROM normalized_notices
-        WHERE effective_ts IS NOT NULL
-          AND (
-            ${activePredicate}
-            OR ${upcomingPredicate}
-            OR (end_ts IS NOT NULL AND end_ts >= now() - interval '${TIMELINE_RECENT_ENDED_DAYS} days')
-          )
-        ORDER BY
-          CASE
-            WHEN ${activePredicate} THEN 0
-            WHEN ${upcomingPredicate} THEN 1
-            ELSE 2
-          END,
-          COALESCE(effective_ts, posted_ts) ASC NULLS LAST,
-          severity DESC
-        LIMIT 40
+          COUNT(*) FILTER (WHERE status = 'ACTIVE')::int AS active_outages,
+          COUNT(*) FILTER (WHERE status = 'UPCOMING')::int AS upcoming_outages,
+          COALESCE(SUM(capacity_loss_bcfd::numeric) FILTER (WHERE status IN ('ACTIVE', 'UPCOMING') AND capacity_loss_bcfd::numeric > 0), 0)::float AS capacity_at_risk_bcfd
+        FROM gas_ebbs.planned_outages
       `),
     ]);
 
     const summary = summaryResult.rows[0];
+    const outageKpi = outageKpisResult.rows[0];
 
     const response: GasEbbDashboardResponse = {
       asOf: new Date().toISOString(),
@@ -309,23 +236,10 @@ export async function GET() {
         totalNotices: summary?.total_notices ?? 0,
         latestScrapeAt: summary?.latest_scrape_at ?? null,
       },
-      charts: {
-        noticesOverTime: overTimeResult.rows.map((row) => ({
-          date: row.date,
-          notices: row.notices,
-        })),
-        byCategory: categoryResult.rows.map((row) => ({
-          noticeCategory: row.notice_category,
-          notices: row.notices,
-        })),
-        byPipeline: pipelineResult.rows.map((row) => ({
-          pipelineName: row.pipeline_name,
-          notices: row.notices,
-        })),
-        bySourceFamily: sourceFamilyResult.rows.map((row) => ({
-          sourceFamily: row.source_family,
-          notices: row.notices,
-        })),
+      outageKpis: {
+        activeOutages: outageKpi?.active_outages ?? 0,
+        upcomingOutages: outageKpi?.upcoming_outages ?? 0,
+        capacityAtRiskBcfd: outageKpi?.capacity_at_risk_bcfd ?? 0,
       },
       notices: noticesResult.rows.map((row) => ({
         sourceFamily: row.source_family,
@@ -349,17 +263,6 @@ export async function GET() {
         timingState: row.timing_state,
         isActiveHeuristic: row.is_active_heuristic,
         isUpcoming: row.is_upcoming,
-      })),
-      timeline: timelineResult.rows.map((row) => ({
-        sourceFamily: row.source_family,
-        pipelineName: row.pipeline_name,
-        noticeIdentifier: row.notice_identifier,
-        subject: row.subject,
-        noticeCategory: row.notice_category,
-        severity: row.severity,
-        effectiveTs: row.effective_ts,
-        endTs: row.end_ts,
-        timingState: row.timing_state,
       })),
     };
 

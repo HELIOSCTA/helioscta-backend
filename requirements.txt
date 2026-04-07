@@ -35,9 +35,11 @@ paramiko
 azure-storage-blob>=12.19.0
 azure-core>=1.29.0
 
-# prefect
-prefect>=3.0.0
-# pendulum>=3.0.0
+# dagster
+dagster
+dagster-cloud
+dagster-postgres
+dagster-dbt
 
 # dbt
 dbt-core==1.8.* 
@@ -46,3 +48,8 @@ dbt-sqlserver==1.8.*
 
 # slack
 slack-sdk
+
+# api
+fastapi>=0.115.0
+uvicorn>=0.34.0
+fastapi-mcp>=0.3.0

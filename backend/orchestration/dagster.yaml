@@ -1,0 +1,28 @@
+# Dagster instance configuration
+# Local dev: uses the dagster-postgres container from docker-compose
+# Production: point DAGSTER_PG_URL at your Azure PostgreSQL
+
+run_storage:
+  module: dagster_postgres.run_storage
+  class: PostgresRunStorage
+  config:
+    postgres_url:
+      env: DAGSTER_PG_URL
+
+event_log_storage:
+  module: dagster_postgres.event_log
+  class: PostgresEventLogStorage
+  config:
+    postgres_url:
+      env: DAGSTER_PG_URL
+
+schedule_storage:
+  module: dagster_postgres.schedule_storage
+  class: PostgresScheduleStorage
+  config:
+    postgres_url:
+      env: DAGSTER_PG_URL
+
+run_launcher:
+  module: dagster.core.launcher
+  class: DefaultRunLauncher

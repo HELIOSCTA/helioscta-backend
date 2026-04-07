@@ -1,6 +1,8 @@
 {{
   config(
-    materialized='ephemeral'
+    materialized='incremental',
+    unique_key=['report_date', 'date', 'region'],
+    on_schema_change='sync_all_columns'
   )
 }}
 
@@ -25,6 +27,10 @@ WITH GENSCAPE_PROD_FORECAST AS (
         ,value
 
     FROM {{ source('genscape_v2', 'gas_production_forecast_v2_2025_09_23') }}
+
+    {% if is_incremental() %}
+    WHERE reportdate::DATE > (SELECT MAX(report_date) FROM {{ this }})
+    {% endif %}
 ),
 
 -------------------------------------------------------------

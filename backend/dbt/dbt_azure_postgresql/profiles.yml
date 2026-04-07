@@ -3,24 +3,10 @@ dbt_azure_postgresql:
   outputs:
     azure_postgres:
       type: postgres
-      host: heliosctadb.postgres.database.azure.com
-      user: helioscta
-      password: admin!2024
-      port: 5432
+      host: "{{ env_var('AZURE_POSTGRESQL_DB_HOST', 'heliosctadb.postgres.database.azure.com') }}"
+      user: "{{ env_var('AZURE_POSTGRESQL_DB_USER', 'helioscta') }}"
+      password: "{{ env_var('AZURE_POSTGRESQL_DB_PASSWORD') }}"
+      port: "{{ env_var('AZURE_POSTGRESQL_DB_PORT', '5432') | int }}"
       dbname: helioscta
       schema: dbt
-      threads: 4
-
-    azure_sql:
-      type: sqlserver
-      driver: "ODBC Driver 18 for SQL Server"
-      server: heliosazuresql.database.windows.net
-      user: heliosadmin
-      password: admin!2024
-      port: 1433
-      # optional, defaults are secure with driver 18:
-      # encrypt: true
-      # trust_cert: false
-      database: GenscapeDataFeed
-      schema: natgas
-      threads: 4
+      threads: 12

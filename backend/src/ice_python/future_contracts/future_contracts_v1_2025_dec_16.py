@@ -9,6 +9,17 @@ import pandas as pd
 from backend.utils import logging_utils, pipeline_run_logger
 
 from backend.src.ice_python import utils
+from backend.src.ice_python.symbols.future_contracts_gas_symbols import (
+    get_gas_futures_products,
+    build_ice_symbol,
+    STRIP_MAPPING,
+)
+from backend.src.ice_python.symbols.future_contracts_power_pjm_symbols import (
+    get_pjm_power_futures_products,
+)
+from backend.src.ice_python.symbols.future_contracts_power_ercot_symbols import (
+    get_ercot_power_futures_products,
+)
 
 API_SCRAPE_NAME = "future_contracts_v1_2025_dec_16"
 
@@ -19,60 +30,50 @@ logger = logging_utils.init_logging(
     delete_if_no_errors=True,
 )
 
-
-# -- Product registry ---------------------------------------------------------
-
-# Gas products: basis futures where zero is a valid settlement (hub at parity).
-GAS_PRODUCTS: list[str] = [
-    "HNG",  # HH Nat Gas .. https://www.ice.com/products/6590258
-
-    # SOUTHEAST
-    "TRZ",   # TRANSCO_ST85
-    "CGB",   # COLUMBIA_GULF
-    "CGM",   # ANR_SE_T
-    "TWB",   # TETCO_WLA
-
-    # EAST TEXAS
-    "HXS",  # HSC Basis .. https://www.ice.com/products/6590137
-    "WAH",  # Waha Basis .. https://www.ice.com/products/6590171
-    "NTO",  # NGPL TXOK Basis .. https://www.ice.com/products/6590143
-
-    # NORTHEAST
-    "ALQ",  # Algonquin Citygates Basis .. https://www.ice.com/products/6590124
-    "TMT",  # TETCO M3 Basis .. https://www.ice.com/products/6590161
-    "T5B",  # Transco Zone 5 South Basis .. https://www.ice.com/products/82270888
-    "IZB",  # Iroquois-Z2 Basis (Platts) .. https://www.ice.com/products/21587547
-    "TZS",  # TRANSCO_Z6_NY
-    "DOM",  # DOMINION_SOUTH
-
-    # SOUTHWEST
-    "SCB",  # SOCAL_CG
-    "PGE",  # PG&E_CG
-
-    # ROCKIES/NORTHWEST
-    "CRI",  # CIG_MAINLINE
-]
-
-# Power products: included for completeness but tracked separately.
-POWER_PRODUCTS: list[str] = [
-    "PMI",  # PJM Western Hub RT Peak (1 MW)
-    "ERN",  # ERCOT North 345 kV Hub RT Peak
-]
-
-ICE_PRODUCTS: list[str] = GAS_PRODUCTS # + POWER_PRODUCTS
-
-
-STRIP_MAPPING = {
-    1: "F", 2: "G", 3: "H", 4: "J", 5: "K", 6: "M",
-    7: "N", 8: "Q", 9: "U", 10: "V", 11: "X", 12: "Z",
-}
-
 # Minimum fraction of expected symbols that must return data for a run to be
 # considered healthy.  Below this the run is logged as degraded.
 COMPLETENESS_THRESHOLD = 0.70
 
 
-# -- Helpers ------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+# Product loading & validation
+# ---------------------------------------------------------------------------
+
+_REQUIRED_KEYS = {"product", "description"}
+
+
+def _load_products() -> list[dict]:
+    """Load all futures products from the symbol registries and validate."""
+    gas = get_gas_futures_products()
+    power_pjm = get_pjm_power_futures_products()
+    power_ercot = get_ercot_power_futures_products()
+    products = gas + power_pjm + power_ercot
+
+    if not products:
+        raise ValueError(
+            "No futures products returned from symbol registries. "
+            "Check backend/src/ice_python/symbols/future_contracts_*_symbols.py"
+        )
+
+    for idx, entry in enumerate(products):
+        missing = _REQUIRED_KEYS - set(entry.keys())
+        if missing:
+            raise ValueError(
+                f"Product entry [{idx}] is missing required keys: {missing}. "
+                f"Entry: {entry}"
+            )
+        if not entry["product"] or not entry["product"].strip():
+            raise ValueError(
+                f"Product entry [{idx}] has an empty 'product' value. "
+                f"Description: {entry.get('description', 'N/A')}"
+            )
+
+    return products
+
+
+# ---------------------------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------------------------
 
 def get_relevant_strips(
     contract_year: int,
@@ -113,16 +114,9 @@ def get_relevant_strips(
     return strips_to_pull
 
 
-def _build_ice_symbol(
-    ice_product: str,
-    strip: str,
-    contract_year: int,
-    suffix: str = "-IUS",
-) -> str:
-    return f"{ice_product} {strip}{str(contract_year)[-2:]}{suffix}"
-
-
-# -- Pipeline stages ----------------------------------------------------------
+# ---------------------------------------------------------------------------
+# Pipeline stages
+# ---------------------------------------------------------------------------
 
 def _pull(
     symbol: str,
@@ -153,7 +147,7 @@ def _format(
 ) -> pd.DataFrame:
     # keep_zeros=True: for basis futures, zero is a legitimate settlement
     # (location at parity with HH). Dropping zeros created artificial nulls
-    # in downstream pivot queries. This was the primary root cause of gaps.
+    # in downstream pivot queries.
     return utils.format_timeseries(
         df=df,
         date_col=date_col,
@@ -176,7 +170,9 @@ def _upsert(
     )
 
 
-# -- Completeness audit -------------------------------------------------------
+# ---------------------------------------------------------------------------
+# Completeness audit
+# ---------------------------------------------------------------------------
 
 def _audit_completeness(
     expected: set[str],
@@ -203,7 +199,9 @@ def _audit_completeness(
     }
 
 
-# -- Main orchestrator --------------------------------------------------------
+# ---------------------------------------------------------------------------
+# Main orchestrator
+# ---------------------------------------------------------------------------
 
 def main(
     data_type: str = "Settlement",
@@ -225,6 +223,8 @@ def main(
     contract_end_year = contract_end_year or (current_date.year + 3)
     start_date = start_date or utils.default_start_date()
     end_date = end_date or utils.default_end_date()
+
+    products = _load_products()
 
     run = pipeline_run_logger.PipelineRunLogger(
         pipeline_name=API_SCRAPE_NAME,
@@ -250,6 +250,11 @@ def main(
         )
         logger.info(f"Date range: {start_date.date()} to {end_date.date()}")
         logger.info(f"Retry policy: {max_retries} attempts per symbol")
+        logger.info(f"Loaded {len(products)} products from symbol registries:")
+        for entry in products:
+            logger.info(
+                f"  {entry['product']:<6} | {entry['description']:<40} | {entry.get('region', 'unknown')}"
+            )
 
         for contract_year in range(contract_start_year, contract_end_year + 1):
             if specific_strips:
@@ -276,9 +281,11 @@ def main(
                 strip_expected: set[str] = set()
                 strip_returned: set[str] = set()
 
-                for ice_product in ICE_PRODUCTS:
-                    symbol = _build_ice_symbol(
-                        ice_product=ice_product,
+                for product_entry in products:
+                    ice_product = product_entry["product"]
+                    description = product_entry["description"]
+                    symbol = build_ice_symbol(
+                        product=ice_product,
                         strip=strip,
                         contract_year=contract_year,
                     )
@@ -287,7 +294,7 @@ def main(
 
                     logger.info(
                         f"Pulling {symbol} "
-                        f"(product={ice_product}, strip={strip_name}, "
+                        f"({description}, strip={strip_name}, "
                         f"year={contract_year})"
                     )
 
@@ -388,8 +395,7 @@ def main(
         run.success(rows_processed=total_rows, metadata=metadata)
 
         # Return empty frame instead of accumulating everything in memory.
-        # The data is already in PostgreSQL. Callers that need the combined
-        # frame for testing can query the DB directly.
+        # The data is already in PostgreSQL.
         return utils.empty_timeseries_frame(date_col=date_col)
 
     except Exception as exc:

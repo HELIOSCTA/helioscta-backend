@@ -20,6 +20,7 @@ from bs4 import BeautifulSoup
 
 from backend.src.gas_ebbs.base_scraper import EBBScraper, register_adapter
 from backend.src.gas_ebbs.ebb_utils import clean_text, extract_numeric_id, DEFAULT_HEADERS
+from backend.src.gas_ebbs import outage_extractor
 
 
 BASE_URL = "https://web-prd.myquorumcloud.com"
@@ -76,6 +77,46 @@ class QuorumAdapter(EBBScraper):
     Detail URL pattern:
         /{app_code}/NoticePosting/Detail?noticeId={notice_id}&tspno={tspno}
     """
+
+    def _parse_detail(self, html: str, notice: dict) -> dict:
+        """Parse Quorum (MyQuorumCloud) detail page.
+
+        Quorum detail pages (NoticePosting/Detail) render the notice
+        body in an HTML page. The Kendo UI framework wraps the content
+        in structured div containers.
+        """
+        soup = BeautifulSoup(html, "html.parser")
+
+        for tag in soup(["script", "style", "nav", "header", "footer"]):
+            tag.decompose()
+
+        body_text = ""
+
+        # Quorum detail pages use a content panel or notice body area
+        content = soup.find("div", class_=re.compile(r"notice-detail|notice-body|content|detail-content", re.IGNORECASE))
+        if not content:
+            content = soup.find("div", id=re.compile(r"notice|content|detail", re.IGNORECASE))
+
+        if content:
+            body_text = content.get_text(separator=" ", strip=True)
+        else:
+            # Fallback: find the largest text block among divs
+            divs = soup.find_all("div")
+            longest = ""
+            for div in divs:
+                text = div.get_text(separator=" ", strip=True)
+                if len(text) > len(longest):
+                    longest = text
+            body_text = longest if len(longest) > 100 else soup.get_text(separator=" ", strip=True)
+
+        body_text = " ".join(body_text.split())
+
+        extraction = outage_extractor.extract_outage(
+            subject=notice.get("subject", ""),
+            detail_text=body_text,
+        )
+        extraction["detail_text"] = body_text[:5000]
+        return extraction
 
     def _get_listing_sources(self) -> list[dict]:
         """Return one source per configured notice type (Y=Critical, N=Non-Critical)."""

@@ -25,7 +25,7 @@ PRODUCT_LOOKUP_TABLE AS (
         ,exchange_code_grouping
         ,exchange_code_region
         ,exchange_code_underlying
-    FROM {{ ref('source_v1_positions_and_trades_product_lookup') }}
+    FROM {{ ref('utils_v1_positions_and_trades_product_lookup') }}
 ),
 
 COMBINED_WITH_PRODUCT_LOOKUP AS (

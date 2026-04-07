@@ -98,3 +98,72 @@ models:
         description: "NGPL Midcontinent next-day cash price ($/MMBtu)."
       - name: michcon_cash
         description: "MichCon next-day cash price ($/MMBtu)."
+      - name: columbia_tco_cash
+        description: "Columbia TCO Pool next-day cash price ($/MMBtu)."
+      - name: transco_z6_ny_cash
+        description: "Transco Zone 6 NY next-day cash price ($/MMBtu)."
+      - name: dominion_south_cash
+        description: "Dominion South (Eastern Gas-South) next-day cash price ($/MMBtu)."
+      - name: transco_z5_north_cash
+        description: "Transco Zone 5 North (non-WGL) next-day cash price ($/MMBtu)."
+      - name: tetco_m2_cash
+        description: "Tetco M2 (Receipt) next-day cash price ($/MMBtu)."
+      - name: tenn_z4_marcellus_cash
+        description: "Tennessee Z4 Marcellus next-day cash price ($/MMBtu)."
+      - name: transco_leidy_cash
+        description: "Transco Leidy next-day cash price ($/MMBtu)."
+      - name: nng_ventura_cash
+        description: "Northern Natural Gas Ventura next-day cash price ($/MMBtu)."
+      - name: chicago_cg_cash
+        description: "Chicago CityGate (NGPL-Nicor) next-day cash price ($/MMBtu)."
+
+  - name: source_v1_options_greeks
+    description: >
+      Raw ICE options Greeks cleaned from the options_greeks table.
+      Filters to rows with at least one non-null Greek. Parses symbol
+      into product and expiry_code components. Adds mid_price and
+      days_to_expiry. Grain: one row per trade_date x snapshot_at x symbol.
+    columns:
+      - name: trade_date
+        description: "Date of the snapshot."
+        tests:
+          - not_null
+      - name: snapshot_at
+        description: "Timestamp of the intraday snapshot (MST wall-clock)."
+        tests:
+          - not_null
+      - name: symbol
+        description: "ICE option symbol (e.g. HNG J26C3-IUS)."
+        tests:
+          - not_null
+      - name: product
+        description: "Parsed product prefix (e.g. HNG, PMI)."
+      - name: expiry_code
+        description: "Parsed expiration code (e.g. J26 = April 2026)."
+      - name: underlying
+        description: "Underlying futures symbol (e.g. HNG J26-IUS)."
+      - name: underlying_price
+        description: "Current price of the underlying futures contract."
+      - name: strike
+        description: "Option strike price."
+      - name: expiration
+        description: "Option expiration date."
+      - name: option_type
+        description: "call or put."
+        tests:
+          - accepted_values:
+              values: ['call', 'put']
+      - name: days_to_expiry
+        description: "Calendar days from trade_date to expiration."
+      - name: mid_price
+        description: "Mid-market price: (bid + ask) / 2 when both are available."
+      - name: delta
+        description: "Exchange delta."
+      - name: gamma
+        description: "Exchange gamma."
+      - name: theta
+        description: "Exchange theta."
+      - name: vega
+        description: "Exchange vega."
+      - name: rho
+        description: "Exchange rho."

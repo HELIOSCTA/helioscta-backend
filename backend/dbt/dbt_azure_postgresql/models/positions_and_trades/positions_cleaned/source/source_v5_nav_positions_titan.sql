@@ -56,6 +56,8 @@ WITH NAV_TITAN_POSITIONS as (
         END AS contract_yyyymm
         ,CASE
             WHEN month_year ~ '^\s*\d{2}/\d{2}/\d{4}$' THEN TO_CHAR(TO_DATE(TRIM(month_year), 'MM/DD/YYYY'), 'YYYYMMDD')
+            WHEN month_year ~* '^\s*[A-Z]{3}\d{2}$' AND product ~ 'DAY-\d+' THEN
+                TO_CHAR(TO_DATE(UPPER(TRIM(month_year)), 'MONYY'), 'YYYYMM') || LPAD(SUBSTRING(product FROM 'DAY-(\d+)'), 2, '0')
             ELSE NULL
         END AS contract_yyyymmdd
 
@@ -71,6 +73,8 @@ WITH NAV_TITAN_POSITIONS as (
         END AS contract_month
         ,CASE
             WHEN month_year ~ '^\s*\d{2}/\d{2}/\d{4}$' THEN TO_CHAR(TO_DATE(TRIM(month_year), 'MM/DD/YYYY'), 'DD')
+            WHEN month_year ~* '^\s*[A-Z]{3}\d{2}$' AND product ~ 'DAY-\d+' THEN
+                LPAD(SUBSTRING(product FROM 'DAY-(\d+)'), 2, '0')
             ELSE NULL
         END AS contract_day
 

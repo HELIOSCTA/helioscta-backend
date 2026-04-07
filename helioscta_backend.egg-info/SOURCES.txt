@@ -4,8 +4,10 @@ backend/__init__.py
 backend/secrets.py
 backend/src/__init__.py
 backend/utils/__init__.py
+backend/utils/azure_blob_storage_utils.py
 backend/utils/azure_email_utils.py
 backend/utils/azure_postgresql_utils.py
+backend/utils/azure_sql_utils.py
 backend/utils/file_utils.py
 backend/utils/logging_utils.py
 backend/utils/pipeline_run_logger.py

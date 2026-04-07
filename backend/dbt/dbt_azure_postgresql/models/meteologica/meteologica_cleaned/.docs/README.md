@@ -12,7 +12,7 @@ Consumer-facing views for Meteologica xTraders API PJM forecasts, observations, 
 | `meteologica_pjm_demand_forecast_ecmwf_ens_hourly` | `forecast_date x hour_ending x region x forecast_rank` |
 | `meteologica_pjm_generation_forecast_hourly` | `forecast_date x hour_ending x region x generation_type x forecast_rank` |
 | `meteologica_pjm_da_price_forecast_hourly` | `forecast_date x hour_ending x hub x forecast_rank` |
-| `meteologica_pjm_demand_observation` | `observation_date x hour_ending x region x update_rank` |
+| `meteologica_pjm_demand_observation_5min` | `observation_datetime x region x update_rank` |
 | `meteologica_pjm_generation_observation` | `observation_date x hour_ending x source x region x update_rank` |
 | `meteologica_pjm_da_price_observation` | `observation_date x hour_ending x hub x update_rank` |
 | `meteologica_pjm_demand_projection_hourly` | `projection_date x hour_ending x region x update_rank` |

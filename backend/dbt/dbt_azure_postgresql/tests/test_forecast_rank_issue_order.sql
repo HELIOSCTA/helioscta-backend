@@ -1,19 +1,5 @@
 WITH ALL_VINTAGES AS (
     SELECT
-        'staging_v1_meteologica_pjm_demand_forecast_hourly' AS model_name,
-        forecast_date,
-        region::TEXT AS partition_dim_1,
-        NULL::TEXT AS partition_dim_2,
-        forecast_execution_datetime AS issue_timestamp,
-        forecast_rank
-    FROM (
-        SELECT DISTINCT forecast_date, region, forecast_execution_datetime, forecast_rank
-        FROM {{ ref('staging_v1_meteologica_pjm_demand_forecast_hourly') }}
-    ) d
-
-    UNION ALL
-
-    SELECT
         'staging_v1_meteo_pjm_demand_fcst_ecmwf_ens_hourly' AS model_name,
         forecast_date,
         region::TEXT AS partition_dim_1,

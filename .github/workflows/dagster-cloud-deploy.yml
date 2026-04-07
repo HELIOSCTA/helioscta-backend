@@ -1,0 +1,29 @@
+name: Dagster Cloud Deploy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: dagster-cloud-deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  dagster-cloud-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dagster-io/dagster-cloud-action/actions/serverless_prod_deploy@v0.1
+        with:
+          dagster_cloud_api_token: ${{ secrets.DAGSTER_CLOUD_API_TOKEN }}
+          organization_id: ${{ secrets.DAGSTER_CLOUD_ORGANIZATION_ID }}
+        if: github.event_name == 'push'
+
+      - uses: dagster-io/dagster-cloud-action/actions/serverless_branch_deploy@v0.1
+        with:
+          dagster_cloud_api_token: ${{ secrets.DAGSTER_CLOUD_API_TOKEN }}
+          organization_id: ${{ secrets.DAGSTER_CLOUD_ORGANIZATION_ID }}
+        if: github.event_name == 'pull_request'

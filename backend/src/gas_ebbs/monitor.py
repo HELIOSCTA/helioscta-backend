@@ -4,13 +4,17 @@ Gas EBB scraper health monitor.
 Queries logging.pipeline_runs to report scraper health status.
 
 Usage:
-    python monitor.py              # print health report
-    python monitor.py --hours 6    # custom lookback window
-    python monitor.py --failures   # show only failures
+    python monitor.py                # print health report
+    python monitor.py --hours 6      # custom lookback window
+    python monitor.py --failures     # show only failures
+    python monitor.py --alert        # send Slack alert for DEAD/DEGRADED pipelines
 """
 
+import logging
 import sys
 from pathlib import Path
+
+import requests
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = SCRIPT_DIR.parent.parent.parent
@@ -97,9 +101,50 @@ def print_health_report(hours: int = 24, failures_only: bool = False):
         print()
 
 
+def send_alert(hours: int = 24) -> bool:
+    """Send a Slack alert if any pipelines are DEAD or DEGRADED.
+
+    Returns True if an alert was sent, False otherwise.
+    """
+    webhook_url = getattr(secrets, "SLACK_DEFAULT_WEBHOOK_URL", None)
+    if not webhook_url:
+        logging.warning("SLACK_DEFAULT_WEBHOOK_URL not set — skipping alert")
+        return False
+
+    results = get_pipeline_health(hours)
+    dead = [r for r in results if r["status"] == "DEAD"]
+    degraded = [r for r in results if r["status"] == "DEGRADED"]
+
+    if not dead and not degraded:
+        return False
+
+    lines = [f"*Gas EBB Scraper Alert* (last {hours}h)"]
+    if dead:
+        lines.append(f"\n:red_circle: *DEAD ({len(dead)})*")
+        for r in dead:
+            lines.append(f"  `{r['pipeline']}` — 0 successes, {r['failures']} failures")
+    if degraded:
+        lines.append(f"\n:large_orange_circle: *DEGRADED ({len(degraded)})*")
+        for r in degraded:
+            lines.append(
+                f"  `{r['pipeline']}` — {r['successes']} ok, {r['failures']} fail"
+            )
+
+    payload = {"text": "\n".join(lines)}
+    try:
+        resp = requests.post(webhook_url, json=payload, timeout=10)
+        resp.raise_for_status()
+        print(f"Alert sent ({len(dead)} dead, {len(degraded)} degraded)")
+        return True
+    except requests.exceptions.RequestException as e:
+        logging.error(f"Failed to send Slack alert: {e}")
+        return False
+
+
 def main():
     hours = 24
     failures_only = False
+    alert = False
 
     args = sys.argv[1:]
     if "--hours" in args:
@@ -107,8 +152,13 @@ def main():
         hours = int(args[idx + 1])
     if "--failures" in args:
         failures_only = True
+    if "--alert" in args:
+        alert = True
 
     print_health_report(hours=hours, failures_only=failures_only)
+
+    if alert:
+        send_alert(hours=hours)
 
 
 if __name__ == "__main__":

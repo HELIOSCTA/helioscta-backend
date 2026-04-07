@@ -158,7 +158,7 @@ Hourly DA electricity price forecasts for PJM by pricing hub, from Meteologica's
 
 ## Demand Observation
 
-Hourly observed actual demand (load) for PJM by region, from Meteologica's xTraders API.
+5-minute observed actual demand (load) for PJM by region, from Meteologica's xTraders API.
 
 ### Data Source
 - Meteologica xTraders API — 36 raw tables (RTO + 3 macro regions + 32 utility-level sub-regions)
@@ -166,24 +166,24 @@ Hourly observed actual demand (load) for PJM by region, from Meteologica's xTrad
 ### Key Transformations
 - UNIONs 36 region-specific tables with a `region` label
 - Converts `issue_date` (VARCHAR, UTC) to `update_datetime` (TIMESTAMP, EPT)
-- Extracts `observation_date` + `hour_ending` from `forecast_period_start` (already EPT)
+- Converts `forecast_period_start` (UTC) to `observation_datetime` (TIMESTAMP, EPT) and derives `observation_date`
 - Ranks updates by issue time (earliest first) via `DENSE_RANK()` partitioned by `(observation_date, region)`
 
 ### Model
 
 | Layer | Model | Materialization |
 |-------|-------|-----------------|
-| Staging | `staging_v1_meteologica_pjm_demand_observation_hourly` | ephemeral |
-| Mart | `meteologica_pjm_demand_observation_hourly` | view |
+| Staging | `staging_v1_meteologica_pjm_demand_observation` | ephemeral |
+| Mart | `meteologica_pjm_demand_observation_5min` | incremental (delete+insert) |
 
-**Grain:** update_rank x observation_date x hour_ending x region
+**Grain:** update_rank x observation_datetime x region
 
 ### Column Mapping (raw -> staging)
 
 | Raw Column | Staging Column |
 |------------|---------------|
 | `issue_date` | `update_datetime`, `update_date` |
-| `forecast_period_start` | `observation_date`, `hour_ending`, `observation_datetime` |
+| `forecast_period_start` | `observation_datetime`, `observation_date` |
 | `observation_mw` | `observation_load_mw` |
 
 {% enddocs %}

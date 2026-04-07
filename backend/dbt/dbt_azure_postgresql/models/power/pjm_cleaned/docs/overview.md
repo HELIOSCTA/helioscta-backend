@@ -9,7 +9,7 @@ mart views for the HeliosCTA power trading desk.
 
 | Source | Description | Ingestion |
 |--------|-------------|-----------|
-| **PJM Data Miner 2** | Official PJM API — LMPs, load (metered, prelim, DA bids), outage forecasts, tie flows, 7-day load forecast | Direct API scrapes (`backend/src/power/pjm/`) |
+| **PJM Data Miner 2** | Official PJM API — LMPs (hourly + 5-min), load (metered, prelim, DA bids), reserves (operational, dispatched), ancillary services prices, outage forecasts, tie flows, 7-day load forecast | Direct API scrapes (`backend/src/power/pjm/`) |
 | **GridStatus (open-source)** | Community library wrapping PJM public data — fuel mix, solar/wind forecasts, load forecast | `backend/src/power/gridstatus_open_source/pjm/` |
 | **GridStatus.io (paid API)** | Commercial API with enriched PJM data — LMPs, fuel mix, load | `backend/src/power/gridstatusio_api_key/pjm/` |
 
@@ -53,6 +53,11 @@ utils/           Utility models (ephemeral)
 | Solar/wind forecast | Multiple per day | ~4x daily |
 | Outage forecast | Daily | Daily |
 | Fuel mix | ~1 hour | Hourly |
+| Ancillary services prices | ~1 hour | Hourly |
+| Dispatched reserves | ~5 min | Every 5 min |
+| Operational reserves | ~15 sec | Every 15 sec |
+| RT dispatched reserves | Next business day | Daily |
+| 5-min RT LMPs (unverified) | ~5 min | Every 5 min |
 
 {% enddocs %}
 

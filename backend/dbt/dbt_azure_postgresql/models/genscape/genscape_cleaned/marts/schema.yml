@@ -1,8 +1,8 @@
 version: 2
 
 models:
-  - name: genscape_gas_production_forecast
-    description: '{{ doc("genscape_gas_production_forecast_mart") }}'
+  - name: genscape_gas_production_forecast_weekly
+    description: '{{ doc("genscape_gas_production_forecast_weekly_mart") }}'
     columns:
       - name: year
         description: "Forecast target year"
@@ -25,7 +25,43 @@ models:
         tests:
           - not_null
       - name: max_revision
-        description: "Total number of forecast revisions available for this date"
+        description: "Total number of forecast revisions available for this date (weekly cadence)"
+        tests:
+          - not_null
+      - name: lower_48_production
+        description: '{{ doc("genscape_col_production") }}'
+      - name: lower_48_dry_gas_production_yoy
+        description: '{{ doc("genscape_col_dry_gas_production_yoy") }}'
+      - name: lower_48_oil_rig_count
+        description: '{{ doc("genscape_col_oil_rig_count") }}'
+      - name: lower_48_gas_rig_count
+        description: '{{ doc("genscape_col_gas_rig_count") }}'
+
+  - name: genscape_gas_production_forecast_monthly
+    description: '{{ doc("genscape_gas_production_forecast_monthly_mart") }}'
+    columns:
+      - name: year
+        description: "Forecast target year"
+        tests:
+          - not_null
+      - name: month
+        description: "Forecast target month (1-12)"
+        tests:
+          - not_null
+      - name: date
+        description: '{{ doc("genscape_col_date") }}'
+        tests:
+          - not_null
+      - name: report_date
+        description: '{{ doc("genscape_col_report_date") }}'
+        tests:
+          - not_null
+      - name: revision
+        description: '{{ doc("genscape_col_revision") }}'
+        tests:
+          - not_null
+      - name: max_revision
+        description: "Total number of forecast revisions available for this date (monthly cadence only)"
         tests:
           - not_null
       - name: lower_48_production

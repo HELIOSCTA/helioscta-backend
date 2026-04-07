@@ -44,6 +44,13 @@ NEXT_DAY_GAS_SYMBOLS: list[dict] = [
         "region": "southeast",
     },
     {
+        "symbol": "XLM D1-IPG",
+        "description": "TGP-500L",
+        "product_type": "gas",
+        "contract_type": "next_day",
+        "region": "southeast",
+    },
+    {
         "symbol": "YHV D1-IPG",
         "description": "FGT Zone 3",
         "product_type": "gas",
@@ -72,7 +79,7 @@ NEXT_DAY_GAS_SYMBOLS: list[dict] = [
         "region": "southeast",
     },
     {
-        "symbol": "XT6 D1-IPG",
+        "symbol": "XVM D1-IPG",
         "description": "Tetco WLA",
         "product_type": "gas",
         "contract_type": "next_day",
@@ -149,6 +156,48 @@ NEXT_DAY_GAS_SYMBOLS: list[dict] = [
         "product_type": "gas",
         "contract_type": "next_day",
         "region": "northeast",
+    },
+    {
+        "symbol": "XIZ D1-IPG",
+        "description": "Columbia TCO Pool",
+        "product_type": "gas",
+        "contract_type": "next_day",
+        "region": "northeast",
+    },
+    {
+        "symbol": "YAG D1-IPG",
+        "description": "Tetco M2 (Receipt)",
+        "product_type": "gas",
+        "contract_type": "next_day",
+        "region": "northeast",
+    },
+    {
+        "symbol": "Z1Q D1-IPG",
+        "description": "Tennessee Z4 (Marcellus)",
+        "product_type": "gas",
+        "contract_type": "next_day",
+        "region": "northeast",
+    },
+    {
+        "symbol": "YQE D1-IPG",
+        "description": "Transco Leidy",
+        "product_type": "gas",
+        "contract_type": "next_day",
+        "region": "northeast",
+    },
+    {
+        "symbol": "XTG D1-IPG",
+        "description": "Northern Ventura (NNG)",
+        "product_type": "gas",
+        "contract_type": "next_day",
+        "region": "midwest",
+    },
+    {
+        "symbol": "YHF D1-IPG",
+        "description": "Chicago CityGate (NGPL-Nicor)",
+        "product_type": "gas",
+        "contract_type": "next_day",
+        "region": "midwest",
     },
     # -- Southwest ---------------------------------------------------------------
     {

@@ -33,4 +33,3 @@ FINAL AS (
 )
 
 SELECT * FROM FINAL
-ORDER BY datetime DESC, region, site_id

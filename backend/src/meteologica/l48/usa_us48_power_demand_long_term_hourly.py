@@ -9,7 +9,7 @@ Source: https://api-markets.meteologica.com/api/v1/
 from pathlib import Path
 
 import pandas as pd
-from prefect import flow
+
 
 from backend import secrets
 from backend.utils import (
@@ -179,7 +179,6 @@ def _upsert(
 # main
 # --------------------------------------------------------------------------- #
 
-@flow(name=API_SCRAPE_NAME, retries=2, retry_delay_seconds=60, log_prints=True)
 def main():
     """
     Orchestrate the Meteologica forecast pull -> format -> upsert pipeline.
@@ -230,7 +229,7 @@ def main():
 
 
 if __name__ == "__main__":
-    # Bypass Prefect @flow decorator for local runs (no server required)
+    
     df, metadata = _pull()
     df = _format(df, metadata)
     _upsert(df)

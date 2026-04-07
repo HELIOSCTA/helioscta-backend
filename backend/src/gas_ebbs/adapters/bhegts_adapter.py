@@ -20,6 +20,7 @@ from bs4 import BeautifulSoup
 
 from backend.src.gas_ebbs.base_scraper import EBBScraper, register_adapter
 from backend.src.gas_ebbs.ebb_utils import clean_text, extract_numeric_id
+from backend.src.gas_ebbs import outage_extractor
 
 
 @register_adapter("bhegts")
@@ -37,6 +38,91 @@ class BHEGTSAdapter(EBBScraper):
         API: /api/v1/{code}/postings?category=notices&subcategory={subcategory}
         Doc: https://infopost.bhegts.com/docs/{code}/postings/{noticeId}/{revision}/{code}-{noticeId}.pdf
     """
+
+    def _parse_detail(self, html: str, notice: dict) -> dict:
+        """Parse BHEGTS/Dominion detail page.
+
+        BHEGTS detail URLs typically point to PDF documents. When the
+        response is HTML (e.g. a Next.js page with embedded notice data),
+        the adapter extracts text from the JSON payload or HTML content.
+        When the response is a PDF or binary, fall back to subject-only
+        extraction.
+        """
+        # BHEGTS detail URLs are often PDFs — check if this is HTML
+        stripped = html.strip()
+        if stripped.startswith("%PDF") or not stripped:
+            # Binary/PDF content — can't parse, use subject only
+            extraction = outage_extractor.extract_outage(
+                subject=notice.get("subject", ""),
+                detail_text="",
+            )
+            extraction["detail_text"] = ""
+            return extraction
+
+        # Try JSON parsing (Next.js SSR data)
+        try:
+            data = json.loads(html)
+            text_parts = []
+            if isinstance(data, dict):
+                for key in ("subject", "body", "content", "text",
+                            "noticeText", "description"):
+                    val = data.get(key, "")
+                    if val and isinstance(val, str):
+                        text_parts.append(val)
+            if text_parts:
+                body_text = " ".join(text_parts)
+                body_text = " ".join(body_text.split())
+                extraction = outage_extractor.extract_outage(
+                    subject=notice.get("subject", ""),
+                    detail_text=body_text,
+                )
+                extraction["detail_text"] = body_text[:5000]
+                return extraction
+        except (json.JSONDecodeError, ValueError):
+            pass
+
+        # HTML parsing
+        soup = BeautifulSoup(html, "html.parser")
+
+        for tag in soup(["script", "style", "nav", "header", "footer"]):
+            tag.decompose()
+
+        body_text = ""
+
+        # Try Next.js SSR: extract JSON from __NEXT_DATA__ script
+        next_data = soup.find("script", id="__NEXT_DATA__")
+        if next_data and next_data.string:
+            try:
+                nd = json.loads(next_data.string)
+                page_props = nd.get("props", {}).get("pageProps", {})
+                notice_data = page_props.get("notice", page_props.get("posting", {}))
+                if isinstance(notice_data, dict):
+                    text_parts = []
+                    for key in ("subject", "body", "content", "text", "description"):
+                        val = notice_data.get(key, "")
+                        if val and isinstance(val, str):
+                            text_parts.append(val)
+                    if text_parts:
+                        body_text = " ".join(text_parts)
+            except (json.JSONDecodeError, ValueError):
+                pass
+
+        if not body_text:
+            # Fallback: extract from HTML content
+            content = soup.find("div", class_=re.compile(r"notice|content|detail|posting", re.IGNORECASE))
+            if content:
+                body_text = content.get_text(separator=" ", strip=True)
+            else:
+                body_text = soup.get_text(separator=" ", strip=True)
+
+        body_text = " ".join(body_text.split())
+
+        extraction = outage_extractor.extract_outage(
+            subject=notice.get("subject", ""),
+            detail_text=body_text,
+        )
+        extraction["detail_text"] = body_text[:5000]
+        return extraction
 
     def _get_listing_sources(self) -> list[dict]:
         """Return one source per configured notice subcategory (Critical, Non-Critical)."""
