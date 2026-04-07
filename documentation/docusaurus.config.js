@@ -7,10 +7,10 @@ const config = {
   tagline: "Data catalog, pipelines, and dbt views",
   // favicon: "img/favicon.ico",
 
-  url: "https://helioscta-backend.vercel.app",
-  baseUrl: "/",
+  url: "https://helioscta.github.io",
+  baseUrl: "/helioscta-backend/",
 
-  organizationName: "akeavenyhelioscta",
+  organizationName: "HELIOSCTA",
   projectName: "helioscta-backend",
 
   onBrokenLinks: "throw",
@@ -30,7 +30,7 @@ const config = {
           routeBasePath: "/",
           sidebarPath: require.resolve("./sidebars.js"),
           editUrl:
-            "https://github.com/akeavenyhelioscta/helioscta-backend/edit/main/documentation/",
+            "https://github.com/HELIOSCTA/helioscta-backend/edit/main/documentation/",
         },
         blog: false,
         theme: {
@@ -51,7 +51,7 @@ const config = {
         title: "HeliosCTA Docs",
         items: [
           {
-            href: "https://github.com/akeavenyhelioscta/helioscta-backend",
+            href: "https://github.com/HELIOSCTA/helioscta-backend",
             label: "GitHub",
             position: "right",
           },
