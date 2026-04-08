@@ -918,7 +918,7 @@ backend/
         power/
           ...
 
-schedulers/
+backend/schedulers/
   task_scheduler_azurepostgresql/
     power/
       scheduled/
@@ -965,7 +965,7 @@ def main():
 | 5 | `events.event_log` migration | SQL/dbt | `backend/dbt/.../macros/triggers/event_log_table.sql` |
 | 6 | Trigger template/macros (per table) | SQL/dbt | `backend/dbt/.../macros/triggers/{schema}_{table}.sql` |
 | 7 | Handler functions (per event) | Python | `backend/src/power/event_driven/iso/{iso}/{table}.py` |
-| 8 | Listener service wrapper | PowerShell | `schedulers/.../listeners/start_pg_listener.ps1` |
+| 8 | Listener service wrapper | PowerShell | `backend/schedulers/.../listeners/start_pg_listener.ps1` |
 | 9 | `events.listener_heartbeat` table | SQL/dbt | `backend/dbt/.../macros/triggers/listener_heartbeat_table.sql` |
 
 **Recommended implementation order:** 1 -> 5 -> 2 -> 3 -> 4 -> 6 -> 7 -> 8 -> 9

@@ -66,7 +66,7 @@ Provides daily power generation burn estimates by region and model type. Used to
 
 | PowerShell Runner | Python Entrypoint | Task Name | Task Path | Cadence |
 |---|---|---|---|---|
-| `schedulers/.../genscape/genscape_all_scripts.ps1` | `python backend/src/genscape/runs.py all` | Genscape All Scripts | `\helioscta-backend\Genscape\` | Daily 6:00 AM, 12:00 PM |
+| `backend/schedulers/.../genscape/genscape_all_scripts.ps1` | `python backend/src/genscape/runs.py all` | Genscape All Scripts | `\helioscta-backend\Genscape\` | Daily 6:00 AM, 12:00 PM |
 
 ### Register / Remove Tasks
 

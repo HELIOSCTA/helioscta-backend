@@ -17,7 +17,7 @@ else
 fi
 
 # --- Files that never require docs updates ---
-IGNORE_PATTERN='^(\.claude/|\.github/|\.githooks/|\.gitattributes|\.gitignore|\.env|\.vscode/|\.SKILLS/|scripts/check-docs-updated\.sh|documentation/package-lock\.json|\.pre-commit-config\.yaml|vercel\.json|documentation/(docusaurus\.config\.js|sidebars\.js|package\.json|vercel\.json|src/|static/|vendor-docs/|working-notes/))'
+IGNORE_PATTERN='^(\.claude/|\.github/|\.githooks/|\.gitattributes|\.gitignore|\.env|\.vscode/|\.claude/standards/|scripts/check-docs-updated\.sh|documentation/package-lock\.json|\.pre-commit-config\.yaml|vercel\.json|documentation/(docusaurus\.config\.js|sidebars\.js|package\.json|vercel\.json|src/|static/|vendor-docs/))'
 
 # --- Split into docs vs non-docs, filtering out ignored files ---
 DOCS_CHANGED=$(echo "$ALL_CHANGED" | grep -E '^(documentation/docs/|README\.md)' || true)

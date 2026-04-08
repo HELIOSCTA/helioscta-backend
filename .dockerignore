@@ -2,6 +2,7 @@
 frontend
 documentation
 TODO
+.TODO
 node_modules
 __pycache__
 **/__pycache__/
@@ -14,7 +15,7 @@ helioscta_backend.egg-info
 .sql-scripts
 .vendor-docs
 .vscode
-.SKILLS
+.claude/standards
 *.csv
 *.xlsx
 *.XLSX

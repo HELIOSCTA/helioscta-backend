@@ -11,7 +11,7 @@
 | **Runner** | `backend/src/power/ercot/runs.py` |
 | **Prefect Flows** | `backend/src/power/ercot/flows.py` |
 | **Shared Helpers** | `backend/src/power/ercot/ercot_api_utils.py` |
-| **Scheduler Script** | `schedulers/task_scheduler_azurepostgresql/power/ercot.ps1` |
+| **Scheduler Script** | `backend/schedulers/task_scheduler_azurepostgresql/power/ercot.ps1` |
 | **Task Name** | `ERCOT - ISO` |
 | **Task Path** | `\helioscta-backend\Power\` |
 | **Cadence** | Every hour, 24/7 (scheduler host local time) |

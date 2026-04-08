@@ -1,7 +1,7 @@
 # Task Scheduling
 
 How to add or modify Windows Task Scheduler orchestration in
-`schedulers/task_scheduler_azurepostgresql/`.
+`backend/schedulers/task_scheduler_azurepostgresql/`.
 
 ## Use This Skill When
 
@@ -15,7 +15,7 @@ For every new scheduled workflow:
 
 1. A stable Python entrypoint exists under `backend/src/`.
 2. A matching PowerShell registration script exists under
-   `schedulers/task_scheduler_azurepostgresql/<domain>/`.
+   `backend/schedulers/task_scheduler_azurepostgresql/<domain>/`.
 3. If the workflow supports an `all` command, keep a folder-level aggregate runner such as
    `eia/eia_all_scripts.ps1`.
 4. At least one file under `documentation/docs/` is updated in the same change.
@@ -53,7 +53,7 @@ Preferred documentation targets:
 
 1. Create or update the Python entrypoint under `backend/src/...`.
 2. Add or update the matching PowerShell runner under
-   `schedulers/task_scheduler_azurepostgresql/...`.
+   `backend/schedulers/task_scheduler_azurepostgresql/...`.
 3. If you add a control script that should never be scheduled, update
    `register_all_tasks.ps1` so bulk registration skips it.
 4. Update `documentation/docs/` in the same change.
@@ -63,4 +63,4 @@ Preferred documentation targets:
 
 - Repo policy: `AGENTS.md`
 - Operator reference: `documentation/docs/task-scheduling.md`
-- Docs conventions: `.SKILLS/documentation.md`
+- Docs conventions: `.claude/standards/documentation.md`

@@ -4,7 +4,7 @@
 
 ## Goal
 
-Migrate 6 active-candidate SQL files from the legacy `.refactor/dbt_criterion_postgresql/` directory into a properly structured `criterion_cleaned` dbt domain following project conventions in `.SKILLS/dbt-preferences.md`.
+Migrate 6 active-candidate SQL files from the legacy `.refactor/dbt_criterion_postgresql/` directory into a properly structured `criterion_cleaned` dbt domain following project conventions in `.claude/standards/dbt-preferences.md`.
 
 ## Target Structure
 

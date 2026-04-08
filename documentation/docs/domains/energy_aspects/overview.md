@@ -75,7 +75,7 @@ Pipeline: `source (pass-through) -> staging (PJM column extraction + rename) -> 
 
 | Field | Value |
 |-------|-------|
-| **PowerShell Runner** | `schedulers/task_scheduler_azurepostgresql/energy_aspects/energy_aspects_all_scripts.ps1` |
+| **PowerShell Runner** | `backend/schedulers/task_scheduler_azurepostgresql/energy_aspects/energy_aspects_all_scripts.ps1` |
 | **Python Entrypoint** | `python backend/src/energy_aspects/timeseries/runs.py all` |
 | **Task Name** | `Energy Aspects (All Scripts)` |
 | **Task Path** | `\helioscta-backend\Energy Aspects\` |

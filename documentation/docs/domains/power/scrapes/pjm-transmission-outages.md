@@ -75,7 +75,7 @@ python backend/src/power/pjm/runs.py  # then select transmission_outages
 
 | Field | Value |
 |-------|-------|
-| **PowerShell** | `schedulers/task_scheduler_azurepostgresql/power/pjm_transmission_outages.ps1` |
+| **PowerShell** | `backend/schedulers/task_scheduler_azurepostgresql/power/pjm_transmission_outages.ps1` |
 | **Task Name** | `PJM Transmission Outages (eDART)` |
 | **Task Path** | `\helioscta-backend\Power\` |
 | **Cadence** | Daily at 07:00 ET |

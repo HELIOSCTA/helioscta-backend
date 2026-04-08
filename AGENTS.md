@@ -16,18 +16,18 @@ Project-specific conventions and preferences for Codex.
 
 | Skill | Path | Description |
 |-------|------|-------------|
-| dbt Preferences | [.SKILLS/dbt-preferences.md](.SKILLS/dbt-preferences.md) | dbt project conventions: materialization, naming, documentation, testing standards |
-| Python Script Preferences | [.SKILLS/python-script-preferences.md](.SKILLS/python-script-preferences.md) | Backend Python script structure, imports, and pipeline patterns |
-| Logging | [.SKILLS/logging.md](.SKILLS/logging.md) | Logging and pipeline run tracking conventions |
-| Task Scheduling | [.SKILLS/task_scheduling.md](.SKILLS/task_scheduling.md) | Windows Task Scheduler PowerShell runner conventions, bulk registration rules, and required docs updates |
-| Scheduled vs Event-Driven | [.SKILLS/scheduled_vs_event_driven.md](.SKILLS/scheduled_vs_event_driven.md) | Prompt template and decision framework for API scrape orchestration |
-| Documentation | [.SKILLS/documentation.md](.SKILLS/documentation.md) | Docusaurus site conventions: theme, nav structure, content templates, QA checklist |
-| TODO Tracking | [.SKILLS/todo-preferences.md](.SKILLS/todo-preferences.md) | TODO directory structure, tags, and conventions for tracking work and bugs |
+| dbt Preferences | [.claude/standards/dbt-preferences.md](.claude/standards/dbt-preferences.md) | dbt project conventions: materialization, naming, documentation, testing standards |
+| Python Script Preferences | [.claude/standards/python-script-preferences.md](.claude/standards/python-script-preferences.md) | Backend Python script structure, imports, and pipeline patterns |
+| Logging | [.claude/standards/logging.md](.claude/standards/logging.md) | Logging and pipeline run tracking conventions |
+| Task Scheduling | [.claude/standards/task_scheduling.md](.claude/standards/task_scheduling.md) | Windows Task Scheduler PowerShell runner conventions, bulk registration rules, and required docs updates |
+| Scheduled vs Event-Driven | [.claude/standards/scheduled_vs_event_driven.md](.claude/standards/scheduled_vs_event_driven.md) | Prompt template and decision framework for API scrape orchestration |
+| Documentation | [.claude/standards/documentation.md](.claude/standards/documentation.md) | Docusaurus site conventions: theme, nav structure, content templates, QA checklist |
+| TODO Tracking | [.claude/standards/todo-preferences.md](.claude/standards/todo-preferences.md) | TODO directory structure, tags, and conventions for tracking work and bugs |
 
 ## API Orchestration Decision Standard
 
 For all new or refactored API scripts, apply the library-wide decision criteria in
-[.SKILLS/scheduled_vs_event_driven.md](.SKILLS/scheduled_vs_event_driven.md) before choosing scheduled, event-driven, or hybrid orchestration.
+[.claude/standards/scheduled_vs_event_driven.md](.claude/standards/scheduled_vs_event_driven.md) before choosing scheduled, event-driven, or hybrid orchestration.
 
 - Required: use the scoring rubric and decision rules in Section 8 of that document.
 - Default policy: scheduled for external pulls unless freshness/arrival variability requires event-driven or hybrid.
@@ -35,8 +35,8 @@ For all new or refactored API scripts, apply the library-wide decision criteria 
 
 ## Task Scheduler Standard
 
-All new or modified Windows Task Scheduler scripts under `schedulers/task_scheduler_azurepostgresql/` must follow
-[.SKILLS/task_scheduling.md](.SKILLS/task_scheduling.md).
+All new or modified Windows Task Scheduler scripts under `backend/schedulers/task_scheduler_azurepostgresql/` must follow
+[.claude/standards/task_scheduling.md](.claude/standards/task_scheduling.md).
 
 - Required: every scheduled Python entrypoint must have a matching `.ps1` registration script.
 - Required: every new or modified `.ps1` must update at least one file under `documentation/docs/` in the same change.
@@ -46,7 +46,7 @@ All new or modified Windows Task Scheduler scripts under `schedulers/task_schedu
 
 All new PJM scripts must follow the canonical pattern established in [`backend/src/power/pjm/`](backend/src/power/pjm/). Do not refactor existing PJM scripts unless explicitly requested.
 
-- Detailed standard: [.SKILLS/python-script-preferences.md](.SKILLS/python-script-preferences.md)
+- Detailed standard: [.claude/standards/python-script-preferences.md](.claude/standards/python-script-preferences.md)
 - Canonical examples: [`backend/src/power/pjm/`](backend/src/power/pjm/) (e.g., `da_hrl_lmps.py`)
 
 ### Required pattern for new scripts

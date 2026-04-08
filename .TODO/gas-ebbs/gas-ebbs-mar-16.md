@@ -15,7 +15,7 @@
 - [x] CLI runner (`runs.py` — `--list`, numbered, `all`, parallel by family)
 - [x] Prefect flows (`flows.py` — ~168 flows + master `gas_ebb_all`)
 - [x] DB tables: `gas_ebbs.notices`, `gas_ebbs.notice_snapshots`, `gas_ebbs.notice_details`, `gas_ebbs.planned_outages`, `gas_ebbs.outage_impacts`, `gas_reference.pipeline_regions`
-- [x] Windows Task Scheduler (`schedulers/.../gas_ebbs.ps1` — hourly)
+- [x] Windows Task Scheduler (`backend/schedulers/.../gas_ebbs.ps1` — hourly)
 - [x] Frontend dashboard (`GasEbbDashboard.tsx` + API route `gas-ebbs/route.ts`)
 
 ---
@@ -194,10 +194,10 @@ Gaps: BHEGTS (0% dates), Williams (0% dates/capacity/locations).
 ## References
 
 - Design doc: `TODO/gas-ebbs/GAS_EBB_REFACTOR.md`
-- Source inventory: `.SKILLS/gas_ebbs.md`
+- Source inventory: `.claude/standards/gas_ebbs.md`
 - Implementation: `backend/src/gas_ebbs/`
 - Impact analyzer: `backend/src/gas_ebbs/impact_analyzer.py`
-- Scheduler: `schedulers/task_scheduler_azurepostgresql/gas_ebbs/gas_ebbs.ps1`
+- Scheduler: `backend/schedulers/task_scheduler_azurepostgresql/gas_ebbs/gas_ebbs.ps1`
 - Frontend: `frontend/components/data-explorer/GasEbbDashboard.tsx`
 - API route: `frontend/app/api/data-explorer/gas-ebbs/route.ts`
 - Dashboard mockups: `TODO/gas-ebbs/*.png`

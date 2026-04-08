@@ -74,7 +74,7 @@ Task Scheduler script also now includes:
 
 - `backend/dbt/dbt_azure_postgresql/runner_dbt_azure_postgresql.py` -- the runner entry point
 - `backend/dbt/dbt_azure_postgresql/dbt_utils.py` -- subprocess + retry + lock connection hardening
-- `schedulers/task_scheduler_azurepostgresql/dbt/dbt_run.ps1` -- Task Scheduler registration
+- `backend/schedulers/task_scheduler_azurepostgresql/dbt/dbt_run.ps1` -- Task Scheduler registration
 - `documentation/docs/task-scheduling.md` -- operator behavior and CLI documentation
 
 ## Production Rollout Plan (Updated Mar 18, 2026)

@@ -10,7 +10,7 @@
 | **Source** | ICE Python API (PJM short-term quote snapshots) |
 | **Target Table** | `ice_python.intraday_quotes` |
 | **Schema** | `ice_python` |
-| **Scheduler Script** | `schedulers/task_scheduler_azurepostgresql/ice_python/intraday_quotes.ps1` |
+| **Scheduler Script** | `backend/schedulers/task_scheduler_azurepostgresql/ice_python/intraday_quotes.ps1` |
 | **Task Name** | `Intraday Quotes` |
 | **Task Path** | `\helioscta-backend\ICE Python\` |
 | **Trigger** | Scheduled (Windows Task Scheduler) |
@@ -56,7 +56,7 @@ Unregister-ScheduledTask -TaskName "Intraday Quotes" -TaskPath "\helioscta-backe
 | **Source** | ICE Python API (`Strip`, `Startdt`, `Enddt` fields) |
 | **Target Table** | `ice_python.contract_dates` |
 | **Schema** | `ice_python` |
-| **Scheduler Script** | `schedulers/task_scheduler_azurepostgresql/ice_python/contract_dates.ps1` |
+| **Scheduler Script** | `backend/schedulers/task_scheduler_azurepostgresql/ice_python/contract_dates.ps1` |
 | **Task Name** | `Contract Dates` |
 | **Task Path** | `\helioscta-backend\ICE Python\` |
 | **Trigger** | Scheduled (Windows Task Scheduler) |

@@ -2,7 +2,7 @@
 
 Repo-wide conventions for Windows Task Scheduler orchestration. All scheduled
 tasks are registered via PowerShell scripts under
-`schedulers/task_scheduler_azurepostgresql/`.
+`backend/schedulers/task_scheduler_azurepostgresql/`.
 
 ---
 
@@ -12,7 +12,7 @@ Refreshes all dbt views on the `helioscta` Azure PostgreSQL database.
 
 | Field | Value |
 |-------|-------|
-| PowerShell runner | `schedulers/task_scheduler_azurepostgresql/dbt/dbt_run.ps1` |
+| PowerShell runner | `backend/schedulers/task_scheduler_azurepostgresql/dbt/dbt_run.ps1` |
 | Python entrypoint | `backend/dbt/dbt_azure_postgresql/runner_dbt_azure_postgresql.py` |
 | CLI arguments | `--select <selector>`, `--dry-run`, `--timeout <seconds>`, `--max-attempts <n>`, `--retry-backoff-seconds <seconds>` |
 | Task Scheduler name | `dbt run (Azure PostgreSQL)` |

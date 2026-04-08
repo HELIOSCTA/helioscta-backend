@@ -67,7 +67,7 @@ Check import health via these Azure SQL tables:
 - **`natgas.load_status`** -- last successful import per source type
 - **`administration.error_log`** -- import errors and failures
 
-See [verification notes](https://github.com/helioscta/helioscta-backend/blob/main/schedulers/task_scheduler_azuresql/wm_natgasdatafeed_import/.verify/notes.md) for detailed health check queries.
+See [verification notes](https://github.com/helioscta/helioscta-backend/blob/main/backend/schedulers/task_scheduler_azuresql/wm_natgasdatafeed_import/.verify/notes.md) for detailed health check queries.
 
 ## Known Caveats
 

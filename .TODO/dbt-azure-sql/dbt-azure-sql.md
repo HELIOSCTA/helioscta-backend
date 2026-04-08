@@ -4,12 +4,12 @@
 **Status:** Planning
 **References:**
 - Legacy dbt code: `.refactor/dbt_azure_sql/`
-- Vendor docs/scripts: `.vendor-docs/wm_natgasdatafeed_import/`
-- dbt conventions: `.SKILLS/dbt-preferences.md`
-- Scheduler conventions: `.SKILLS/task_scheduling.md`
-- Orchestration rubric: `.SKILLS/scheduled_vs_event_driven.md` (Section 8)
-- Scheduler target folder: `schedulers/task_scheduler_azuresql/`
-- Existing scheduler conventions: `schedulers/task_scheduler_azurepostgresql/`
+- Vendor docs/scripts: `documentation/vendor-docs/wm_natgasdatafeed_import/`
+- dbt conventions: `.claude/standards/dbt-preferences.md`
+- Scheduler conventions: `.claude/standards/task_scheduling.md`
+- Orchestration rubric: `.claude/standards/scheduled_vs_event_driven.md` (Section 8)
+- Scheduler target folder: `backend/schedulers/task_scheduler_azuresql/`
+- Existing scheduler conventions: `backend/schedulers/task_scheduler_azurepostgresql/`
 
 ---
 
@@ -270,7 +270,7 @@ backend/dbt/dbt_azure_postgresql/
 
 ### 5.2 Proposed Python Entrypoints
 
-Following the standard from `.SKILLS/python-script-preferences.md` and the existing `backend/src/gas_ebbs/` pattern:
+Following the standard from `.claude/standards/python-script-preferences.md` and the existing `backend/src/gas_ebbs/` pattern:
 
 ```
 backend/src/natgas/
@@ -293,7 +293,7 @@ Each script follows the canonical pattern:
 ### 5.3 Matching .ps1 Registration Scripts
 
 ```
-schedulers/task_scheduler_azuresql/
+backend/schedulers/task_scheduler_azuresql/
   natgas/
     wm_natgas_metadata.ps1       -- Hourly at :05
     wm_natgas_delta.ps1          -- Hourly at :10 and :45
@@ -376,7 +376,7 @@ python backend/src/natgas/wm_natgas_baseline.py --source gas_burn
 
 **To include natgas models in dbt run:**
 - Add `models/natgas/` to the dbt run scope in the existing dbt scheduler
-- Or create a separate `schedulers/task_scheduler_azuresql/dbt/dbt_run_azuresql.ps1` for Azure SQL target
+- Or create a separate `backend/schedulers/task_scheduler_azuresql/dbt/dbt_run_azuresql.ps1` for Azure SQL target
 
 ---
 

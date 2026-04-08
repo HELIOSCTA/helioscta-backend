@@ -31,6 +31,7 @@ __pycache__/
 .archive/*
 .sql-scripts/*
 .vendor-docs/*
+.TODO/
 TODO/*
 *.pdf
 *.csv
