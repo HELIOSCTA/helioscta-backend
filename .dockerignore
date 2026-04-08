@@ -1,7 +1,5 @@
 .git
-frontend
 documentation
-TODO
 .TODO
 node_modules
 __pycache__
@@ -9,11 +7,9 @@ __pycache__
 *.pyc
 *.pyo
 *.pyd
-helioscta_backend.egg-info
 .archive
 .refactor
 .sql-scripts
-.vendor-docs
 .vscode
 .claude/standards
 *.csv

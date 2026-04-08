@@ -17,10 +17,12 @@ jobs:
         with:
           dagster_cloud_api_token: ${{ secrets.DAGSTER_CLOUD_API_TOKEN }}
           organization_id: ${{ secrets.DAGSTER_CLOUD_ORGANIZATION_ID }}
+          dagster_cloud_yaml_path: backend/dagster_cloud.yaml
         if: github.event_name == 'push'
 
       - uses: dagster-io/dagster-cloud-action/actions/serverless_branch_deploy@v0.1
         with:
           dagster_cloud_api_token: ${{ secrets.DAGSTER_CLOUD_API_TOKEN }}
           organization_id: ${{ secrets.DAGSTER_CLOUD_ORGANIZATION_ID }}
+          dagster_cloud_yaml_path: backend/dagster_cloud.yaml
         if: github.event_name == 'pull_request'

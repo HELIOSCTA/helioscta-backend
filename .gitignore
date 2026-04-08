@@ -6,6 +6,7 @@ azure-infra/config.secrets.sh
 
 # Python build/dist directories
 dist/*
+*.egg-info/
 
 # Docusaurus
 node_modules/
@@ -30,7 +31,6 @@ __pycache__/
 # misc files
 .archive/*
 .sql-scripts/*
-.vendor-docs/*
 .TODO/
 TODO/*
 *.pdf
