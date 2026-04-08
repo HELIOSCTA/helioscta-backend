@@ -6,15 +6,10 @@ Pre-upload checks (assert_no_missing_product_codes) are dbt tests
 that run as part of the dbt build step.
 """
 
-import os
-from datetime import datetime, timedelta
-from zoneinfo import ZoneInfo
+from datetime import datetime
 
 from dagster import (
     asset,
-    asset_check,
-    AssetCheckResult,
-    AssetCheckSeverity,
     MaterializeResult,
     MetadataValue,
 )
@@ -22,31 +17,13 @@ from dagster import (
 from backend.orchestration.slack_utils import fmt_date, send_slack
 from backend.utils import azure_postgresql_utils
 
-MT = ZoneInfo("America/Denver")
-
-
-def _is_dry_run(context) -> bool:
-    """Check env var or run tag for dry run mode."""
-    if os.getenv("DAGSTER_DRY_RUN", "").lower() in ("1", "true"):
-        return True
-    tags = {}
-    if hasattr(context, "run_tags"):
-        tags = context.run_tags
-    elif hasattr(context, "dagster_run") and context.dagster_run:
-        tags = context.dagster_run.tags
-    elif hasattr(context, "run") and context.run:
-        tags = context.run.tags
-    return tags.get("dry_run", "").lower() in ("1", "true")
-
-
-# ---------------------------------------------------------------------------
-# MUFG export asset
-# ---------------------------------------------------------------------------
+from ._helpers import MT, _is_dry_run
 
 
 @asset(
-    deps=["data_transformation_in_sql"],
+    deps=["step_dbt_transform"],
     kinds={"python", "sftp"},
+    group_name="clear_street_to_mufg",
     description=(
         "**Phase 3** — filter transformed trades for MUFG firms (ADU/905), "
         "generate a CSV, and upload to MUFG SFTP.\n\n"
@@ -67,7 +44,7 @@ def _is_dry_run(context) -> bool:
         "with firms ADU/905."
     ),
 )
-def upload_clear_street_trades_to_mufg(context) -> MaterializeResult:
+def step_upload_to_mufg(context) -> MaterializeResult:
     from backend.src.postions_and_trades.tasks.email_sftp_files.send_clear_street_trades_to_mufg_v1_2026_feb_02 import (
         main as send_to_mufg_main,
     )
@@ -184,49 +161,4 @@ def upload_clear_street_trades_to_mufg(context) -> MaterializeResult:
             "mufg_trades": MetadataValue.md(mufg_trades.to_markdown(index=False)),
             "all_trades": MetadataValue.md(all_trades.to_markdown(index=False)),
         }
-    )
-
-
-# ---------------------------------------------------------------------------
-# Post-upload check — validate SFTP date matches today
-# ---------------------------------------------------------------------------
-
-
-@asset_check(
-    asset=upload_clear_street_trades_to_mufg,
-    blocking=False,
-    description=(
-        "Validates that the latest `sftp_date` in `trades_cleaned.clear_street_trades` "
-        "for MUFG firms (ADU/905) matches today's date. Warns but does not block."
-    ),
-)
-def mufg_sftp_date_is_today(context) -> AssetCheckResult:
-    result = azure_postgresql_utils.pull_from_db(
-        query="""
-        SELECT MAX(sftp_date)::TEXT AS latest_sftp_date
-        FROM trades_cleaned.clear_street_trades
-        WHERE give_in_out_firm_num IN ('ADU', '905')
-        """
-    )
-
-    latest_date_str = str(result["latest_sftp_date"].iloc[0])
-    latest_date = datetime.strptime(latest_date_str, "%Y-%m-%d").date()
-
-    if _is_dry_run(context):
-        expected_date = datetime.now().date() - timedelta(days=1)
-        context.log.info(f"DRY RUN: using yesterday ({expected_date}) as target date")
-    else:
-        expected_date = datetime.now().date()
-
-    passed = latest_date == expected_date
-
-    context.log.info(f"MUFG SFTP date check: latest={latest_date}, expected={expected_date}, match={passed}")
-
-    return AssetCheckResult(
-        passed=passed,
-        severity=AssetCheckSeverity.WARN,
-        metadata={
-            "latest_sftp_date": MetadataValue.text(latest_date_str),
-            "expected_date": MetadataValue.text(str(expected_date)),
-        },
     )

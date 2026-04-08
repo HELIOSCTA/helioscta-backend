@@ -4,7 +4,10 @@ documentation
 TODO
 node_modules
 __pycache__
+**/__pycache__/
 *.pyc
+*.pyo
+*.pyd
 helioscta_backend.egg-info
 .archive
 .refactor
@@ -14,9 +17,31 @@ helioscta_backend.egg-info
 .SKILLS
 *.csv
 *.xlsx
+*.XLSX
 *.xlsm
+*.XLSM
 *.xlsb
+*.XLSB
 *.pdf
-backend/dbt/dbt_azure_postgresql/target
+*.PDF
+*.log
+*.tmp
+
+# Local runtime/output artifacts that should never be part of image build context
+backend/src/meteologica/examples_from_api_docs/
+backend/src/**/logs/
+backend/src/postions_and_trades/sftp_files/
+backend/.pytest_cache/
+backend/.mypy_cache/
+
+# dbt local artifacts
+backend/dbt/dbt_azure_postgresql/target/*
+!backend/dbt/dbt_azure_postgresql/target/manifest.json
 backend/dbt/dbt_azure_postgresql/dbt_packages
 backend/dbt/dbt_azure_postgresql/logs
+backend/dbt/dbt_azure_sql/target/
+backend/dbt/dbt_azure_sql/dbt_packages/
+backend/dbt/dbt_azure_sql/logs/
+
+# Local scratch/orchestration state
+.tmp_dagster_home_*/

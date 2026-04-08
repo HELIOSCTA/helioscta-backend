@@ -1,10 +1,7 @@
 name: Dagster Cloud Deploy
 
 on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
+  workflow_dispatch:  # Manual trigger only — click "Run workflow" in GitHub Actions
 
 concurrency:
   group: dagster-cloud-deploy-${{ github.ref }}

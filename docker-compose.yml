@@ -19,28 +19,27 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.dagster
-    command: dagster-webserver -w backend/orchestration/workspace.yaml -h 0.0.0.0 -p 4321
+    command: dagster-webserver -w backend/orchestration/workspace.yaml -h 0.0.0.0 -p 7777
     ports:
-      - "4321:4321"
+      - "127.0.0.1:7777:7777"
+      - "[::1]:7777:7777"
     environment:
       - DAGSTER_HOME=/app/backend/orchestration
       - DAGSTER_PG_URL=postgresql://dagster:dagster@dagster-db:5432/dagster
     env_file:
-      - .env
+      - backend/.env
     depends_on:
       dagster-db:
         condition: service_healthy
 
   dagster-daemon:
-    build:
-      context: .
-      dockerfile: Dockerfile.dagster
+    image: helioscta-backend-dagster-webserver
     command: dagster-daemon run -w backend/orchestration/workspace.yaml
     environment:
       - DAGSTER_HOME=/app/backend/orchestration
       - DAGSTER_PG_URL=postgresql://dagster:dagster@dagster-db:5432/dagster
     env_file:
-      - .env
+      - backend/.env
     depends_on:
       dagster-db:
         condition: service_healthy

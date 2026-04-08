@@ -1,24 +1,20 @@
-"""
-Schedules for the Positions & Trades domain.
-
-Every 15 minutes from 9 PM to 11:45 PM Mountain Time, Mon-Fri.
-"""
+"""Job definitions for the Clear Street → MUFG pipeline."""
 
 from datetime import datetime
-from zoneinfo import ZoneInfo
 
 from dagster import (
+    AssetSelection,
     HookContext,
-    ScheduleDefinition,
     define_asset_job,
     failure_hook,
     in_process_executor,
-    AssetSelection,
 )
 
 from backend.orchestration.slack_utils import send_slack
 
-MT = ZoneInfo("America/Denver")
+from ._helpers import MT
+from .check_clear_street_sftp import check_clear_street_sftp
+from .check_mufg_sftp import check_mufg_sftp
 
 
 @failure_hook
@@ -51,15 +47,14 @@ def slack_on_failure(context: HookContext):
     context.log.info(f"Slack failure notification sent: {message}")
 
 
-# Job that materializes the full pipeline in dependency order
-clear_street_to_mufg_job = define_asset_job(
-    name="clear_street_to_mufg_job",
-    selection=AssetSelection.groups("positions_and_trades"),
+clear_street_to_mufg_pipeline = define_asset_job(
+    name="clear_street_to_mufg_pipeline",
+    selection=AssetSelection.groups("clear_street_to_mufg"),
     executor_def=in_process_executor,
     hooks={slack_on_failure},
     description=(
         "End-to-end pipeline: Clear Street SFTP → dbt transform → MUFG SFTP.\n\n"
-        "Materializes all assets in the `positions_and_trades` group in dependency "
+        "Materializes all assets in the `clear_street_to_mufg` group in dependency "
         "order:\n\n"
         "1. `pull_from_clear_street_sftp` — download trade CSVs, upsert to raw table\n"
         "2. `data_transformation_in_sql` — dbt build: staging + mart + tests\n"
@@ -68,20 +63,14 @@ clear_street_to_mufg_job = define_asset_job(
     ),
 )
 
-# Every 15 minutes from 9 PM to 11:45 PM Mountain Time, Mon-Fri
-clear_street_to_mufg_schedule = ScheduleDefinition(
-    name="clear_street_to_mufg_schedule",
-    job=clear_street_to_mufg_job,
-    cron_schedule="*/15 21-23 * * 1-5",
-    execution_timezone="America/Denver",
-    description=(
-        "Runs the Clear Street → MUFG pipeline every 15 minutes from "
-        "9:00 PM to 11:45 PM Mountain Time, Monday through Friday.\n\n"
-        "Clear Street typically publishes EOD trade files between 9–10 PM MT. "
-        "The schedule retries every 15 minutes to catch late files and ensure "
-        "MUFG receives the data before midnight."
-    ),
+check_clear_street_sftp_job = define_asset_job(
+    name="check_clear_street_sftp_job",
+    selection=AssetSelection.assets(check_clear_street_sftp),
+    description="Check Clear Street SFTP for today's EoD trade file and notify Slack.",
 )
 
-jobs = [clear_street_to_mufg_job]
-schedules = [clear_street_to_mufg_schedule]
+check_mufg_sftp_job = define_asset_job(
+    name="check_mufg_sftp_job",
+    selection=AssetSelection.assets(check_mufg_sftp),
+    description="Check MUFG SFTP to confirm today's filtered trade file was uploaded.",
+)

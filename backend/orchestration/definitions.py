@@ -15,7 +15,7 @@ from dagster import (
 from dagster_dbt import DbtCliResource
 
 from backend.orchestration import domains
-from backend.orchestration.domains.positions_and_trades.clear_street_to_mufg.assets.dbt_transform import dbt_project
+from backend.orchestration.domains.positions_and_trades.clear_street_to_mufg.assets.step_dbt_transform import dbt_project
 
 # ---------------------------------------------------------------------------
 # Auto-discover all domain modules under backend/orchestration/domains/
@@ -29,7 +29,7 @@ all_asset_checks = []
 
 for _importer, domain_name, _ispkg in pkgutil.iter_modules(domains.__path__):
     module = importlib.import_module(f"backend.orchestration.domains.{domain_name}")
-    all_assets += load_assets_from_modules([module], group_name=domain_name)
+    all_assets += load_assets_from_modules([module])
     all_jobs += getattr(module, "jobs", [])
     all_schedules += getattr(module, "schedules", [])
     all_sensors += getattr(module, "sensors", [])

@@ -14,15 +14,8 @@ RUN pip install --no-cache-dir pendulum --only-binary :all:
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Install dagster packages
-RUN pip install --no-cache-dir \
-    dagster \
-    dagster-webserver \
-    dagster-postgres \
-    dagster-dbt \
-    dbt-core \
-    dbt-postgres
-
-COPY . .
+# Copy only runtime sources needed by Dagster instead of the full repository
+COPY setup.py README.md ./
+COPY backend ./backend
 
 RUN pip install -e . --no-deps

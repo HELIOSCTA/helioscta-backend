@@ -25,14 +25,14 @@ class PositionsAndTradesDbtTranslator(DagsterDbtTranslator):
     def get_asset_key(self, dbt_resource_props):
         if dbt_resource_props.get("resource_type") == "source":
             if dbt_resource_props.get("source_name") == "clear_street_v2":
-                return AssetKey("pull_from_clear_street_sftp")
+                return AssetKey("step_pull_from_clear_street")
         if dbt_resource_props.get("resource_type") == "model":
             if dbt_resource_props.get("name") == "clear_street_trades":
-                return AssetKey("data_transformation_in_sql")
+                return AssetKey("step_dbt_transform")
         return super().get_asset_key(dbt_resource_props)
 
     def get_group_name(self, dbt_resource_props):
-        return "positions_and_trades"
+        return "clear_street_to_mufg"
 
 
 @dbt_assets(
@@ -40,5 +40,5 @@ class PositionsAndTradesDbtTranslator(DagsterDbtTranslator):
     select="+clear_street_trades",
     dagster_dbt_translator=PositionsAndTradesDbtTranslator(),
 )
-def positions_and_trades_dbt_assets(context, dbt: DbtCliResource):
+def step_dbt_transform(context, dbt: DbtCliResource):
     yield from dbt.cli(["build"], context=context).stream()

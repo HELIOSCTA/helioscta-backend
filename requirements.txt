@@ -37,6 +37,7 @@ azure-core>=1.29.0
 
 # dagster
 dagster
+dagster-webserver
 dagster-cloud
 dagster-postgres
 dagster-dbt

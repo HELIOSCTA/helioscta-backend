@@ -140,8 +140,12 @@ def _connect_to_clear_street_sftp(
         private_key_path: str,
     ) -> tuple[paramiko.SFTPClient, paramiko.Transport]:
     """"""
+    import io
+    import os
+
     transport = paramiko.Transport((host, port))
-    private_key = paramiko.RSAKey.from_private_key_file(private_key_path)
+    key_content = os.getenv("CLEAR_STREET_SSH_KEY_CONTENT")
+    private_key = paramiko.RSAKey.from_private_key(io.StringIO(key_content))
     transport.connect(username=username, pkey=private_key)
     sftp = paramiko.SFTPClient.from_transport(transport)
     return sftp, transport
@@ -191,13 +195,16 @@ def _pull(
             logger.info(f"Downloaded {new_filename} to {sftp_dir}")
 
     except Exception as e:
-        logger.error(f"Error pulling {filename} ... {e}")
-        raise Exception(f"Error pulling {filename} ... {e}")
+        _fname = filename if 'filename' in dir() else "unknown"
+        logger.error(f"Error pulling {_fname} ... {e}")
+        raise
 
     finally:
         # Clean up
-        sftp.close()
-        transport.close()
+        if 'sftp' in dir():
+            sftp.close()
+        if 'transport' in dir():
+            transport.close()
         logger.info(f"Closed SFTP connection ..")
 
 
@@ -436,7 +443,7 @@ def main(
     sftp_host: str = secrets.CLEAR_STREET_SFTP_HOST,
     sftp_port: int = secrets.CLEAR_STREET_SFTP_PORT,
     sftp_user: str = secrets.CLEAR_STREET_SFTP_USER,
-    sftp_private_key_path: str = secrets.CLEAR_STREET_SSH_KEY_PATH,
+    sftp_private_key_path: str = secrets.CLEAR_STREET_SSH_KEY_CONTENT,
     sftp_remote_dir: str = secrets.CLEAR_STREET_SFTP_REMOTE_DIR,
 ):
 

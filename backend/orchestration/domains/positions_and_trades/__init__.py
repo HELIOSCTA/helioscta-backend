@@ -1,9 +1,11 @@
 """Positions & Trades domain — aggregates all subdomains."""
 
 from backend.orchestration.domains.positions_and_trades.clear_street_to_mufg import (
-    pull_from_clear_street_sftp,
-    positions_and_trades_dbt_assets,
-    upload_clear_street_trades_to_mufg,
+    check_clear_street_sftp,
+    check_mufg_sftp,
+    step_pull_from_clear_street,
+    step_dbt_transform,
+    step_upload_to_mufg,
     asset_checks as _cs_checks,
     jobs as _cs_jobs,
     schedules as _cs_schedules,
