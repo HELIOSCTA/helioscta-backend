@@ -3,10 +3,10 @@ dbt_azure_postgresql:
   outputs:
     azure_postgres:
       type: postgres
-      host: "{{ env_var('AZURE_POSTGRESQL_DB_HOST', 'heliosctadb.postgres.database.azure.com') }}"
-      user: "{{ env_var('AZURE_POSTGRESQL_DB_USER', 'helioscta') }}"
+      host: "{{ env_var('AZURE_POSTGRESQL_DB_HOST') }}"
+      dbname: "{{ env_var('AZURE_POSTGRESQL_DB_NAME') }}"
+      user: "{{ env_var('AZURE_POSTGRESQL_DB_USER') }}"
       password: "{{ env_var('AZURE_POSTGRESQL_DB_PASSWORD') }}"
-      port: "{{ env_var('AZURE_POSTGRESQL_DB_PORT', '5432') | int }}"
-      dbname: helioscta
+      port: "{{ env_var('AZURE_POSTGRESQL_DB_PORT') | int }}"
       schema: dbt
       threads: 12

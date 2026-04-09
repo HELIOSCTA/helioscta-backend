@@ -1,6 +1,7 @@
 # Environment files (secrets)
 .env
 **/.env
+**/.env.*
 .mcp.json
 azure-infra/config.secrets.sh
 

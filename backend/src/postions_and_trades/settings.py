@@ -1,15 +1,11 @@
 import os
-import os
-from dotenv import load_dotenv
 from pathlib import Path
 
-# init logging
+from backend import secrets  # noqa: F401 — ensures env vars are loaded
+
 import logging
 logging.basicConfig(level=logging.INFO)
 logging.getLogger().handlers[0].setLevel(logging.INFO)
-
-"""
-"""
 
 SENDER_EMAIL_ADDRESS: str = "admin@HeliosCTA.com"
 RECIPIENT_EMAIL_ADDRESSES: list[str] = ["Aidan.Keaveny@HeliosCTA.com", "kapil.saxena@helioscta.com", "edi.lacic@helioscta.com", "HeliosCTA@navfundservices.com"]

@@ -11,11 +11,11 @@ RUN apt-get update && apt-get install -y \
 # Install pendulum binary wheel first to avoid build issues
 RUN pip install --no-cache-dir pendulum --only-binary :all:
 
-COPY requirements.txt .
+COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy only runtime sources needed by Dagster instead of the full repository
-COPY setup.py README.md ./
+COPY backend/setup.py ./
 COPY backend ./backend
 
 RUN pip install -e . --no-deps

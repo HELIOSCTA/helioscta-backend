@@ -336,3 +336,25 @@ def upsert_to_azure_postgresql(
     except Exception as e:
         logging.error(f"Error upserting data into Azure PostgreSQL: {e}")
         raise
+
+
+"""
+"""
+
+if __name__ == "__main__":
+    print(f"BACKEND_ENV={secrets.BACKEND_ENV}")
+    print(f"HOST={secrets.AZURE_POSTGRESQL_DB_HOST}")
+    print(f"USER={secrets.AZURE_POSTGRESQL_DB_USER}")
+    print()
+    conn = _connect_to_azure_postgressql()
+    cur = conn.cursor()
+    cur.execute(
+        "SELECT schema_name FROM information_schema.schemata "
+        "WHERE schema_name NOT LIKE 'pg_%' "
+        "AND schema_name != 'information_schema' "
+        "ORDER BY schema_name"
+    )
+    for row in cur.fetchall():
+        print(row[0])
+    cur.close()
+    conn.close()

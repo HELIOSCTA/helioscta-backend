@@ -21,10 +21,10 @@ clean-targets:         # directories to be removed by `dbt clean`
   - "target"
   - "dbt_packages"
 
-# ── triggers ────────────────────────────────────────────────────────────────────
-# Run triggers after every dbt run
-on-run-end:
-  - "{{ setup_postgres_triggers() }}"
+# # ── triggers ────────────────────────────────────────────────────────────────────
+# # Run triggers after every dbt run
+# on-run-end:
+#   - "{{ setup_postgres_triggers() }}"
 
 # ── seeds ────────────────────────────────────────────────────────────────────
 seeds:

@@ -1,20 +1,37 @@
 import os
-import os
 from dotenv import load_dotenv
 from pathlib import Path
 
-# init logging
 import logging
 logging.basicConfig(level=logging.INFO)
 logging.getLogger().handlers[0].setLevel(logging.INFO)
 
-"""
-"""
-
-# Get the directory where this config file lives
+# ────── Environment selection ──────
+# Set BACKEND_ENV=dev to target the test database, defaults to prod
+#
+# Loading order:
+#   1. .env.shared   — API keys, SFTP creds, Slack, etc. (everything except DB)
+#   2. .env.{env}    — database credentials (prod or dev)
+#   3. .env          — optional local overrides
 CONFIG_DIR = Path(__file__).parent
-logging.info(f"CONFIG_DIR: {CONFIG_DIR}")
-load_dotenv(dotenv_path=CONFIG_DIR / ".env", override=False)
+BACKEND_ENV = os.environ.get("BACKEND_ENV", "dev")
+
+shared_env = CONFIG_DIR / ".env.shared"
+env_file = CONFIG_DIR / f".env.{BACKEND_ENV}"
+
+if not shared_env.exists():
+    raise FileNotFoundError(f"Shared env file not found: {shared_env}")
+if not env_file.exists():
+    raise FileNotFoundError(f"Environment file not found: {env_file}")
+
+logging.info(f"BACKEND_ENV={BACKEND_ENV}, loading {shared_env} + {env_file}")
+load_dotenv(dotenv_path=shared_env, override=False)
+load_dotenv(dotenv_path=env_file, override=True)
+
+# Optional local overrides (backend/.env, gitignored)
+local_env = CONFIG_DIR / ".env"
+if local_env.exists():
+    load_dotenv(dotenv_path=local_env, override=True)
 
 
 # ────── Azure PostgreSQL ──────
