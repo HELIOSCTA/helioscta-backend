@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# ------------------------------------------------------------------------------
+# Shared configuration for HeliosCTA Azure infrastructure scripts.
+# Source this file; do not execute directly.
+# ------------------------------------------------------------------------------
+
+# Subscription and region
+SUBSCRIPTION="ec7843fc-6505-4677-b84f-f4c613b2914d"
+LOCATION="eastus2"
+
+# Resource Group
+RG="helioscta-backend-rg"
+
+# Azure Managed Grafana
+GRAFANA_NAME="amg-helioscta-backend"
+GRAFANA_SKU_TIER="Standard"
+GRAFANA_VIEWERS_GROUP_NAME="grafana-viewers"
+GRAFANA_VIEWERS_GROUP_DESCRIPTION="Org-wide read-only access to Azure Managed Grafana dashboards."
+
+# Azure Monitor Action Group (mobile push only)
+ACTION_GROUP_NAME="helioscta-night-push-ag"
+ACTION_GROUP_SHORT_NAME="HCTAOps"
+# Set explicitly or leave empty to default to current az account user principal name.
+ACTION_GROUP_PUSH_EMAIL=""
+
+# Test Database
+TEST_PG_SERVER="psql-helioscta-test"
+TEST_PG_ADMIN="testadmin"
+TEST_PG_DB="helioscta"
+
+# Optional local-only secrets/overrides file (ignored by git).
+# Create azure-infra/config.secrets.sh on your machine for passwords.
+CONFIG_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+LOCAL_SECRETS_FILE="$CONFIG_DIR/config.secrets.sh"
+if [[ -f "$LOCAL_SECRETS_FILE" ]]; then
+  # shellcheck disable=SC1090
+  source "$LOCAL_SECRETS_FILE"
+fi
