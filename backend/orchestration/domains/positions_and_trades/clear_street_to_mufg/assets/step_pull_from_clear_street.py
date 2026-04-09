@@ -12,7 +12,7 @@ from dagster import (
     MetadataValue,
 )
 
-from backend.orchestration.slack_utils import fmt_date, send_slack
+from backend.orchestration.notification_utils import send_slack_once_per_day
 from backend.utils import azure_postgresql_utils
 
 from ._helpers import MT, _is_dry_run
@@ -74,6 +74,35 @@ def step_pull_from_clear_street(context) -> MaterializeResult:
         query="SELECT MAX(trade_date_from_sftp)::TEXT AS dt FROM clear_street.helios_transactions_v2_2026_feb_23"
     )["dt"].iloc[0]
 
+    file_timing = azure_postgresql_utils.pull_from_db(
+        query="""
+        SELECT DISTINCT
+            trade_date_from_sftp::DATE AS trade_date_sort,
+            sftp_upload_timestamp AS released_sort,
+            TO_CHAR(trade_date_from_sftp::DATE, 'Dy Mon-DD') AS expected_trade_date,
+            TO_CHAR(sftp_upload_timestamp, 'Dy Mon-DD HH12:MI AM') AS released_from_clear_street,
+            TO_CHAR(created_at, 'Dy Mon-DD HH12:MI AM') AS downloaded_at
+        FROM clear_street.helios_transactions_v2_2026_feb_23
+        WHERE trade_date_from_sftp::DATE >= CURRENT_DATE - 7
+        ORDER BY released_sort DESC
+        """
+    )
+    file_timing_display = file_timing[[
+        "expected_trade_date",
+        "released_from_clear_street",
+        "downloaded_at",
+    ]]
+
+    if not file_timing_display.empty:
+        latest_timing = file_timing_display.iloc[0]
+        expected_trade_date = str(latest_timing["expected_trade_date"])
+        released_from_clear_street = str(latest_timing["released_from_clear_street"])
+        downloaded_at = str(latest_timing["downloaded_at"])
+    else:
+        expected_trade_date = "N/A"
+        released_from_clear_street = "N/A"
+        downloaded_at = "N/A"
+
     pipeline_timeline = azure_postgresql_utils.pull_from_db(
         query="""
         WITH sftp_files AS (
@@ -123,17 +152,38 @@ def step_pull_from_clear_street(context) -> MaterializeResult:
 
     # Notify Slack only when today's file has arrived
     latest_date_parsed = datetime.strptime(str(latest_date), "%Y%m%d").date()
-    if latest_date_parsed == datetime.now().date():
-        now = datetime.now(MT).strftime("%a %b-%d %I:%M:%S %p MT")
-        sftp_date_fmt = fmt_date(str(latest_date))
-        message = f":inbox_tray: *Clear Street SFTP file received*\nSFTP Date: `{sftp_date_fmt}`\nDownloaded at: `{now}`"
-        send_slack(message)
-        context.log.info(f"Slack notification sent: {message}")
+    if latest_date_parsed == datetime.now(MT).date():
+        message = (
+            ":inbox_tray: *Clear Street SFTP file received*\n"
+            f"Expected trade date: `{expected_trade_date}`\n"
+            f"Released from Clear Street: `{released_from_clear_street}`\n"
+            f"Downloaded at: `{downloaded_at}`"
+        )
+        sent = send_slack_once_per_day(
+            notification_key="clear_street_sftp_file_received",
+            message=message,
+            source="positions_and_trades",
+            priority="medium",
+            tags="sftp,clear_street,notification",
+            metadata={
+                "expected_trade_date": expected_trade_date,
+                "released_from_clear_street": released_from_clear_street,
+                "downloaded_at": downloaded_at,
+            },
+        )
+        if sent:
+            context.log.info(f"Slack notification sent: {message}")
+        else:
+            context.log.info("Slack notification skipped (already sent today or send failure).")
 
     return MaterializeResult(
         metadata={
             "row_count": int(row_count),
             "latest_trade_date": MetadataValue.text(str(latest_date)),
+            "expected_trade_date": MetadataValue.text(expected_trade_date),
+            "released_from_clear_street": MetadataValue.text(released_from_clear_street),
+            "downloaded_at": MetadataValue.text(downloaded_at),
+            "file_timing": MetadataValue.md(file_timing_display.to_markdown(index=False)),
             "target_table": MetadataValue.text("clear_street.helios_transactions_v2_2026_feb_23"),
             "pipeline_timeline": MetadataValue.md(timeline_md),
         }

@@ -18,8 +18,11 @@ from dagster import (
     asset,
 )
 
+from backend.orchestration.notification_utils import (
+    already_sent_today,
+    send_slack_once_per_day,
+)
 from backend.orchestration.slack_utils import send_slack
-from backend.utils import azure_postgresql_utils
 
 from ._helpers import MT, _is_dry_run, _is_test_notification
 
@@ -29,13 +32,7 @@ TRADE_FILE_PATTERN = "Helios_Transactions_*_filtered.csv"
 
 def _already_confirmed_today() -> bool:
     """Check if a confirmation notification was already sent today."""
-    result = azure_postgresql_utils.pull_from_db(query=f"""
-        SELECT COUNT(*) AS cnt FROM logging.pipeline_runs
-        WHERE pipeline_name = '{PIPELINE_NAME}'
-          AND event_type = 'RUN_SUCCESS'
-          AND event_timestamp::date = CURRENT_DATE
-    """)
-    return int(result["cnt"].iloc[0]) > 0
+    return already_sent_today(PIPELINE_NAME)
 
 
 def _check_mufg_sftp_for_todays_file() -> dict:
@@ -110,8 +107,6 @@ def _check_mufg_sftp_for_todays_file() -> dict:
     ),
 )
 def check_mufg_sftp(context):
-    from backend.utils import pipeline_run_logger
-
     if _is_dry_run(context):
         if _is_test_notification(context):
             now = datetime.now(MT).strftime("%a %b-%d %I:%M:%S %p MT")
@@ -205,18 +200,18 @@ def check_mufg_sftp(context):
         f"File: `{result['expected_file']}`\n"
         f"Time: `{now}`"
     )
-    send_slack(message)
-    context.log.info(f"Slack notification sent: {message}")
-
-    run = pipeline_run_logger.PipelineRunLogger(
-        pipeline_name=PIPELINE_NAME,
+    sent = send_slack_once_per_day(
+        notification_key=PIPELINE_NAME,
+        message=message,
         source="positions_and_trades",
         priority="medium",
         tags="sftp,mufg,notification",
-        operation_type="consume",
+        metadata={"file": result["expected_file"], "confirmed_at": now},
     )
-    run.start()
-    run.success(metadata={"file": result["expected_file"]})
+    if sent:
+        context.log.info(f"Slack notification sent: {message}")
+    else:
+        context.log.warning("Slack notification was not sent (already sent today or send failure).")
 
     yield AssetCheckResult(
         check_name="mufg_file_uploaded",

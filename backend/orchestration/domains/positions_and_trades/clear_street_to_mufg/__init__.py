@@ -1,14 +1,14 @@
 """
-Clear Street → MUFG subdomain.
+Clear Street to MUFG subdomain.
 
 Three-phase nightly pipeline:
-  1. Pull trade CSVs from Clear Street SFTP → upsert to raw PostgreSQL table
+  1. Pull trade CSVs from Clear Street SFTP and upsert to raw PostgreSQL table
   2. dbt build: staging models + mart view (trades_cleaned.clear_street_trades)
-  3. Filter for MUFG firms (ADU/905) → CSV → upload to MUFG SFTP
+  3. Filter for MUFG firms (ADU/905), generate CSV, upload to MUFG SFTP
 
-Schedule: Every 15 min, 9–11:45 PM MT, Mon–Fri
+Schedule: Primary + overnight + catch-up windows (America/Denver)
 Notifications: Inline Slack messages on SFTP received, success, and failure
-Asset checks: Validate SFTP dates match today
+Asset checks: Validate SFTP dates match expected trade date
 """
 
 from backend.orchestration.domains.positions_and_trades.clear_street_to_mufg.assets.step_pull_from_clear_street import (
@@ -33,13 +33,11 @@ from backend.orchestration.domains.positions_and_trades.clear_street_to_mufg.ass
     check_mufg_sftp_job,
 )
 from backend.orchestration.domains.positions_and_trades.clear_street_to_mufg.assets.schedules import (
-    clear_street_to_mufg_pipeline_schedule,
-    check_clear_street_sftp_job_schedule,
-    check_mufg_sftp_job_schedule,
+    all_schedules,
 )
 
 jobs = [clear_street_to_mufg_pipeline, check_clear_street_sftp_job, check_mufg_sftp_job]
-schedules = [clear_street_to_mufg_pipeline_schedule, check_clear_street_sftp_job_schedule, check_mufg_sftp_job_schedule]
+schedules = all_schedules
 sensors = []
 
 asset_checks = [

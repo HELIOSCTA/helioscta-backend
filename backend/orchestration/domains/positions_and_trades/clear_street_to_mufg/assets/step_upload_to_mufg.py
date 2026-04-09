@@ -14,7 +14,8 @@ from dagster import (
     MetadataValue,
 )
 
-from backend.orchestration.slack_utils import fmt_date, send_slack
+from backend.orchestration.notification_utils import send_slack_once_per_day
+from backend.orchestration.slack_utils import fmt_date
 from backend.utils import azure_postgresql_utils
 
 from ._helpers import MT, _is_dry_run
@@ -90,8 +91,18 @@ def step_upload_to_mufg(context) -> MaterializeResult:
         now = datetime.now(MT).strftime("%a %b-%d %I:%M:%S %p MT")
         sftp_date_fmt = fmt_date(latest_date)
         message = f":white_check_mark: *Clear Street → MUFG* succeeded\nSFTP Date: `{sftp_date_fmt}`\nSent to MUFG: `{now}`\nRows: `{row_count}`"
-        send_slack(message)
-        context.log.info(f"Slack notification sent: {message}")
+        sent = send_slack_once_per_day(
+            notification_key="clear_street_to_mufg_upload_succeeded",
+            message=message,
+            source="positions_and_trades",
+            priority="medium",
+            tags="sftp,mufg,notification",
+            metadata={"sftp_date": latest_date, "sent_to_mufg_at": now, "rows": row_count},
+        )
+        if sent:
+            context.log.info(f"Slack notification sent: {message}")
+        else:
+            context.log.info("Slack notification skipped (already sent today or send failure).")
 
     _GROUPED_QUERY = """
         WITH TRADES AS (
