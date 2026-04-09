@@ -46,5 +46,23 @@ services:
       dagster-db:
         condition: service_healthy
 
+  # ── Grafana ────────────────────────────────────────────────────────
+  grafana:
+    image: grafana/grafana:11.6.0
+    restart: unless-stopped
+    ports:
+      - "4000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    env_file:
+      - .env.shared
+      - .env.${BACKEND_ENV:-prod}
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+
 volumes:
   dagster-db-data:
+  grafana-data:
