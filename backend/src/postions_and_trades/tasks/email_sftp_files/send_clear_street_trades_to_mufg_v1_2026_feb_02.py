@@ -161,14 +161,14 @@ def main(
         )
         logger.success(f"Connected to MUFG SFTP server ..")
 
-        # upload the trades file to the MUFG SFTP server
-        logger.section(f"Uploading trades file to MUFG SFTP server")
-        _upload_trades_file(
-            sftp=mufg_sftp,
-            remote_dir=mufg_remote_dir,
-            file_name=filtered_trade_file_path,
-        )
-        logger.success(f"Uploaded trades file to MUFG SFTP server ..")
+        # # upload the trades file to the MUFG SFTP server
+        # logger.section(f"Uploading trades file to MUFG SFTP server")
+        # _upload_trades_file(
+        #     sftp=mufg_sftp,
+        #     remote_dir=mufg_remote_dir,
+        #     file_name=filtered_trade_file_path,
+        # )
+        # logger.success(f"Uploaded trades file to MUFG SFTP server ..")
 
         run.success()
 
