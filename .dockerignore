@@ -39,6 +39,3 @@ backend/dbt/dbt_azure_postgresql/logs
 backend/dbt/dbt_azure_sql/target/
 backend/dbt/dbt_azure_sql/dbt_packages/
 backend/dbt/dbt_azure_sql/logs/
-
-# Local scratch/orchestration state
-.tmp_dagster_home_*/

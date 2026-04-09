@@ -58,7 +58,7 @@ SFTP File Drops (Marex, NAV, Clear Street)
 - **Positions:** T+1 (files arrive overnight, pulled next morning)
 - **Trades (end-of-day):** T+1
 - **Trades (intraday):** Multiple times per trading day
-- **Trigger:** Scheduled (Dagster — see `backend/orchestration/domains/positions_and_trades/clear_street_to_mufg/`)
+- **Trigger:** Scheduled
 
 ## dbt Views
 
@@ -89,20 +89,6 @@ Each trade staging pipeline adds product codes and standardized columns.
 | `source_v1_positions_and_trades_product_lookup` | `dbt` | Maps raw product symbols to standardized product codes |
 | `source_v1_positions_and_trades_accounts_lookup` | `dbt` | Maps account IDs to fund names |
 | `source_v1_positions_and_trades_traders_lookup` | `dbt` | Maps trader IDs to trader names |
-
-## Dagster Orchestration
-
-The Clear Street → MUFG pipeline is orchestrated in Dagster with modular step assets:
-
-| Asset | Description |
-|-------|-------------|
-| `step_pull_from_clear_street` | Pulls trade/position files from Clear Street SFTP |
-| `step_dbt_transform` | Runs dbt models to clean and stage data |
-| `step_upload_to_mufg` | Uploads cleaned files to MUFG SFTP |
-| `check_clear_street_sftp` | Health check for Clear Street SFTP connectivity |
-| `check_mufg_sftp` | Health check for MUFG SFTP connectivity |
-
-Jobs and schedules are defined in `assets/jobs.py` and `assets/schedules.py`. SFTP authentication uses the `CLEAR_STREET_SSH_KEY_CONTENT` env var (key content, not file path).
 
 ## Known Caveats
 
