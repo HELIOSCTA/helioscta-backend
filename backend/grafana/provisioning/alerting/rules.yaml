@@ -1,0 +1,132 @@
+# Alert rules for Clear Street EOD file landing.
+#
+# Data-source rationale:
+# The Task Scheduler job `helios_transactions_v2_2026_feb_23.ps1` runs five
+# times every weekday (19:30, 20:00, 20:30, 21:00, 23:50 MT) and writes a
+# RUN_SUCCESS row to `logging.pipeline_runs` at the end of every run -- even
+# when no new file arrived on the SFTP that run (it just upserts whatever is
+# already on disk). Querying pipeline_runs for RUN_SUCCESS would therefore
+# produce a false-positive detected alert at 19:30 every weekday regardless
+# of whether today's Clear Street file actually landed.
+#
+# Instead, both rules below query `clear_street.helios_transactions_v2_2026_feb_23`
+# directly. The raw table's `trade_date_from_sftp` column is populated from
+# the CSV filename (e.g. `Helios_Transactions_20260106.csv`) by
+# `backend/src/postions_and_trades/tasks/pull_from_sftp/trades/clear_street/helios_transactions_v2_2026_feb_23.py`,
+# so the presence of a row with today's trade date is a direct,
+# deduped signal that today's file has been pulled from the SFTP and
+# ingested. This matches the semantics the existing dashboard at
+# `backend/grafana/dashboards/Positions and Trades/clear-street-trades-to-mufg.json`
+# already uses.
+
+apiVersion: 1
+
+groups:
+  - orgId: 1
+    name: clear-street-eod-file
+    folder: Positions and Trades
+    interval: 1m
+    rules:
+
+      # ─────────────────────────────────────────────────────────────────
+      # Rule A: today's Clear Street EOD file has been detected + ingested
+      # ─────────────────────────────────────────────────────────────────
+      - uid: cs-eod-file-detected
+        title: Clear Street EOD file detected
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 600
+              to: 0
+            datasourceUid: helioscta-postgresql
+            model:
+              format: table
+              refId: A
+              rawSql: |
+                SELECT COUNT(*)::float AS detected
+                FROM clear_street.helios_transactions_v2_2026_feb_23
+                WHERE CAST(trade_date_from_sftp AS DATE)
+                      = (NOW() AT TIME ZONE 'America/Denver')::date
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              refId: C
+              expression: A
+              conditions:
+                - evaluator:
+                    type: gt
+                    params: [0]
+        noDataState: OK
+        execErrState: Alerting
+        for: 0s
+        labels:
+          team: helioscta-positions
+          severity: critical
+          event: eod_file_detected
+        annotations:
+          summary: Clear Street EOD file detected on SFTP
+          description: |
+            At least one row with today's trade_date_from_sftp exists in
+            clear_street.helios_transactions_v2_2026_feb_23. This means the
+            Task Scheduler pull task has successfully pulled today's
+            Helios_Transactions_<YYYYMMDD>.csv from the Clear Street SFTP.
+
+      # ─────────────────────────────────────────────────────────────────
+      # Rule B: today's Clear Street EOD file is late
+      # (past 22:00 MT on a weekday, still no row with today's trade date)
+      # ─────────────────────────────────────────────────────────────────
+      - uid: cs-eod-file-late
+        title: Clear Street EOD file late
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 600
+              to: 0
+            datasourceUid: helioscta-postgresql
+            model:
+              format: table
+              refId: A
+              rawSql: |
+                SELECT
+                  CASE
+                    WHEN (NOW() AT TIME ZONE 'America/Denver')::time >= '22:00:00'
+                     AND (NOW() AT TIME ZONE 'America/Denver')::time <= '23:59:59'
+                     AND EXTRACT(ISODOW FROM (NOW() AT TIME ZONE 'America/Denver')) BETWEEN 1 AND 5
+                     AND NOT EXISTS (
+                       SELECT 1
+                       FROM clear_street.helios_transactions_v2_2026_feb_23
+                       WHERE CAST(trade_date_from_sftp AS DATE)
+                             = (NOW() AT TIME ZONE 'America/Denver')::date
+                     )
+                    THEN 1::float
+                    ELSE 0::float
+                  END AS late
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              refId: C
+              expression: A
+              conditions:
+                - evaluator:
+                    type: gt
+                    params: [0]
+        noDataState: OK
+        execErrState: Alerting
+        for: 5m
+        labels:
+          team: helioscta-positions
+          severity: warning
+          event: eod_file_late
+        annotations:
+          summary: Clear Street EOD file is late
+          description: |
+            It is past 22:00 MT on a weekday and no row exists in
+            clear_street.helios_transactions_v2_2026_feb_23 with
+            trade_date_from_sftp = today. The Task Scheduler pull task
+            has not successfully landed today's EOD file yet -- check
+            whether Clear Street has released it on the SFTP and whether
+            the 19:30/20:00/20:30/21:00 pull attempts ran cleanly.
