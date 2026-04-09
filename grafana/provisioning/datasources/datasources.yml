@@ -1,0 +1,16 @@
+apiVersion: 1
+datasources:
+  - name: HeliosCTA PostgreSQL
+    uid: helioscta-postgresql
+    type: postgres
+    access: proxy
+    url: ${AZURE_POSTGRESQL_DB_HOST}:${AZURE_POSTGRESQL_DB_PORT}
+    database: helioscta
+    user: ${AZURE_POSTGRESQL_DB_USER}
+    secureJsonData:
+      password: ${AZURE_POSTGRESQL_DB_PASSWORD}
+    jsonData:
+      sslmode: require
+      postgresVersion: 1500
+    isDefault: true
+    editable: true

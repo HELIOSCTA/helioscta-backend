@@ -1,0 +1,17 @@
+services:
+  grafana:
+    image: grafana/grafana:11.6.0
+    ports:
+      - "4000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    env_file:
+      - .env.prod
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./provisioning:/etc/grafana/provisioning
+      - ./dashboards:/var/lib/grafana/dashboards
+
+volumes:
+  grafana-data:
