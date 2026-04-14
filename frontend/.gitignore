@@ -1,0 +1,16 @@
+# Next.js
+.next/
+out/
+build/
+
+# Misc
+*.tsbuildinfo
+next-env.d.ts
+
+# Local env (root .gitignore already covers .env*, this is a belt-and-braces)
+.env
+.env.local
+.env.*.local
+
+# Vercel
+.vercel/
