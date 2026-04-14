@@ -7,7 +7,7 @@ With 533 scripts, Meteologica is far too large to document individually. Scripts
 ## Standard Script Pattern
 
 Every Meteologica script:
-1. Authenticates via `backend/src/meteologica/auth.py` (JWT token)
+1. Authenticates via `backend/scrapes/meteologica/auth.py` (JWT token)
 2. Pulls data from the xTraders API for a specific content ID (forecasts, observations, normals, projections, etc.)
 3. Formats the response into a standardized DataFrame
 4. Upserts to a table in the `meteologica` schema
@@ -115,7 +115,7 @@ usa_{iso}_{region}_{type}_power_{category}_{schema_type}.py
 
 | Field | Value |
 |-------|-------|
-| **Script** | `backend/src/meteologica/pjm/usa_pjm_power_demand_forecast_hourly.py` |
+| **Script** | `backend/scrapes/meteologica/pjm/usa_pjm_power_demand_forecast_hourly.py` |
 | **Table** | `meteologica.usa_pjm_power_demand_forecast_hourly` |
 | **API Account** | ISO (`helios_cta`) |
 | **Content Type** | Demand forecast |
@@ -128,11 +128,11 @@ usa_{iso}_{region}_{type}_power_{category}_{schema_type}.py
 
 ```bash
 # List all scripts
-python backend/src/meteologica/runs.py --list
+python backend/scrapes/meteologica/runs.py --list
 
 # Run all scripts
-python backend/src/meteologica/runs.py all
+python backend/scrapes/meteologica/runs.py all
 
 # Run specific script by number
-python backend/src/meteologica/runs.py 5
+python backend/scrapes/meteologica/runs.py 5
 ```

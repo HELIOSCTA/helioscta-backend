@@ -3,7 +3,7 @@
 Raw CAISO data ingested via **GridStatus** open-source Python library.
 
 Tables in this source are stored in the `gridstatus` schema. Data is pulled by
-scheduled Python scripts in `backend/src/power/gridstatus_open_source/caiso/`.
+scheduled Python scripts in `backend/scrapes/power/gridstatus_open_source/caiso/`.
 
 **Included datasets:**
 - Day-ahead hourly LMPs by pricing hub

@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cd \"C:/Users/AidanKeaveny/Documents/github/helioscta-backend/backend/scrapes/postions_and_trades/tasks/pull_from_sftp\" && python -c \"from pathlib import Path; p = Path\\('runs.py'\\).resolve\\(\\); root = p.parent.parent.parent.parent.parent.parent; print\\(f'SCRIPT_DIR: {p.parent}'\\); print\\(f'PROJECT_ROOT: {root}'\\); print\\(f'Exists: {root.exists\\(\\)}'\\); print\\(f'Has backend/: {\\(root / \\\\\"backend\\\\\"\\).exists\\(\\)}'\\)\")",
+      "Bash(cd \"C:/Users/AidanKeaveny/Documents/github/helioscta-backend/backend/scrapes/postions_and_trades/tasks/pull_from_sftp\" && python runs.py --list)"
+    ]
+  }
+}

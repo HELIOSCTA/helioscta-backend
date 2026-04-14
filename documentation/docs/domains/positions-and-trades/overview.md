@@ -9,7 +9,7 @@ Trading operations data -- position reports (Marex, NAV) and trade confirmations
 ```
 SFTP File Drops (Marex, NAV, Clear Street)
         |
-   Pull Scripts  (backend/src/postions_and_trades/tasks/pull_from_sftp/)
+   Pull Scripts  (backend/scrapes/postions_and_trades/tasks/pull_from_sftp/)
         |
    Raw Tables    (marex.*, nav.*, clear_street.* schemas)
         |

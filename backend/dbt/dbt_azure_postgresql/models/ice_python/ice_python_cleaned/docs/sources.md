@@ -15,7 +15,7 @@ Each row represents one trade at one hub with symbol, value, and trade date.
 
 **Primary key:** `trade_date` + `symbol`
 
-**Ingestion:** Python script `backend/src/ice_python/next_day_gas/next_day_gas_v1_2025_dec_16.py`
+**Ingestion:** Python script `backend/scrapes/ice_python/next_day_gas/next_day_gas_v1_2025_dec_16.py`
 upserts into Azure PostgreSQL.
 
 {% enddocs %}
@@ -37,7 +37,7 @@ Each row represents one BALMO settle at one hub.
 
 **Primary key:** `trade_date` + `symbol`
 
-**Ingestion:** Python script `backend/src/ice_python/balmo/balmo_v1_2025_dec_16.py`
+**Ingestion:** Python script `backend/scrapes/ice_python/balmo/balmo_v1_2025_dec_16.py`
 upserts into Azure PostgreSQL.
 
 {% enddocs %}

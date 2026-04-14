@@ -8,7 +8,7 @@ Six scripts pull WDD forecasts from different weather models. All write to `wsi`
 
 | Field | Value |
 |-------|-------|
-| **Script** | `backend/src/wsi/weighted_degree_day/wsi_wdd_day_forecast_v2_2025_dec_17.py` |
+| **Script** | `backend/scrapes/wsi/weighted_degree_day/wsi_wdd_day_forecast_v2_2025_dec_17.py` |
 | **Table** | `wsi.wsi_wdd_day_forecast_v2_2025_dec_17` |
 | **Source** | WSI Trader API (`GetWeightedDegreeDayForecast`) |
 | **Description** | WSI's proprietary blended model for population-weighted degree days |
@@ -63,7 +63,7 @@ Six scripts pull WDD forecasts from different weather models. All write to `wsi`
 
 | Field | Value |
 |-------|-------|
-| **Script** | `backend/src/wsi/hourly_forecast/hourly_forecast_temp_v4_2025_jan_12.py` |
+| **Script** | `backend/scrapes/wsi/hourly_forecast/hourly_forecast_temp_v4_2025_jan_12.py` |
 | **Table** | `wsi.hourly_forecast_temp_v4_2025_jan_12` |
 | **Source** | WSI Trader API (`GetHourlyForecast`) |
 | **Description** | Hourly temperature forecast by city |
@@ -78,7 +78,7 @@ Six scripts pull WDD forecasts from different weather models. All write to `wsi`
 
 | Field | Value |
 |-------|-------|
-| **Script** | `backend/src/wsi/weighted_forecast_iso/weighted_temp_daily_forecast_iso_models_v2_2026_jan_12.py` |
+| **Script** | `backend/scrapes/wsi/weighted_forecast_iso/weighted_temp_daily_forecast_iso_models_v2_2026_jan_12.py` |
 | **Table** | `wsi.weighted_temp_daily_forecast_iso_models_v2_2026_jan_12` |
 | **Source** | WSI Trader API (`GetModelForecast`) |
 | **Description** | Population-weighted temperature forecasts at ISO level from multiple weather models |
@@ -95,7 +95,7 @@ Six scripts pull WDD forecasts from different weather models. All write to `wsi`
 
 | Field | Value |
 |-------|-------|
-| **Script** | `backend/src/wsi/weighted_forecast_city/weighted_temp_daily_forecast_city_v2_2026_jan_12.py` |
+| **Script** | `backend/scrapes/wsi/weighted_forecast_city/weighted_temp_daily_forecast_city_v2_2026_jan_12.py` |
 | **Table** | `wsi.weighted_temp_daily_forecast_city_v2_2026_jan_12` |
 | **Source** | WSI Trader API (`GetWsiForecastForDDModelCities`) |
 | **Description** | Population-weighted temperature forecast at individual city level |
@@ -120,7 +120,7 @@ Three scripts pull the WSI "homepage" city forecast tables in different formats:
 
 | Field | Value |
 |-------|-------|
-| **Script** | `backend/src/wsi/historical_observations/hourly_observed_temp_v2_2025_07_22.py` |
+| **Script** | `backend/scrapes/wsi/historical_observations/hourly_observed_temp_v2_2025_07_22.py` |
 | **Table** | `wsi.hourly_observed_temp_v2_20250722` |
 | **Source** | WSI Trader API (`GetHistoricalObservations`) |
 | **Description** | Actual observed hourly temperatures -- used as ground truth for forecast accuracy |
@@ -129,7 +129,7 @@ Three scripts pull the WSI "homepage" city forecast tables in different formats:
 
 | Field | Value |
 |-------|-------|
-| **Script** | `backend/src/wsi/historical_observations/daily_observed_wdd_v1_2026_mar_06.py` |
+| **Script** | `backend/scrapes/wsi/historical_observations/daily_observed_wdd_v1_2026_mar_06.py` |
 | **Table** | `wsi.daily_observed_wdd_v1_2026_mar_06` |
 | **Description** | Actual observed daily weighted degree days |
 
@@ -141,7 +141,7 @@ Three scripts pull the WSI "homepage" city forecast tables in different formats:
 
 | Field | Value |
 |-------|-------|
-| **Script** | `backend/src/wsi/natural_gas/daily_forecast_bcf_v1_2026_mar_06.py` |
+| **Script** | `backend/scrapes/wsi/natural_gas/daily_forecast_bcf_v1_2026_mar_06.py` |
 | **Table** | `wsi.daily_forecast_bcf_v1_2026_mar_06` |
 | **Description** | Daily natural gas demand forecast in BCF (Billion Cubic Feet) |
 
@@ -153,6 +153,6 @@ Three scripts pull the WSI "homepage" city forecast tables in different formats:
 
 | Field | Value |
 |-------|-------|
-| **Script** | `backend/src/wsi/reference/wsitrader_cityids_v1_2026_jan_12.py` |
+| **Script** | `backend/scrapes/wsi/reference/wsitrader_cityids_v1_2026_jan_12.py` |
 | **Description** | Loads WSI city ID reference data (not run on schedule) |
 | **Note** | Reference only -- used by other WSI scripts for city lookups |

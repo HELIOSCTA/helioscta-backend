@@ -3,7 +3,7 @@
 Raw PJM data from the **Meteologica xTraders API**.
 
 Tables in this source contain API responses stored in the `meteologica` schema. Data is
-pulled by scheduled Python scripts in `backend/src/meteologica/` and upserted into Azure
+pulled by scheduled Python scripts in `backend/scrapes/meteologica/` and upserted into Azure
 PostgreSQL.
 
 **Raw table columns:** `content_id`, `content_name`, `update_id`, `issue_date` (VARCHAR),

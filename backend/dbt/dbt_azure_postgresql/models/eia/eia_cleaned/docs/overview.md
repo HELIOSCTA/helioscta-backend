@@ -9,7 +9,7 @@ for the HeliosCTA power trading desk.
 
 | Source | Description | Ingestion |
 |--------|-------------|-----------|
-| **EIA-930** | Hourly generation by fuel type for all US balancing authorities | Python scrape (`backend/src/eia/`) into `eia` schema |
+| **EIA-930** | Hourly generation by fuel type for all US balancing authorities | Python scrape (`backend/scrapes/eia/`) into `eia` schema |
 
 ## Geographic Hierarchy
 
@@ -76,7 +76,7 @@ broken down by end-use sector.
 
 | Source | Description | Ingestion |
 |--------|-------------|-----------|
-| **EIA Natural Gas API** | Monthly consumption by end-use category for all US states | Python scrape (`backend/src/eia/`) into `eia` schema |
+| **EIA Natural Gas API** | Monthly consumption by end-use category for all US states | Python scrape (`backend/scrapes/eia/`) into `eia` schema |
 
 ## Geographic Coverage
 

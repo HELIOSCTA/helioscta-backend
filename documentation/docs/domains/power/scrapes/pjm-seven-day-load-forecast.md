@@ -4,7 +4,7 @@
 
 | Field | Value |
 |-------|-------|
-| **Script** | `backend/src/power/pjm/seven_day_load_forecast_v1_2025_08_13.py` |
+| **Script** | `backend/scrapes/power/pjm/seven_day_load_forecast_v1_2025_08_13.py` |
 | **Source** | PJM API |
 | **Target Table** | `pjm.seven_day_load_forecast_v1_2025_08_13` |
 | **Trigger** | Scheduled |

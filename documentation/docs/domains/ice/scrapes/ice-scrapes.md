@@ -4,9 +4,9 @@
 
 | Field | Value |
 |-------|-------|
-| **Runner** | `backend/src/ice_python/intraday_quotes/runs.py all` |
-| **Script** | `backend/src/ice_python/intraday_quotes/runner_pjm_short_term.py` |
-| **Symbol Registry** | `backend/src/ice_python/symbols/pjm_short_term_symbols.py` |
+| **Runner** | `backend/scrapes/ice_python/intraday_quotes/runs.py all` |
+| **Script** | `backend/scrapes/ice_python/intraday_quotes/runner_pjm_short_term.py` |
+| **Symbol Registry** | `backend/scrapes/ice_python/symbols/pjm_short_term_symbols.py` |
 | **Source** | ICE Python API (PJM short-term quote snapshots) |
 | **Target Table** | `ice_python.intraday_quotes` |
 | **Schema** | `ice_python` |
@@ -50,9 +50,9 @@ Unregister-ScheduledTask -TaskName "Intraday Quotes" -TaskPath "\helioscta-backe
 
 | Field | Value |
 |-------|-------|
-| **Runner** | `backend/src/ice_python/contract_dates/runs.py all` |
-| **Script** | `backend/src/ice_python/contract_dates/runner_pjm_short_term.py` |
-| **Symbol Registry** | `backend/src/ice_python/symbols/pjm_short_term_symbols.py` |
+| **Runner** | `backend/scrapes/ice_python/contract_dates/runs.py all` |
+| **Script** | `backend/scrapes/ice_python/contract_dates/runner_pjm_short_term.py` |
+| **Symbol Registry** | `backend/scrapes/ice_python/symbols/pjm_short_term_symbols.py` |
 | **Source** | ICE Python API (`Strip`, `Startdt`, `Enddt` fields) |
 | **Target Table** | `ice_python.contract_dates` |
 | **Schema** | `ice_python` |
@@ -96,7 +96,7 @@ Unregister-ScheduledTask -TaskName "Contract Dates" -TaskPath "\helioscta-backen
 
 | Field | Value |
 |-------|-------|
-| **Script** | `backend/src/ice_python/next_day_gas/next_day_gas_v1_2025_dec_16.py` |
+| **Script** | `backend/scrapes/ice_python/next_day_gas/next_day_gas_v1_2025_dec_16.py` |
 | **Source** | ICE Python API (firm physical next-day gas) |
 | **Target Table** | `ice_python.next_day_gas_v1_2025_dec_16` |
 | **Schema** | `ice_python` |
@@ -135,7 +135,7 @@ Henry Hub, Transco Station 85, Pine Prairie, Waha, Houston Ship Channel, NGPL TX
 
 | Field | Value |
 |-------|-------|
-| **Script** | `backend/src/ice_python/balmo/balmo_v1_2025_dec_16.py` |
+| **Script** | `backend/scrapes/ice_python/balmo/balmo_v1_2025_dec_16.py` |
 | **Source** | ICE Python API (balance-of-month gas swaps) |
 | **Target Table** | `ice_python.balmo_v1_2025_dec_16` |
 | **Schema** | `ice_python` |

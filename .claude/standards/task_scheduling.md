@@ -13,7 +13,7 @@ How to add or modify Windows Task Scheduler orchestration in
 
 For every new scheduled workflow:
 
-1. A stable Python entrypoint exists under `backend/src/`.
+1. A stable Python entrypoint exists under `backend/scrapes/`.
 2. A matching PowerShell registration script exists under
    `backend/schedulers/task_scheduler_azurepostgresql/<domain>/`.
 3. If the workflow supports an `all` command, keep a folder-level aggregate runner such as
@@ -51,7 +51,7 @@ Preferred documentation targets:
 
 ## Implementation Checklist
 
-1. Create or update the Python entrypoint under `backend/src/...`.
+1. Create or update the Python entrypoint under `backend/scrapes/...`.
 2. Add or update the matching PowerShell runner under
    `backend/schedulers/task_scheduler_azurepostgresql/...`.
 3. If you add a control script that should never be scheduled, update

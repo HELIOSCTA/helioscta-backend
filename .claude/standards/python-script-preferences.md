@@ -1,6 +1,6 @@
 # Python Script Preferences
 
-> **Canonical reference implementation:** [`backend/src/power/pjm/`](../backend/src/power/pjm/) — all new PJM scripts must follow this pattern (e.g., `da_hrl_lmps.py`).
+> **Canonical reference implementation:** [`backend/scrapes/power/pjm/`](../backend/scrapes/power/pjm/) — all new PJM scripts must follow this pattern (e.g., `da_hrl_lmps.py`).
 
 ## Imports (every file)
 
@@ -12,7 +12,7 @@ When refactoring existing scripts, update old-style imports to this format:
 | `from helioscta_api_scrapes.utils import logging_utils` | `from backend.utils import logging_utils` |
 | `from helioscta_api_scrapes.utils import slack_utils` | Remove (see "No Slack" below) |
 | `from helioscta_api_scrapes import settings` | `from backend import secrets` |
-| `from helioscta_api_scrapes.src.cloud.wsi import utils` | `from backend.src.wsi import utils` |
+| `from helioscta_api_scrapes.src.cloud.wsi import utils` | `from backend.scrapes.wsi import utils` |
 
 ```python
 from backend import secrets
@@ -84,7 +84,7 @@ def _upsert(
 
 | File type | Required name | Example |
 |-----------|--------------|---------|
-| Runner | `runs.py` (plural, **not** `run.py`) | `backend/src/power/ercot/runs.py` |
+| Runner | `runs.py` (plural, **not** `run.py`) | `backend/scrapes/power/ercot/runs.py` |
 | Flows | `flows.py` | `backend/prefect_orchestration/power/ercot/flows.py` |
 | API helpers / utilities | `{source}_api_utils.py` | `ercot_api_utils.py`, `genscape_api_utils.py` |
 | General utilities | `{source}_utils.py` or `{domain}_utils.py` | `wsi_utils.py`, `ice_utils.py` |
@@ -97,13 +97,13 @@ def _upsert(
 
 ## Folder Orchestration Files
 
-Every source subfolder in `backend/src/` should include:
+Every source subfolder in `backend/scrapes/` should include:
 
 - `runs.py` - manual runner that always calls each script's `main()` function
 
-Prefect `flows.py` wrappers live in the matching path under `backend/prefect_orchestration/` (not `backend/src/`):
+Prefect `flows.py` wrappers live in the matching path under `backend/prefect_orchestration/` (not `backend/scrapes/`):
 
-- `backend/prefect_orchestration/<domain>/flows.py` - Prefect flow wrappers (using lazy `importlib` loading to call scripts in `backend/src/`)
+- `backend/prefect_orchestration/<domain>/flows.py` - Prefect flow wrappers (using lazy `importlib` loading to call scripts in `backend/scrapes/`)
 
 Use `backend/prefect_orchestration/power/ercot/flows.py` as the canonical structure for flows.
 
@@ -131,11 +131,11 @@ Do **not** rely on `detect_adapter()` auto-detection, which may pick `run_script
 
 Each WSI domain subfolder (e.g. `weighted_degree_day/`) has its own `runs.py`.
 Prefect wrappers are in `backend/prefect_orchestration/wsi/<domain>/flows.py`.
-A top-level `backend/src/wsi/runs.py` also exists to run all scripts across subfolders.
+A top-level `backend/scrapes/wsi/runs.py` also exists to run all scripts across subfolders.
 
 ## No Prefect in Scripts
 
-Do not add `from prefect import flow` or `@flow` decorators to individual scripts. Scripts must be pure Python. Prefect wrappers live in `backend/prefect_orchestration/` (not `backend/src/`), using lazy `importlib` loading to call back into `backend/src/`. See `.markdowns/Mar-03/runners_without_prefect.md`.
+Do not add `from prefect import flow` or `@flow` decorators to individual scripts. Scripts must be pure Python. Prefect wrappers live in `backend/prefect_orchestration/` (not `backend/scrapes/`), using lazy `importlib` loading to call back into `backend/scrapes/`. See `.markdowns/Mar-03/runners_without_prefect.md`.
 
 ## No Slack
 

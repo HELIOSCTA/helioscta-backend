@@ -4,7 +4,7 @@
 
 | Field | Value |
 |-------|-------|
-| **Script** | `backend/src/eia/fuel_type_hrl_gen_v3_2026_mar_09.py` |
+| **Script** | `backend/scrapes/eia/fuel_type_hrl_gen_v3_2026_mar_09.py` |
 | **Source** | EIA Open Data API v2 (`/electricity/rto/fuel-type-data`) |
 | **Target Table** | `eia.fuel_type_hrl_gen_v3_2026_mar_09` |
 | **Schema** | `eia` |
@@ -66,7 +66,7 @@ Provides a comprehensive view of U.S. electricity generation broken down by fuel
 
 | Field | Value |
 |-------|-------|
-| **Script** | `backend/src/eia/weekly_underground_storage_test.py` |
+| **Script** | `backend/scrapes/eia/weekly_underground_storage_test.py` |
 | **Source** | EIA Open Data API v2 (`/natural-gas/stor/wkly`) |
 | **Target Table** | `eia.weekly_underground_storage_test` |
 | **Schema** | `eia` |
@@ -100,7 +100,7 @@ Tracks weekly natural gas in underground storage by region. This is one of the m
 
 | Field | Value |
 |-------|-------|
-| **Script** | `backend/src/eia/` (TBD) |
+| **Script** | `backend/scrapes/eia/` (TBD) |
 | **Source** | EIA Open Data API v2 (`/natural-gas/cons/sum`) |
 | **Target Table** | `eia.nat_gas_consumption_end_use_v2_2025_dec_28` |
 | **Schema** | `eia` |
@@ -147,7 +147,7 @@ Monthly state-level natural gas consumption broken down by end-use sector. Answe
 
 | Field | Value |
 |-------|-------|
-| **Script** | `backend/src/eia/eia_860_test.py` |
+| **Script** | `backend/scrapes/eia/eia_860_test.py` |
 | **Source** | EIA Open Data API v2 (`/electricity/rto/fuel-type-data`) |
 | **Target Table** | `eia.eia_860_test` |
 | **Schema** | `eia` |

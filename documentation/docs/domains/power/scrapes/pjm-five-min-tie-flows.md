@@ -4,7 +4,7 @@
 
 | Field | Value |
 |-------|-------|
-| **Script** | `backend/src/power/pjm/five_min_tie_flows.py` |
+| **Script** | `backend/scrapes/power/pjm/five_min_tie_flows.py` |
 | **Source** | PJM API |
 | **Target Table** | `pjm.five_min_tie_flows` |
 | **Trigger** | Scheduled |

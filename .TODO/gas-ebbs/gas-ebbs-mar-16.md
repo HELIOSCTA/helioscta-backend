@@ -195,8 +195,8 @@ Gaps: BHEGTS (0% dates), Williams (0% dates/capacity/locations).
 
 - Design doc: `TODO/gas-ebbs/GAS_EBB_REFACTOR.md`
 - Source inventory: `.claude/standards/gas_ebbs.md`
-- Implementation: `backend/src/gas_ebbs/`
-- Impact analyzer: `backend/src/gas_ebbs/impact_analyzer.py`
+- Implementation: `backend/scrapes/gas_ebbs/`
+- Impact analyzer: `backend/scrapes/gas_ebbs/impact_analyzer.py`
 - Scheduler: `backend/schedulers/task_scheduler_azurepostgresql/gas_ebbs/gas_ebbs.ps1`
 - Frontend: `frontend/components/data-explorer/GasEbbDashboard.tsx`
 - API route: `frontend/app/api/data-explorer/gas-ebbs/route.ts`

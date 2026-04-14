@@ -9,8 +9,8 @@ data into analysis-ready mart views for the HeliosCTA trading desk.
 
 | Source | Description | Ingestion |
 |--------|-------------|-----------|
-| **ICE Next-Day Gas** | Hourly VWAP close prices for firm physical next-day gas at 15 hubs | Python scrape (`backend/src/ice_python/next_day_gas/`) into `ice_python` schema |
-| **ICE BALMO** | Balance-of-month gas swap settle prices at 15 hubs | Python scrape (`backend/src/ice_python/balmo/`) into `ice_python` schema |
+| **ICE Next-Day Gas** | Hourly VWAP close prices for firm physical next-day gas at 15 hubs | Python scrape (`backend/scrapes/ice_python/next_day_gas/`) into `ice_python` schema |
+| **ICE BALMO** | Balance-of-month gas swap settle prices at 15 hubs | Python scrape (`backend/scrapes/ice_python/balmo/`) into `ice_python` schema |
 
 ## Hub Coverage
 

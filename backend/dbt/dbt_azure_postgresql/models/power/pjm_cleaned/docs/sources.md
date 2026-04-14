@@ -3,7 +3,7 @@
 Raw PJM data ingested via **PJM Data Miner 2** and direct PJM API scrapes.
 
 Tables in this source contain unmodified API responses stored in the `pjm` schema.
-Data is pulled by scheduled Python scripts in `backend/src/power/pjm/` and upserted
+Data is pulled by scheduled Python scripts in `backend/scrapes/power/pjm/` and upserted
 into Azure PostgreSQL.
 
 **Included datasets:**
@@ -28,8 +28,8 @@ PJM data ingested via **GridStatus** — both the open-source Python library and
 paid GridStatus.io API.
 
 Tables in this source are stored in the `gridstatus` schema. Data is pulled by
-scheduled Python scripts in `backend/src/power/gridstatus_open_source/pjm/` and
-`backend/src/power/gridstatusio_api_key/pjm/`.
+scheduled Python scripts in `backend/scrapes/power/gridstatus_open_source/pjm/` and
+`backend/scrapes/power/gridstatusio_api_key/pjm/`.
 
 **Included datasets:**
 - 7-day load forecast (regions pre-normalized to RTO, MIDATL, WEST, SOUTH)

@@ -18,7 +18,7 @@ represents one hour of generation for one balancing authority, broken down by
 
 **Primary key:** `datetime_utc` + `respondent`
 
-**Ingestion:** Python script in `backend/src/eia/` upserts into Azure PostgreSQL.
+**Ingestion:** Python script in `backend/scrapes/eia/` upserts into Azure PostgreSQL.
 
 {% enddocs %}
 
@@ -47,7 +47,7 @@ end-use category.
 
 **Primary key:** `period` + `area_name` + `process_name`
 
-**Ingestion:** Python script in `backend/src/eia/` upserts into Azure PostgreSQL.
+**Ingestion:** Python script in `backend/scrapes/eia/` upserts into Azure PostgreSQL.
 
 {% enddocs %}
 

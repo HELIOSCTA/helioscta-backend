@@ -9,7 +9,7 @@ data into analysis-ready mart views for the HeliosCTA power trading desk.
 
 | Source | Description | Ingestion |
 |--------|-------------|-----------|
-| **GridStatus** | Community library wrapping MISO public data — day-ahead and real-time LMPs | `backend/src/power/gridstatus_open_source/miso/` |
+| **GridStatus** | Community library wrapping MISO public data — day-ahead and real-time LMPs | `backend/scrapes/power/gridstatus_open_source/miso/` |
 
 ## Hub Breakdown
 

@@ -4,7 +4,7 @@
 
 | Field | Value |
 |-------|-------|
-| **Script** | `backend/src/power/pjm/rt_unverified_hourly_lmps.py` |
+| **Script** | `backend/scrapes/power/pjm/rt_unverified_hourly_lmps.py` |
 | **Source** | PJM Data Miner 2 API |
 | **Target Table** | `pjm.rt_unverified_hourly_lmps` |
 | **Trigger** | Scheduled |

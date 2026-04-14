@@ -25,9 +25,9 @@ __pycache__
 *.tmp
 
 # Local runtime/output artifacts that should never be part of image build context
-backend/src/meteologica/examples_from_api_docs/
-backend/src/**/logs/
-backend/src/postions_and_trades/sftp_files/
+backend/scrapes/meteologica/examples_from_api_docs/
+backend/scrapes/**/logs/
+backend/scrapes/postions_and_trades/sftp_files/
 backend/.pytest_cache/
 backend/.mypy_cache/
 

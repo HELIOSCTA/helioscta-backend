@@ -600,7 +600,7 @@ A single long-running Python process per environment that:
 #### 4.2 Proposed Implementation
 
 ```python
-# backend/src/listeners/pg_listener.py
+# backend/scrapes/listeners/pg_listener.py
 
 import json
 import select
@@ -657,10 +657,10 @@ class PostgreSQLListener:
 #### 4.3 Handler Registration
 
 ```python
-# backend/src/listeners/main.py
+# backend/scrapes/listeners/main.py
 
-from backend.src.listeners.pg_listener import PostgreSQLListener
-from backend.src.power.event_driven.pjm.da_hrl_lmps import handle_event as handle_da_hrl_lmps
+from backend.scrapes.listeners.pg_listener import PostgreSQLListener
+from backend.scrapes.power.event_driven.pjm.da_hrl_lmps import handle_event as handle_da_hrl_lmps
 
 def main():
     listener = PostgreSQLListener(dsn=build_dsn())
@@ -738,7 +738,7 @@ Modify every trigger function to INSERT into `events.event_log` in addition to c
 Failed events (after all retries exhausted) should:
 1. Be written to `events.event_log` with `status = 'failed'` and `error_message`
 2. Trigger a Slack alert using existing `slack_utils.send_pipeline_failure_with_log()`
-3. Be manually replayable via CLI: `python -m backend.src.listeners.replay --event-id 123`
+3. Be manually replayable via CLI: `python -m backend.scrapes.listeners.replay --event-id 123`
 
 ---
 
@@ -788,7 +788,7 @@ Failed events (after all retries exhausted) should:
 
 ### 8. Library-Wide Decision Criteria (All API Scripts)
 
-Use this framework for any script in `backend/src/**`, not just PJM.
+Use this framework for any script in `backend/scrapes/**`, not just PJM.
 
 #### 8.1 Required Inputs Before Deciding
 
@@ -796,7 +796,7 @@ Capture these fields for every script:
 
 | Input | Description |
 |---|---|
-| Script path | Example: `backend/src/wsi/weighted_degree_day/...` |
+| Script path | Example: `backend/scrapes/wsi/weighted_degree_day/...` |
 | Source type | External API, internal table, file drop, webhook |
 | Publish-time behavior | Fixed window, variable window, or unknown |
 | Freshness SLA | Maximum acceptable delay (minutes/hours) |
@@ -845,7 +845,7 @@ Tie-break rule:
   - Event-driven primary path.
   - Scheduled reconciler to repair missed events.
 
-#### 8.5 Worked Example: `backend/src/wsi/weighted_degree_day` -> Event-Driven
+#### 8.5 Worked Example: `backend/scrapes/wsi/weighted_degree_day` -> Event-Driven
 
 Recommended mode for this folder: **Event-driven primary + scheduled reconciler**.
 
@@ -930,9 +930,9 @@ backend/schedulers/
 #### Registry Pattern
 
 ```python
-# backend/src/listeners/registry.py
+# backend/scrapes/listeners/registry.py
 
-from backend.src.power.event_driven.iso.pjm.da_hrl_lmps import handle_event as pjm_da_hrl_lmps_handler
+from backend.scrapes.power.event_driven.iso.pjm.da_hrl_lmps import handle_event as pjm_da_hrl_lmps_handler
 
 CHANNEL_REGISTRY: dict[str, callable] = {
     "notifications_pjm_da_hrl_lmps": pjm_da_hrl_lmps_handler,
@@ -940,10 +940,10 @@ CHANNEL_REGISTRY: dict[str, callable] = {
 ```
 
 ```python
-# backend/src/listeners/main.py
+# backend/scrapes/listeners/main.py
 
-from backend.src.listeners.pg_listener import PostgreSQLListener
-from backend.src.listeners.registry import CHANNEL_REGISTRY
+from backend.scrapes.listeners.pg_listener import PostgreSQLListener
+from backend.scrapes.listeners.registry import CHANNEL_REGISTRY
 
 def main():
     listener = PostgreSQLListener(dsn=build_dsn())
@@ -958,13 +958,13 @@ def main():
 
 | # | Artifact | Type | Location |
 |---|----------|------|----------|
-| 1 | `PostgreSQLListener` class | Python | `backend/src/listeners/pg_listener.py` |
-| 2 | Channel registry | Python | `backend/src/listeners/registry.py` |
-| 3 | Listener entry point | Python | `backend/src/listeners/main.py` |
-| 4 | Error handler with retry decorator | Python | `backend/src/listeners/error_handler.py` |
+| 1 | `PostgreSQLListener` class | Python | `backend/scrapes/listeners/pg_listener.py` |
+| 2 | Channel registry | Python | `backend/scrapes/listeners/registry.py` |
+| 3 | Listener entry point | Python | `backend/scrapes/listeners/main.py` |
+| 4 | Error handler with retry decorator | Python | `backend/scrapes/listeners/error_handler.py` |
 | 5 | `events.event_log` migration | SQL/dbt | `backend/dbt/.../macros/triggers/event_log_table.sql` |
 | 6 | Trigger template/macros (per table) | SQL/dbt | `backend/dbt/.../macros/triggers/{schema}_{table}.sql` |
-| 7 | Handler functions (per event) | Python | `backend/src/power/event_driven/iso/{iso}/{table}.py` |
+| 7 | Handler functions (per event) | Python | `backend/scrapes/power/event_driven/iso/{iso}/{table}.py` |
 | 8 | Listener service wrapper | PowerShell | `backend/schedulers/.../listeners/start_pg_listener.ps1` |
 | 9 | `events.listener_heartbeat` table | SQL/dbt | `backend/dbt/.../macros/triggers/listener_heartbeat_table.sql` |
 

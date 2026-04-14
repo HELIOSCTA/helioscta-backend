@@ -44,4 +44,4 @@ TODO/*
 .refactor/
 
 # meteologica
-backend/src/meteologica/examples_from_api_docs/
+backend/scrapes/meteologica/examples_from_api_docs/

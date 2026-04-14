@@ -4,7 +4,7 @@ MISO data ingested via **GridStatus** — the open-source Python library wrappin
 MISO public data feeds.
 
 Tables in this source are stored in the `gridstatus` schema. Data is pulled by
-scheduled Python scripts in `backend/src/power/gridstatus_open_source/miso/`.
+scheduled Python scripts in `backend/scrapes/power/gridstatus_open_source/miso/`.
 
 **Included datasets:**
 - Day-ahead hourly LMPs by location

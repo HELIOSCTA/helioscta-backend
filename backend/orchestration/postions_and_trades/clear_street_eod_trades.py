@@ -34,7 +34,7 @@ from backend.orchestration.postions_and_trades._policies import (
     sftp_poll_policy,
     sftp_transient_retry_policy,
 )
-from backend.src.postions_and_trades.tasks.pull_from_sftp.trades.clear_street import (
+from backend.scrapes.postions_and_trades.tasks.pull_from_sftp.trades.clear_street import (
     helios_transactions_v2_2026_feb_23 as scrape,
 )
 

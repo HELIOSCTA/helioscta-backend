@@ -4,7 +4,7 @@
 
 | Field | Value |
 |-------|-------|
-| **Script** | `backend/src/power/pjm/transmission_outages.py` |
+| **Script** | `backend/scrapes/power/pjm/transmission_outages.py` |
 | **Source** | PJM eDART (`https://edart.pjm.com/reports/linesout.txt`) |
 | **Target Tables** | `pjm.transmission_outages`, `pjm.transmission_outages_dod_changes` |
 | **Trigger** | Scheduled (daily at 07:00 ET) |
@@ -65,10 +65,10 @@ Day-over-day (DoD) change tracking surfaces new outages, resolved outages, and f
 
 ```bash
 # Single run (from repo root)
-python backend/src/power/pjm/transmission_outages.py
+python backend/scrapes/power/pjm/transmission_outages.py
 
 # Via PJM runner
-python backend/src/power/pjm/runs.py  # then select transmission_outages
+python backend/scrapes/power/pjm/runs.py  # then select transmission_outages
 ```
 
 ## Task Scheduler

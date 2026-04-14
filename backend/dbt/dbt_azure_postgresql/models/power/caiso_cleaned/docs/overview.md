@@ -9,7 +9,7 @@ mart views for the HeliosCTA power trading desk.
 
 | Source | Description | Ingestion |
 |--------|-------------|-----------|
-| **GridStatus** | CAISO LMP data (day-ahead hourly and real-time 15-minute) | `backend/src/power/gridstatus_open_source/caiso/` |
+| **GridStatus** | CAISO LMP data (day-ahead hourly and real-time 15-minute) | `backend/scrapes/power/gridstatus_open_source/caiso/` |
 
 ## Pricing Hubs
 

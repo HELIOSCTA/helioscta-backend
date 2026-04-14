@@ -4,7 +4,7 @@
 
 | Field | Value |
 |-------|-------|
-| **Script** | `backend/src/power/pjm/da_hrl_lmps.py` |
+| **Script** | `backend/scrapes/power/pjm/da_hrl_lmps.py` |
 | **Source** | PJM Data Miner 2 API |
 | **Target Table** | `pjm.da_hrl_lmps` |
 | **Schema** | `pjm` |
@@ -40,8 +40,8 @@ Captures the day-ahead electricity prices at every pricing node in PJM. These pr
 ## Event-Driven Path
 
 In addition to scheduled pulls, this data also has an event-driven pipeline:
-- `backend/src/power/event_driven/pjm/da_hrl_lmps.py` listens for `notifications_pjm_da_hrl_lmps` on PostgreSQL
-- Managed by the listener service (`backend/src/listeners/`)
+- `backend/scrapes/power/event_driven/pjm/da_hrl_lmps.py` listens for `notifications_pjm_da_hrl_lmps` on PostgreSQL
+- Managed by the listener service (`backend/scrapes/listeners/`)
 - Retries up to 3 times with 5-second backoff on failure
 
 ## Downstream

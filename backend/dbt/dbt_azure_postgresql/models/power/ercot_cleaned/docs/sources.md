@@ -4,8 +4,8 @@ ERCOT data ingested via **GridStatus** -- both the open-source Python library an
 paid GridStatus.io API.
 
 Tables in this source are stored in the `gridstatus` schema. Data is pulled by
-scheduled Python scripts in `backend/src/power/gridstatus_open_source/ercot/` and
-`backend/src/power/gridstatusio_api_key/ercot/`.
+scheduled Python scripts in `backend/scrapes/power/gridstatus_open_source/ercot/` and
+`backend/scrapes/power/gridstatusio_api_key/ercot/`.
 
 **Included datasets:**
 - Day-ahead LMPs by settlement point (`ercot_lmp_by_settlement_point`)

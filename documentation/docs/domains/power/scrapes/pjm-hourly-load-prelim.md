@@ -4,7 +4,7 @@
 
 | Field | Value |
 |-------|-------|
-| **Script** | `backend/src/power/pjm/hourly_load_prelim.py` |
+| **Script** | `backend/scrapes/power/pjm/hourly_load_prelim.py` |
 | **Source** | PJM Data Miner 2 API |
 | **Target Table** | `pjm.hourly_load_prelim` |
 | **Trigger** | Scheduled |

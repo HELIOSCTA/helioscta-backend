@@ -10,7 +10,7 @@ and climatological normals.
 
 | Source | Description | Ingestion |
 |--------|-------------|-----------|
-| **Meteologica xTraders API** | Third-party weather-driven forecasts, observations, projections, and normals for demand, generation (solar/wind/hydro), and DA prices | Scheduled Python scripts (`backend/src/meteologica/`) |
+| **Meteologica xTraders API** | Third-party weather-driven forecasts, observations, projections, and normals for demand, generation (solar/wind/hydro), and DA prices | Scheduled Python scripts (`backend/scrapes/meteologica/`) |
 
 ## API Accounts
 

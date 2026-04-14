@@ -270,10 +270,10 @@ backend/dbt/dbt_azure_postgresql/
 
 ### 5.2 Proposed Python Entrypoints
 
-Following the standard from `.claude/standards/python-script-preferences.md` and the existing `backend/src/gas_ebbs/` pattern:
+Following the standard from `.claude/standards/python-script-preferences.md` and the existing `backend/scrapes/gas_ebbs/` pattern:
 
 ```
-backend/src/natgas/
+backend/scrapes/natgas/
   __init__.py
   runs.py                    -- CLI runner: --list, all, numbered selection
   flows.py                   -- Orchestration (imports from individual scripts)
@@ -371,7 +371,7 @@ Unregister-ScheduledTask -TaskName "WM NatGas Delta" -TaskPath "\helioscta-backe
 **To run a baseline backfill:**
 ```bash
 conda activate helioscta-backend
-python backend/src/natgas/wm_natgas_baseline.py --source gas_burn
+python backend/scrapes/natgas/wm_natgas_baseline.py --source gas_burn
 ```
 
 **To include natgas models in dbt run:**
@@ -409,7 +409,7 @@ python backend/src/natgas/wm_natgas_baseline.py --source gas_burn
 | # | Question | Decision Needed By | Impact |
 |---|---------|-------------------|--------|
 | Q1 | **Target database for dbt natgas models**: Keep in Azure SQL (where raw data lives) or replicate/transform into PostgreSQL? | Phase 0 | Determines SQL dialect, project structure, and whether a separate dbt project is needed |
-| Q2 | **Python wrapper vs PowerShell-only**: Should the Python entrypoints wrap the existing `gasdatafeed_import.ps1` via subprocess, or should we rewrite the import logic in Python? | Phase 0 | Affects `backend/src/natgas/` script design and testing approach |
+| Q2 | **Python wrapper vs PowerShell-only**: Should the Python entrypoints wrap the existing `gasdatafeed_import.ps1` via subprocess, or should we rewrite the import logic in Python? | Phase 0 | Affects `backend/scrapes/natgas/` script design and testing approach |
 | Q3 | **Scope of initial migration**: Just the 3 legacy domains (LNG, Noms, SALTS), or also build source/staging models for the remaining 26+ WM tables (gas_burn, gas_quality, etc.)? | Phase 1 | Significantly changes the size of Phase 1-3 |
 | Q4 | **Who are the downstream consumers** of the legacy date-stamped views? Are there dashboards, notebooks, or other dbt models referencing `salts_v1_2026_jan_08.*`? | Phase 4 | Determines alias strategy and cutover timeline |
 | Q5 | **dbt-sqlserver version**: What version of dbt-sqlserver is installed? Is it compatible with dbt-core used by the PostgreSQL project? | Phase 0 | May require separate virtual environments or dbt version pinning |

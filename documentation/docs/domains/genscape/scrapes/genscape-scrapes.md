@@ -4,7 +4,7 @@
 
 | Field | Value |
 |-------|-------|
-| **Script** | `backend/src/genscape/gas_production_forecast_v2_2025_09_23.py` |
+| **Script** | `backend/scrapes/genscape/gas_production_forecast_v2_2025_09_23.py` |
 | **Source** | Genscape (Enverus) REST API |
 | **Target Table** | `genscape.gas_production_forecast_v2_2025_09_23` |
 | **Trigger** | Scheduled (Windows Task Scheduler) |
@@ -38,7 +38,7 @@ Monthly gas production forecasts by region including production volumes, dry gas
 
 | Field | Value |
 |-------|-------|
-| **Script** | `backend/src/genscape/daily_pipeline_production_v2_2026_mar_10.py` |
+| **Script** | `backend/scrapes/genscape/daily_pipeline_production_v2_2026_mar_10.py` |
 | **Source** | Genscape (Enverus) REST API |
 | **Target Table** | `genscape.daily_pipeline_production_v2_2026_mar_10` |
 | **Trigger** | Scheduled (Windows Task Scheduler) |
@@ -71,7 +71,7 @@ Daily dry gas production estimates (MMCF/d) pivoted by region. Includes 22 regio
 
 | Field | Value |
 |-------|-------|
-| **Script** | `backend/src/genscape/daily_power_estimate.py` |
+| **Script** | `backend/scrapes/genscape/daily_power_estimate.py` |
 | **Source** | Genscape (Enverus) REST API |
 | **Target Table** | `genscape.daily_power_estimate` |
 | **Trigger** | Scheduled (Windows Task Scheduler) |

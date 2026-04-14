@@ -4,7 +4,7 @@
 
 | Field | Value |
 |-------|-------|
-| **Script** | `backend/src/energy_aspects/timeseries/iso_dispatch_costs.py` |
+| **Script** | `backend/scrapes/energy_aspects/timeseries/iso_dispatch_costs.py` |
 | **Source** | EA API `/timeseries/csv` (Mapping ID: 157, 95 datasets) |
 | **Target Table** | `energy_aspects.iso_dispatch_costs` |
 | **Schema** | `energy_aspects` |
@@ -30,7 +30,7 @@ Forecast dispatch costs and fuel costs by fuel type (NG, diesel, fuel oil, bitum
 
 | Field | Value |
 |-------|-------|
-| **Script** | `backend/src/energy_aspects/timeseries/us_regional_power_model.py` |
+| **Script** | `backend/scrapes/energy_aspects/timeseries/us_regional_power_model.py` |
 | **Source** | EA API `/timeseries/csv` (175 datasets) |
 | **Target Table** | `energy_aspects.us_regional_power_model` |
 | **Schema** | `energy_aspects` |
@@ -57,7 +57,7 @@ Comprehensive regional power generation, demand, and natural gas demand model co
 
 | Field | Value |
 |-------|-------|
-| **Script** | `backend/src/energy_aspects/timeseries/na_power_price_heat_rate_spark_forecasts.py` |
+| **Script** | `backend/scrapes/energy_aspects/timeseries/na_power_price_heat_rate_spark_forecasts.py` |
 | **Source** | EA API `/timeseries/csv` (Mapping ID: 45, 15 datasets) |
 | **Target Table** | `energy_aspects.na_power_price_heat_rate_spark_forecasts` |
 | **Schema** | `energy_aspects` |
@@ -84,7 +84,7 @@ On-peak power prices ($/MWh), heat rates (MMBtu/MWh), and spark spreads ($/MWh) 
 
 | Field | Value |
 |-------|-------|
-| **Script** | `backend/src/energy_aspects/timeseries/monthly_iso_load_model.py` |
+| **Script** | `backend/scrapes/energy_aspects/timeseries/monthly_iso_load_model.py` |
 | **Source** | EA API `/timeseries/csv` (Mapping ID: 474, 16 datasets) |
 | **Target Table** | `energy_aspects.monthly_iso_load_model` |
 | **Schema** | `energy_aspects` |
@@ -111,7 +111,7 @@ Weather-normalized load forecasts and actual load by ISO. Two series per ISO: EA
 
 | Field | Value |
 |-------|-------|
-| **Script** | `backend/src/energy_aspects/timeseries/us_installed_capacity_by_iso_and_fuel_type.py` |
+| **Script** | `backend/scrapes/energy_aspects/timeseries/us_installed_capacity_by_iso_and_fuel_type.py` |
 | **Source** | EA API `/timeseries/csv` (Mapping ID: 270, 84 datasets) |
 | **Target Table** | `energy_aspects.us_installed_capacity_by_iso_and_fuel_type` |
 | **Schema** | `energy_aspects` |
@@ -137,7 +137,7 @@ Installed generation capacity (MW) by fuel type across all ISOs/regions. Covers 
 
 | Field | Value |
 |-------|-------|
-| **Script** | `backend/src/energy_aspects/timeseries/lower_48_average_power_demand_mw.py` |
+| **Script** | `backend/scrapes/energy_aspects/timeseries/lower_48_average_power_demand_mw.py` |
 | **Source** | EA API `/timeseries/csv` (7 datasets) |
 | **Target Table** | `energy_aspects.lower_48_average_power_demand_mw` |
 | **Schema** | `energy_aspects` |
@@ -162,7 +162,7 @@ ISO-level average power demand (MW). Subset of the US Regional Power Model focus
 
 | Field | Value |
 |-------|-------|
-| **Script** | `backend/src/energy_aspects/timeseries/lower_48_generation_forecast_mw.py` |
+| **Script** | `backend/scrapes/energy_aspects/timeseries/lower_48_generation_forecast_mw.py` |
 | **Target Table** | `energy_aspects.lower_48_generation_forecast_mw` |
 | **dbt Views** | None |
 | **Trigger** | Scheduled (Prefect) |
@@ -175,7 +175,7 @@ US48 aggregate generation by fuel type (coal, gas, nuclear, hydro, solar, wind, 
 
 | Field | Value |
 |-------|-------|
-| **Script** | `backend/src/energy_aspects/timeseries/lower_48_gas_generation_forecast_mw.py` |
+| **Script** | `backend/scrapes/energy_aspects/timeseries/lower_48_gas_generation_forecast_mw.py` |
 | **Target Table** | `energy_aspects.lower_48_gas_generation_forecast_mw` |
 | **dbt Views** | None |
 | **Trigger** | Scheduled (Prefect) |
@@ -188,7 +188,7 @@ US48 natural gas generation (MW). Single-dataset subset of the generation foreca
 
 | Field | Value |
 |-------|-------|
-| **Script** | `backend/src/energy_aspects/timeseries/lower_48_installed_capacity_mw.py` |
+| **Script** | `backend/scrapes/energy_aspects/timeseries/lower_48_installed_capacity_mw.py` |
 | **Target Table** | `energy_aspects.lower_48_installed_capacity_mw` |
 | **dbt Views** | None |
 | **Trigger** | Scheduled (Prefect) |

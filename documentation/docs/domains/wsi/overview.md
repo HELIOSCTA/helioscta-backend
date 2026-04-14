@@ -8,8 +8,8 @@ Temperature forecasts, weighted degree days (HDD/CDD), and historical observatio
 
 - **API:** WSI Trader (AG2) API
 - **Authentication:** Username/password (`WSI_TRADER_USERNAME`, `WSI_TRADER_NAME`, `WSI_TRADER_PASSWORD`)
-- **Shared utilities:** `backend/src/wsi/utils.py` (auth, HTTP client, CSV pull helpers)
-- **City ID reference:** `backend/src/wsi/wsi_trader_city_ids.json`
+- **Shared utilities:** `backend/scrapes/wsi/utils.py` (auth, HTTP client, CSV pull helpers)
+- **City ID reference:** `backend/scrapes/wsi/wsi_trader_city_ids.json`
 
 ## Domain Subfolders
 

@@ -8,9 +8,9 @@
 
 | Field | Value |
 |-------|-------|
-| **Runner** | `backend/src/power/ercot/runs.py` |
-| **Prefect Flows** | `backend/src/power/ercot/flows.py` |
-| **Shared Helpers** | `backend/src/power/ercot/ercot_api_utils.py` |
+| **Runner** | `backend/scrapes/power/ercot/runs.py` |
+| **Prefect Flows** | `backend/scrapes/power/ercot/flows.py` |
+| **Shared Helpers** | `backend/scrapes/power/ercot/ercot_api_utils.py` |
 | **Scheduler Script** | `backend/schedulers/task_scheduler_azurepostgresql/power/ercot.ps1` |
 | **Task Name** | `ERCOT - ISO` |
 | **Task Path** | `\helioscta-backend\Power\` |
@@ -36,7 +36,7 @@ Unregister-ScheduledTask -TaskName "ERCOT - ISO" -TaskPath "\helioscta-backend\P
 
 | Field | Value |
 |-------|-------|
-| **Script** | `backend/src/power/ercot/actual_system_load.py` |
+| **Script** | `backend/scrapes/power/ercot/actual_system_load.py` |
 | **Source** | ERCOT Public Reports API |
 | **Endpoint** | `np6-346-cd/act_sys_load_by_fzn` |
 | **Target Table** | `ercot.actual_system_load` |
@@ -59,7 +59,7 @@ Operating day, hour ending, and actual MW load per forecast zone.
 
 | Field | Value |
 |-------|-------|
-| **Script** | `backend/src/power/ercot/seven_day_load_forecast.py` |
+| **Script** | `backend/scrapes/power/ercot/seven_day_load_forecast.py` |
 | **Source** | ERCOT Public Reports API |
 | **Endpoint** | `np3-565-cd/lf_by_model_weather_zone` |
 | **Target Table** | `ercot.seven_day_load_forecast` |
@@ -82,7 +82,7 @@ Posted datetime, delivery date, hour ending, model name, weather zone, and forec
 
 | Field | Value |
 |-------|-------|
-| **Script** | `backend/src/power/ercot/dam_stlmnt_pnt_prices.py` |
+| **Script** | `backend/scrapes/power/ercot/dam_stlmnt_pnt_prices.py` |
 | **Source** | ERCOT Public Reports API |
 | **Endpoint** | `np4-190-cd/dam_stlmnt_pnt_prices` |
 | **Target Table** | `ercot.dam_stlmnt_pnt_prices` |
@@ -105,7 +105,7 @@ Delivery date, hour ending, settlement point, and settlement point price.
 
 | Field | Value |
 |-------|-------|
-| **Script** | `backend/src/power/ercot/settlement_point_prices.py` |
+| **Script** | `backend/scrapes/power/ercot/settlement_point_prices.py` |
 | **Source** | ERCOT Public Reports API |
 | **Endpoint** | `np6-905-cd/spp_node_zone_hub` |
 | **Target Table** | `ercot.settlement_point_prices` |
@@ -128,7 +128,7 @@ Delivery date, delivery hour, delivery interval, settlement point, and settlemen
 
 | Field | Value |
 |-------|-------|
-| **Script** | `backend/src/power/ercot/seven_day_solar_forecast.py` |
+| **Script** | `backend/scrapes/power/ercot/seven_day_solar_forecast.py` |
 | **Source** | ERCOT Public Reports API |
 | **Endpoint** | `np4-737-cd/spp_hrly_avrg_actl_fcast` |
 | **Target Table** | `ercot.seven_day_solar_forecast` |
@@ -151,7 +151,7 @@ Posted datetime, delivery date, hour ending, and system-wide solar MW (actual + 
 
 | Field | Value |
 |-------|-------|
-| **Script** | `backend/src/power/ercot/seven_day_solar_forecast_by_region.py` |
+| **Script** | `backend/scrapes/power/ercot/seven_day_solar_forecast_by_region.py` |
 | **Source** | ERCOT Public Reports API |
 | **Endpoint** | `np4-745-cd/spp_hrly_actual_fcast_geo` |
 | **Target Table** | `ercot.seven_day_solar_forecast_by_region` |
@@ -174,7 +174,7 @@ Posted datetime, delivery date, hour ending, region, and solar MW (actual + fore
 
 | Field | Value |
 |-------|-------|
-| **Script** | `backend/src/power/ercot/seven_day_wind_forecast.py` |
+| **Script** | `backend/scrapes/power/ercot/seven_day_wind_forecast.py` |
 | **Source** | ERCOT Public Reports API |
 | **Endpoint** | `np4-732-cd/wpp_hrly_avrg_actl_fcast` |
 | **Target Table** | `ercot.seven_day_wind_forecast` |
@@ -197,7 +197,7 @@ Posted datetime, delivery date, hour ending, and system-wide wind MW (actual + f
 
 | Field | Value |
 |-------|-------|
-| **Script** | `backend/src/power/ercot/seven_day_wind_forecast_by_region.py` |
+| **Script** | `backend/scrapes/power/ercot/seven_day_wind_forecast_by_region.py` |
 | **Source** | ERCOT Public Reports API |
 | **Endpoint** | `np4-742-cd/wpp_hrly_actual_fcast_geo` |
 | **Target Table** | `ercot.seven_day_wind_forecast_by_region` |
@@ -220,7 +220,7 @@ Posted datetime, delivery date, hour ending, region, and wind MW (actual + forec
 
 | Field | Value |
 |-------|-------|
-| **Script** | `backend/src/power/ercot/energy_storage_resources_daily.py` |
+| **Script** | `backend/scrapes/power/ercot/energy_storage_resources_daily.py` |
 | **Source** | ERCOT Dashboard API (no OAuth) |
 | **Endpoint** | `https://www.ercot.com/api/1/services/read/dashboards/energy-storage-resources.json` |
 | **Target Table** | `ercot.energy_storage_resources_daily` |

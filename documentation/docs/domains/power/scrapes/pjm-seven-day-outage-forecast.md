@@ -4,7 +4,7 @@
 
 | Field | Value |
 |-------|-------|
-| **Script** | `backend/src/power/pjm/seven_day_outage_forecast.py` |
+| **Script** | `backend/scrapes/power/pjm/seven_day_outage_forecast.py` |
 | **Source** | PJM API |
 | **Target Table** | `pjm.seven_day_outage_forecast` |
 | **Trigger** | Scheduled |

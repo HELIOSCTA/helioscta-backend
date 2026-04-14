@@ -9,7 +9,7 @@ mart views for the HeliosCTA power trading desk.
 
 | Source | Description | Ingestion |
 |--------|-------------|-----------|
-| **ISO-NE** | Day-ahead hourly LMPs, real-time hourly LMPs (final + preliminary) by location | `backend/src/power/` |
+| **ISO-NE** | Day-ahead hourly LMPs, real-time hourly LMPs (final + preliminary) by location | `backend/scrapes/power/` |
 
 ## Hub Breakdown
 

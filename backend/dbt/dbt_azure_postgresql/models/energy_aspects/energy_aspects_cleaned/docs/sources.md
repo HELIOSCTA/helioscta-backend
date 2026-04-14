@@ -9,7 +9,7 @@ PJM W, PJM Dominion, PJM Nihub, and PJM Adhub.
 
 - **Grain:** 1 row per month
 - **Primary key:** `date`
-- **Ingestion:** `backend/src/energy_aspects/timeseries/iso_dispatch_costs.py`
+- **Ingestion:** `backend/scrapes/energy_aspects/timeseries/iso_dispatch_costs.py`
 
 {% enddocs %}
 
@@ -24,7 +24,7 @@ normal-weather-adjusted demand and thermal generation forecasts.
 
 - **Grain:** 1 row per month
 - **Primary key:** `date`
-- **Ingestion:** `backend/src/energy_aspects/timeseries/us_regional_power_model.py`
+- **Ingestion:** `backend/scrapes/energy_aspects/timeseries/us_regional_power_model.py`
 
 {% enddocs %}
 
@@ -37,7 +37,7 @@ spreads ($/MWh) for ERCOT North, ISONE Mass, NYISO G, PJM West, and CAISO SP15.
 
 - **Grain:** 1 row per month
 - **Primary key:** `date`
-- **Ingestion:** `backend/src/energy_aspects/timeseries/na_power_price_heat_rate_spark_forecasts.py`
+- **Ingestion:** `backend/scrapes/energy_aspects/timeseries/na_power_price_heat_rate_spark_forecasts.py`
 
 {% enddocs %}
 
@@ -52,7 +52,7 @@ and actual load with forecast under normal weather.
 
 - **Grain:** 1 row per month
 - **Primary key:** `date`
-- **Ingestion:** `backend/src/energy_aspects/timeseries/monthly_iso_load_model.py`
+- **Ingestion:** `backend/scrapes/energy_aspects/timeseries/monthly_iso_load_model.py`
 
 {% enddocs %}
 
@@ -67,7 +67,7 @@ hydro, battery.
 
 - **Grain:** 1 row per month
 - **Primary key:** `date`
-- **Ingestion:** `backend/src/energy_aspects/timeseries/us_installed_capacity_by_iso_and_fuel_type.py`
+- **Ingestion:** `backend/scrapes/energy_aspects/timeseries/us_installed_capacity_by_iso_and_fuel_type.py`
 
 {% enddocs %}
 
@@ -79,6 +79,6 @@ average power demand (MW). Subset of the US Regional Power Model.
 
 - **Grain:** 1 row per month
 - **Primary key:** `date`
-- **Ingestion:** `backend/src/energy_aspects/timeseries/lower_48_average_power_demand_mw.py`
+- **Ingestion:** `backend/scrapes/energy_aspects/timeseries/lower_48_average_power_demand_mw.py`
 
 {% enddocs %}

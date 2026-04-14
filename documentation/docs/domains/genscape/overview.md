@@ -8,7 +8,7 @@ Proprietary natural gas production and pipeline flow data from Genscape (Enverus
 
 - **API:** Genscape REST API (`api.genscape.com`)
 - **Authentication:** API key (`GEN_API_KEY`)
-- **Script location:** `backend/src/genscape/`
+- **Script location:** `backend/scrapes/genscape/`
 
 ## Scrape Inventory
 
@@ -21,7 +21,7 @@ Proprietary natural gas production and pipeline flow data from Genscape (Enverus
 ## Folder Structure
 
 ```
-backend/src/genscape/
+backend/scrapes/genscape/
 ├── __init__.py
 ├── genscape_api_utils.py         # Shared API request helper (rate-limit retries)
 ├── daily_pipeline_production_v2_2026_mar_10.py  # Daily pipeline production scrape
@@ -66,7 +66,7 @@ Provides daily power generation burn estimates by region and model type. Used to
 
 | PowerShell Runner | Python Entrypoint | Task Name | Task Path | Cadence |
 |---|---|---|---|---|
-| `backend/schedulers/.../genscape/genscape_all_scripts.ps1` | `python backend/src/genscape/runs.py all` | Genscape All Scripts | `\helioscta-backend\Genscape\` | Daily 6:00 AM, 12:00 PM |
+| `backend/schedulers/.../genscape/genscape_all_scripts.ps1` | `python backend/scrapes/genscape/runs.py all` | Genscape All Scripts | `\helioscta-backend\Genscape\` | Daily 6:00 AM, 12:00 PM |
 
 ### Register / Remove Tasks
 

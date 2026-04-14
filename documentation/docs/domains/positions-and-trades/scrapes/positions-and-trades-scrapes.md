@@ -8,7 +8,7 @@ All position scripts pull CSV/Excel files from SFTP servers and load them into A
 
 | Field | Value |
 |-------|-------|
-| **Script** | `backend/src/postions_and_trades/tasks/pull_from_sftp/positions/marex/marex_sftp_positions_v2_2026_feb_23.py` |
+| **Script** | `backend/scrapes/postions_and_trades/tasks/pull_from_sftp/positions/marex/marex_sftp_positions_v2_2026_feb_23.py` |
 | **Source** | Marex SFTP |
 | **Target Table** | `marex.marex_sftp_positions_v2_2026_feb_23` |
 | **Trigger** | Scheduled |
@@ -35,7 +35,7 @@ All position scripts pull CSV/Excel files from SFTP servers and load them into A
 
 | Field | Value |
 |-------|-------|
-| **Script** | `backend/src/postions_and_trades/tasks/pull_from_sftp/trades/clear_street/helios_transactions_v2_2026_feb_23.py` |
+| **Script** | `backend/scrapes/postions_and_trades/tasks/pull_from_sftp/trades/clear_street/helios_transactions_v2_2026_feb_23.py` |
 | **Source** | Clear Street SFTP |
 | **Target Table** | `clear_street.helios_transactions_v2_2026_feb_23` |
 | **Trigger** | Scheduled |
@@ -81,7 +81,7 @@ All position scripts pull CSV/Excel files from SFTP servers and load them into A
 
 | Field | Value |
 |-------|-------|
-| **Script** | `backend/src/postions_and_trades/tasks/pull_from_sftp/trade_breaks/nav_trade_breaks_v2_2026_feb_24.py` |
+| **Script** | `backend/scrapes/postions_and_trades/tasks/pull_from_sftp/trade_breaks/nav_trade_breaks_v2_2026_feb_24.py` |
 | **Source** | NAV SFTP |
 | **Freshness** | T+1 |
 

@@ -10,7 +10,7 @@ Independent power demand, generation, and DA price forecasts from the xTraders A
 - **Authentication:** JWT token auth, two accounts:
   - **L48 account** (`helios_cta_us48`): 35 scripts for US48 aggregate forecasts
   - **ISO account** (`helios_cta`): ~498 scripts for ISO-level and sub-regional forecasts
-- **Auth module:** `backend/src/meteologica/auth.py`
+- **Auth module:** `backend/scrapes/meteologica/auth.py`
 - **Rate limits:** ~3 minute cooldown after burst of ~34 requests
 
 ## Script Organization

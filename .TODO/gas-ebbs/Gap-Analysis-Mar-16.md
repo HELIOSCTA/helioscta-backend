@@ -1,7 +1,7 @@
 # Backend Gas EBB Scraper TODOs — 2026-03-16 Gap Analysis
 
 Source: `bot/gas_ebbs/outputs/gap_coverage_2026-03-16.json` cross-referenced against
-`helioscta-backend/backend/src/gas_ebbs/config/` and `outages_2026_03_16.json`.
+`helioscta-backend/backend/scrapes/gas_ebbs/config/` and `outages_2026_03_16.json`.
 
 14 of 20 email-extracted outages had no matching scrape notice. Breakdown below.
 

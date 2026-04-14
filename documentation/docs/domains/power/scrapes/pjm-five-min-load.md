@@ -4,7 +4,7 @@
 
 | Field | Value |
 |-------|-------|
-| **Script** | `backend/src/power/pjm/five_min_instantaneous_load_v1_2025_OCT_15.py` |
+| **Script** | `backend/scrapes/power/pjm/five_min_instantaneous_load_v1_2025_OCT_15.py` |
 | **Source** | PJM API |
 | **Target Table** | `pjm.five_min_instantaneous_load_v1_2025_oct_15` |
 | **Trigger** | Scheduled |

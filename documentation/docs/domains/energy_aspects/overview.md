@@ -9,7 +9,7 @@ Subscription-based energy market analytics covering power generation forecasts, 
 - **API:** Energy Aspects Data API (`https://api.energyaspects.com/data/`)
 - **Authentication:** API key (`ENERGY_ASPECTS_API_KEY`)
 - **Documentation:** [EA Developer Portal](https://developer.energyaspects.com/reference/quickstart-guide)
-- **Catalog utility:** `backend/src/energy_aspects/discover_catalog.py` (generates `output/catalog.json`)
+- **Catalog utility:** `backend/scrapes/energy_aspects/discover_catalog.py` (generates `output/catalog.json`)
 
 ## Scrape Inventory
 
@@ -28,7 +28,7 @@ Subscription-based energy market analytics covering power generation forecasts, 
 ## Folder Structure
 
 ```
-backend/src/energy_aspects/
+backend/scrapes/energy_aspects/
 ├── energy_aspects_api_utils.py       # API client (auth, GET, pagination, column mapping)
 ├── discover_catalog.py               # One-time catalog discovery utility
 ├── output/catalog.json               # Cached API catalog (~8 MB)
@@ -76,7 +76,7 @@ Pipeline: `source (pass-through) -> staging (PJM column extraction + rename) -> 
 | Field | Value |
 |-------|-------|
 | **PowerShell Runner** | `backend/schedulers/task_scheduler_azurepostgresql/energy_aspects/energy_aspects_all_scripts.ps1` |
-| **Python Entrypoint** | `python backend/src/energy_aspects/timeseries/runs.py all` |
+| **Python Entrypoint** | `python backend/scrapes/energy_aspects/timeseries/runs.py all` |
 | **Task Name** | `Energy Aspects (All Scripts)` |
 | **Task Path** | `\helioscta-backend\Energy Aspects\` |
 | **Trigger** | Daily at 6:00 AM and 6:00 PM (scheduler host local time) |

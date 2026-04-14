@@ -9,7 +9,7 @@ analysis-ready mart views for the HeliosCTA power trading desk.
 
 | Source | Description | Ingestion |
 |--------|-------------|-----------|
-| **Energy Aspects API** | Subscription-based energy market analytics — generation forecasts, dispatch costs, power prices, heat rates, spark spreads, installed capacity, and load models | Scheduled Python scripts in `backend/src/energy_aspects/timeseries/` |
+| **Energy Aspects API** | Subscription-based energy market analytics — generation forecasts, dispatch costs, power prices, heat rates, spark spreads, installed capacity, and load models | Scheduled Python scripts in `backend/scrapes/energy_aspects/timeseries/` |
 
 ## Coverage
 

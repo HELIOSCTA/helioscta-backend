@@ -9,7 +9,7 @@ mart views for the HeliosCTA power trading desk.
 
 | Source | Description | Ingestion |
 |--------|-------------|-----------|
-| **GridStatus** | SPP day-ahead hourly LMPs and real-time 5-minute LMPs by location | `backend/src/power/gridstatus_open_source/spp/` or `backend/src/power/gridstatusio_api_key/spp/` |
+| **GridStatus** | SPP day-ahead hourly LMPs and real-time 5-minute LMPs by location | `backend/scrapes/power/gridstatus_open_source/spp/` or `backend/scrapes/power/gridstatusio_api_key/spp/` |
 
 ## Hub Breakdown
 

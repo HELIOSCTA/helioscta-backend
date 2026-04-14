@@ -9,7 +9,7 @@ into analysis-ready mart views for the HeliosCTA power trading desk.
 
 | Source | Description | Ingestion |
 |--------|-------------|-----------|
-| **GridStatus** | NYISO day-ahead and real-time LMPs by zone | `backend/src/power/gridstatus_open_source/nyiso/` |
+| **GridStatus** | NYISO day-ahead and real-time LMPs by zone | `backend/scrapes/power/gridstatus_open_source/nyiso/` |
 
 ## NYISO Zones
 

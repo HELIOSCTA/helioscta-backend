@@ -88,7 +88,7 @@
 ## Proposed Folder Structure
 
 ```
-backend/src/gas_ebbs/
+backend/scrapes/gas_ebbs/
 ├── __init__.py
 ├── runs.py                          # Manual runner (--list, all, numbered)
 ├── flows.py                         # Prefect flow wrappers

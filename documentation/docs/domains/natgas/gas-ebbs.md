@@ -5,7 +5,7 @@ Scrapes critical and non-critical notices from 123 NAESB pipeline Electronic Bul
 ## Architecture
 
 - **Pattern:** Abstract base class (`EBBScraper`) + source-family adapters + YAML configs
-- **Code:** `backend/src/gas_ebbs/`
+- **Code:** `backend/scrapes/gas_ebbs/`
 - **DB Schema:** `gas_ebbs` (tables: `notices`, `notice_snapshots`)
 - **Scheduler:** Hourly via Windows Task Scheduler (`backend/schedulers/.../gas_ebbs/gas_ebbs.ps1`)
 

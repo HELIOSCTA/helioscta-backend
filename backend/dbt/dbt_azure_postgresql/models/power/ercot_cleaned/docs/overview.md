@@ -9,8 +9,8 @@ into analysis-ready mart views for the HeliosCTA power trading desk.
 
 | Source | Description | Ingestion |
 |--------|-------------|-----------|
-| **GridStatus (open-source)** | Community library wrapping ERCOT public data -- LMPs, SPPs, fuel mix, load, load forecasts, solar/wind forecasts, outages, energy storage | `backend/src/power/gridstatus_open_source/ercot/` |
-| **GridStatus.io (paid API)** | Commercial API with enriched ERCOT data | `backend/src/power/gridstatusio_api_key/ercot/` |
+| **GridStatus (open-source)** | Community library wrapping ERCOT public data -- LMPs, SPPs, fuel mix, load, load forecasts, solar/wind forecasts, outages, energy storage | `backend/scrapes/power/gridstatus_open_source/ercot/` |
+| **GridStatus.io (paid API)** | Commercial API with enriched ERCOT data | `backend/scrapes/power/gridstatusio_api_key/ercot/` |
 
 ## Trading Hubs
 

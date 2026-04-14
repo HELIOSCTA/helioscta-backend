@@ -8,11 +8,11 @@ Electricity market data across 7 U.S. ISOs. Covers load, LMPs, fuel mix, outages
 
 | Source | Type | ISOs Covered | Script Location |
 |--------|------|--------------|-----------------|
-| **PJM Data Miner 2 / API** | Direct API | PJM only | `backend/src/power/pjm/` |
-| **ERCOT Public API** | Direct API (OAuth 2.0) | ERCOT only | `backend/src/power/ercot/` |
-| **GridStatus (open source)** | Python library (free) | PJM, ERCOT, MISO, CAISO, NYISO, ISO-NE, SPP | `backend/src/power/gridstatus_open_source/` |
-| **GridStatusIO (paid API)** | REST API (paid) | PJM, ERCOT, MISO, CAISO, NYISO, ISO-NE, SPP | `backend/src/power/gridstatusio_api_key/` |
-| **Event-Driven Listener** | PostgreSQL LISTEN/NOTIFY | PJM (DA LMPs) | `backend/src/power/event_driven/pjm/` |
+| **PJM Data Miner 2 / API** | Direct API | PJM only | `backend/scrapes/power/pjm/` |
+| **ERCOT Public API** | Direct API (OAuth 2.0) | ERCOT only | `backend/scrapes/power/ercot/` |
+| **GridStatus (open source)** | Python library (free) | PJM, ERCOT, MISO, CAISO, NYISO, ISO-NE, SPP | `backend/scrapes/power/gridstatus_open_source/` |
+| **GridStatusIO (paid API)** | REST API (paid) | PJM, ERCOT, MISO, CAISO, NYISO, ISO-NE, SPP | `backend/scrapes/power/gridstatusio_api_key/` |
+| **Event-Driven Listener** | PostgreSQL LISTEN/NOTIFY | PJM (DA LMPs) | `backend/scrapes/power/event_driven/pjm/` |
 
 ## Scrape Inventory
 
