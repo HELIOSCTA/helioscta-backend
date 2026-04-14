@@ -110,15 +110,6 @@ ISONE_BASE_URL = os.getenv("ISONE_BASE_URL")
 ISONE_ACCOUNT = os.getenv("ISONE_ACCOUNT")
 ISONE_PASSWORD = os.getenv("ISONE_PASSWORD")
 
-# ────── New Relic ──────
-# License key (ingest-only) is consumed by backend/monitoring jobs that POST
-# events to NRDB. User API key is consumed only by Terraform under
-# backend/newrelic/terraform/ via TF_VAR_new_relic_api_key — never imported in
-# Python. Both are sourced from Azure Key Vault in prod.
-NEW_RELIC_LICENSE_KEY = os.getenv("NEW_RELIC_LICENSE_KEY")
-NEW_RELIC_USER_API_KEY = os.getenv("NEW_RELIC_USER_API_KEY")
-NEW_RELIC_ACCOUNT_ID = os.getenv("NEW_RELIC_ACCOUNT_ID")
-NEW_RELIC_REGION = os.getenv("NEW_RELIC_REGION", "US")
 
 # ────── WSI ──────
 WSI_TRADER_USERNAME = os.getenv("WSI_TRADER_USERNAME")
