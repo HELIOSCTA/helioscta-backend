@@ -1,0 +1,27 @@
+name: helioscta-power-pjm
+
+prefect-version: 3.0.0
+
+build: null
+push: null
+
+pull:
+  - prefect.deployments.steps.set_working_directory:
+      directory: /app
+
+deployments:
+
+  # ────── PJM Day-Ahead Hourly LMPs ──────
+  # Daily pull from PJM Data Miner API, upsert to Azure PostgreSQL
+
+  - name: Power - PJM DA HRL LMPs
+    entrypoint: schedulers/prefect/power/pjm/flows.py:pjm_da_hrl_lmps
+    work_pool:
+      name: default-agent-pool
+      work_queue_name: default
+    tags: [pjm, power, da_hrl_lmps]
+    schedules:
+
+      # ────── Daily run (after data availability ~12:00-1:30 PM EPT) ──────
+      - cron: "30 12 * * *"
+        timezone: "America/New_York"
