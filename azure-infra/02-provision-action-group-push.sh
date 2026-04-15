@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
 # ------------------------------------------------------------------------------
-# Phase 2: Provision Azure Monitor Action Group (Azure mobile app push only).
+# Phase 2: Provision Azure Monitor Action Group with push + email receivers
+# and grant RBAC so the app registration can trigger notifications from Python.
 #
 # This script:
 #   1) Creates or updates one Action Group in the configured Resource Group
-#   2) Configures only one receiver type: Azure app push notifications
-#   3) Optionally sends a test notification
+#   2) Configures two receiver types: Azure app push + email
+#   3) Grants Monitoring Contributor to the app registration (for createNotifications API)
+#   4) Optionally sends a test notification
 #
 # Prerequisites:
 #   - Azure CLI installed and authenticated (az login)
@@ -46,6 +48,8 @@ if ! az group show --name "$RG" --output none 2>/dev/null; then
   exit 1
 fi
 
+# ── Resolve receiver emails ──────────────────────────────────────────────────
+
 PUSH_EMAIL="${ACTION_GROUP_PUSH_EMAIL:-}"
 if [[ -z "$PUSH_EMAIL" ]]; then
   PUSH_EMAIL="$(az account show --query 'user.name' -o tsv | tr -d '\r')"
@@ -56,17 +60,21 @@ if [[ -z "$PUSH_EMAIL" ]]; then
   exit 1
 fi
 
+EMAIL_RECEIVER="${ACTION_GROUP_EMAIL_RECEIVER:-$PUSH_EMAIL}"
+
+# ── Create/update Action Group ───────────────────────────────────────────────
+
 echo ""
 echo "=== Creating/updating Action Group: $ACTION_GROUP_NAME ==="
-echo "  Receiver type: Azure app push"
-echo "  Receiver email/UPN: $PUSH_EMAIL"
+echo "  Push receiver:  $PUSH_EMAIL"
+echo "  Email receiver: $EMAIL_RECEIVER"
 
-# create is idempotent and updates existing resources when called with same name
 az monitor action-group create \
   --resource-group "$RG" \
   --name "$ACTION_GROUP_NAME" \
   --short-name "$ACTION_GROUP_SHORT_NAME" \
   --action azureapppush mobilepush "$PUSH_EMAIL" \
+  --action email emailnotify "$EMAIL_RECEIVER" \
   --output none
 
 ACTION_GROUP_ID="$(az monitor action-group show \
@@ -78,10 +86,35 @@ echo ""
 echo "=== Action Group ready ==="
 echo "  Name: $ACTION_GROUP_NAME"
 echo "  Resource ID: $ACTION_GROUP_ID"
-echo "  Push receiver: $PUSH_EMAIL"
+echo "  Push receiver:  $PUSH_EMAIL"
+echo "  Email receiver: $EMAIL_RECEIVER"
+
+# ── Grant RBAC for Python createNotifications API ────────────────────────────
+
+APP_CLIENT_ID="${ACTION_GROUP_APP_CLIENT_ID:-}"
+if [[ -n "$APP_CLIENT_ID" ]]; then
+  echo ""
+  echo "=== Granting Monitoring Contributor to app registration ==="
+  APP_OBJECT_ID="$(az ad sp show --id "$APP_CLIENT_ID" --query id -o tsv | tr -d '\r')"
+  az role assignment create \
+    --assignee-object-id "$APP_OBJECT_ID" \
+    --assignee-principal-type ServicePrincipal \
+    --role "Monitoring Contributor" \
+    --scope "/subscriptions/$SUBSCRIPTION/resourceGroups/$RG" \
+    --output none 2>/dev/null || echo "  (role assignment already exists)"
+  echo "  Granted to: $APP_CLIENT_ID"
+else
+  echo ""
+  echo "=== Skipping RBAC — set ACTION_GROUP_APP_CLIENT_ID in config.sh ==="
+fi
+
+# ── Summary ──────────────────────────────────────────────────────────────────
+
 echo ""
 echo "Next: attach this Action Group to alert rules using:"
 echo "  --action \"$ACTION_GROUP_ID\""
+
+# ── Optional test notification ───────────────────────────────────────────────
 
 if [[ "${TEST_NOTIFICATION:-0}" == "1" ]]; then
   echo ""
@@ -90,7 +123,8 @@ if [[ "${TEST_NOTIFICATION:-0}" == "1" ]]; then
     --resource-group "$RG" \
     --action-group "$ACTION_GROUP_NAME" \
     --alert-type metricstaticthreshold \
-    --output none
+    --add-action azureapppush mobilepush "$PUSH_EMAIL" \
+    --add-action email emailnotify "$EMAIL_RECEIVER"
   echo "Test request submitted."
 fi
 
