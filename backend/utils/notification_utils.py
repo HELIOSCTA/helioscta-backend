@@ -84,13 +84,60 @@ def send_push_notification(title: str, description: str = "") -> None:
 
 # ── Slack ────────────────────────────────────────────────────────────────────
 
+SEVERITY_EMOJI = {
+    "success": "✅",
+    "warning": "⚠️",
+    "error": "🚨",
+    "info": "ℹ️",
+}
 
-def send_slack_notification(message: str) -> None:
-    """Send a Slack webhook message."""
+
+def send_slack_notification(
+    message: str,
+    *,
+    severity: str = "info",
+    pipeline: str | None = None,
+    fields: dict[str, str] | None = None,
+) -> None:
+    """Send a structured Slack webhook message using Block Kit.
+
+    Args:
+        message:  Main notification text.
+        severity: One of "success", "warning", "error", "info".
+        pipeline: Pipeline name shown in the header (optional).
+        fields:   Extra key/value pairs rendered as a two-column section.
+    """
     webhook_url = secrets.SLACK_DEFAULT_WEBHOOK_URL
     if not webhook_url:
         raise ValueError("SLACK_DEFAULT_WEBHOOK_URL is not set")
-    resp = requests.post(webhook_url, json={"text": message}, timeout=10)
+
+    emoji = SEVERITY_EMOJI.get(severity, "ℹ️")
+    header = f"{emoji}  {pipeline}" if pipeline else f"{emoji}  Alert"
+
+    blocks = [
+        {
+            "type": "header",
+            "text": {"type": "plain_text", "text": header, "emoji": True},
+        },
+        {
+            "type": "section",
+            "text": {"type": "mrkdwn", "text": message},
+        },
+    ]
+
+    if fields:
+        blocks.append({
+            "type": "section",
+            "fields": [
+                {"type": "mrkdwn", "text": f"*{k}:*\n{v}"}
+                for k, v in fields.items()
+            ],
+        })
+
+    blocks.append({"type": "divider"})
+
+    payload = {"blocks": blocks, "text": f"{emoji} {message}"}
+    resp = requests.post(webhook_url, json=payload, timeout=10)
     resp.raise_for_status()
     logger.info(f"Slack notification sent: {message[:80]}")
 

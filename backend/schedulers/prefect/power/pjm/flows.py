@@ -44,8 +44,12 @@ def notify_da_lmps(target_date: str) -> None:
     if already_notified(pipeline_name, target_date):
         return
 
-    message = f"✅ PJM DA LMPs available for {target_date} — synced to blob"
-    send_slack_notification(message)
+    send_slack_notification(
+        message=f"PJM DA LMPs available for *{target_date}* — synced to blob",
+        severity="success",
+        pipeline="PJM DA HRL LMPs",
+        fields={"Target Date": target_date, "Destination": "Azure Blob"},
+    )
 
     run = pipeline_run_logger.PipelineRunLogger(
         pipeline_name=pipeline_name, source="power",
