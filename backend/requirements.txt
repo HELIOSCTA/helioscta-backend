@@ -40,6 +40,8 @@ requests>=2.31
 # azure
 azure-storage-blob>=12.19.0
 azure-core>=1.29.0
+fsspec>=2024.1.0
+adlfs>=2024.1.0
 
 # dbt
 dbt-core==1.8.* 

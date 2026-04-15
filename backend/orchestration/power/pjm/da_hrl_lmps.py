@@ -31,7 +31,7 @@ logger = logging_utils.init_logging(
 """
 
 
-POLL_CEILING_SECONDS = 5 * 60 * 60  # 5 hours
+POLL_CEILING_SECONDS = 2 * 60 * 60  # 2 hours
 
 
 def _build_url(
@@ -192,3 +192,8 @@ def main(
 
 if __name__ == "__main__":
     df = main()
+
+    # start_date: str = (datetime.now() + relativedelta(days=0)).strftime("%Y-%m-%d 00:00")
+    # end_date: str = (datetime.now() + relativedelta(days=0)).strftime("%Y-%m-%d 23:00")
+    # df = main(start_date=start_date, end_date=end_date)
+

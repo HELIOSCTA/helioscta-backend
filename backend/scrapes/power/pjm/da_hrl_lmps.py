@@ -83,7 +83,7 @@ def _upsert(
 
 def main(
         start_date: datetime = (datetime.now() - relativedelta(days=7)),
-        end_date: datetime = (datetime.now() + relativedelta(days=1)),
+        end_date: datetime = (datetime.now() + relativedelta(days=2)),
         delta: relativedelta = relativedelta(days=1),
     ):
 

@@ -9,6 +9,7 @@ from tenacity import (
     stop_after_delay,
     stop_after_attempt,
     wait_exponential_jitter,
+    wait_fixed,
 )
 
 logger = logging.getLogger("orchestration.power.pjm")
@@ -26,15 +27,17 @@ API_TRANSIENT = (
 )
 
 
-def api_poll_policy(max_seconds: int = 18_000):
-    """Poll-until-available with exponential jitter. Default 5h ceiling.
+def api_poll_policy(max_seconds: int = 7_200):
+    """Poll-until-available with exponential jitter. Default 2h ceiling.
 
-    PJM DA LMPs are posted daily between 12:00–01:30 PM EPT.
-    The long ceiling accommodates late postings without a wall-clock check.
+    PJM DA LMPs are posted daily between 12:00–01:30 PM EPT
+    (10:00–11:30 AM MST). Script starts at 11:00 AM MST so data
+    is usually already there or imminent; aggressive polling catches
+    it fast. 2h ceiling covers late postings.
     """
     return retry(
         stop=stop_after_delay(max_seconds),
-        wait=wait_exponential_jitter(initial=30, max=300),
+        wait=wait_fixed(10),
         retry=retry_if_exception_type(API_TRANSIENT),
         before_sleep=before_sleep_log(logger, logging.WARNING),
         reraise=True,
