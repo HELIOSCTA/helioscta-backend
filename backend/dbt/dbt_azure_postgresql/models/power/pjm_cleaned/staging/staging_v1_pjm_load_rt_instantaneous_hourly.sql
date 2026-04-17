@@ -10,7 +10,11 @@
 ---------------------------
 
 SELECT
-    date + (hour_ending || ' hours')::interval AS datetime
+    DATE_TRUNC('hour', datetime_beginning_utc) AS datetime_beginning_utc
+    ,DATE_TRUNC('hour', datetime_beginning_utc) + INTERVAL '1 hour' AS datetime_ending_utc
+    ,timezone
+    ,DATE_TRUNC('hour', datetime_beginning_local) AS datetime_beginning_local
+    ,DATE_TRUNC('hour', datetime_beginning_local) + INTERVAL '1 hour' AS datetime_ending_local
     ,date
     ,hour_ending
     ,load_area AS region
@@ -18,4 +22,4 @@ SELECT
 FROM {{ ref('source_v1_pjm_five_min_load') }}
 WHERE
     load_area IN ('RTO', 'WEST', 'MIDATL', 'SOUTH')
-GROUP BY date, hour_ending, load_area
+GROUP BY 1, 2, 3, 4, 5, date, hour_ending, load_area

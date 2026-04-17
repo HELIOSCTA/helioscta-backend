@@ -72,7 +72,7 @@ models:
     # ── Meteologica ──────────────────────────────────────────────────────────────
     meteologica:
       meteologica_cleaned:
-        +schema: meteologica_cleaned
+        +schema: meteologica_cleaned_v2
         +materialized: view
         staging:
           +materialized: ephemeral
@@ -82,7 +82,7 @@ models:
     # ── Power ──────────────────────────────────────────────────────────────────
     power:
       pjm_cleaned:
-        +schema: pjm_cleaned
+        +schema: pjm_cleaned_v2
         +materialized: ephemeral
         source:
           +materialized: ephemeral
@@ -94,6 +94,14 @@ models:
           +materialized: ephemeral
         marts:
           +materialized: view
+
+      pjm_modelling:
+        +schema: pjm_modelling
+        +materialized: ephemeral
+        staging:
+          +materialized: ephemeral
+        marts:
+          +materialized: table
 
       ercot_cleaned:
         +schema: ercot_cleaned

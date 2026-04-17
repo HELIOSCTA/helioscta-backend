@@ -12,7 +12,12 @@
 
 WITH HOURLY AS (
     SELECT
-        date
+        DATE_TRUNC('hour', datetime_beginning_utc) AS datetime_beginning_utc
+        ,DATE_TRUNC('hour', datetime_beginning_utc) + INTERVAL '1 hour' AS datetime_ending_utc
+        ,timezone
+        ,DATE_TRUNC('hour', datetime_beginning_local) AS datetime_beginning_local
+        ,DATE_TRUNC('hour', datetime_beginning_local) + INTERVAL '1 hour' AS datetime_ending_local
+        ,date
         ,hour_ending
 
         ,tie_flow_name
@@ -20,11 +25,8 @@ WITH HOURLY AS (
         ,AVG(scheduled_mw) AS scheduled_mw
 
     FROM {{ ref('source_v1_pjm_five_min_tie_flows') }}
-    GROUP BY date, hour_ending, tie_flow_name
+    GROUP BY 1, 2, 3, 4, 5, 6, 7, tie_flow_name
 )
 
-SELECT
-    date + (hour_ending || ' hours')::interval AS datetime,
-    *
-FROM HOURLY
-ORDER BY date DESC, hour_ending DESC, tie_flow_name
+SELECT * FROM HOURLY
+ORDER BY datetime_ending_local DESC, tie_flow_name

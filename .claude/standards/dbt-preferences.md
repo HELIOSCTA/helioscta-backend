@@ -84,6 +84,12 @@ Multi-step staging models use numbered suffixes: `_1_combined`, `_2_forward_fill
 
 Use folder-level or model-level configs so that `source/`, `staging/`, `queries/`, and `utils/` resolve to `ephemeral`, and `marts/` resolves to `view`.
 
+**Exception — high-volume hourly time-series marts:** Marts whose backing query is too expensive to re-evaluate on every read (e.g., multi-million-row LMP unions joined for DA/RT/DART) may be materialized as `incremental` tables. Same grain rule as views. When doing this:
+- Set `incremental_strategy='delete+insert'` (project convention).
+- Define `unique_key` matching the model's grain.
+- Add `indexes=[...]` covering the `unique_key` (for fast `delete+insert` matches) and `datetime_beginning_utc` alone (for the lookback `MAX(...) FROM {{ this }}` subquery).
+- Push the `is_incremental()` lookback filter into the source-reading CTEs, not the outer SELECT, so the planner can use source-table indexes through any UNION ALL / INNER JOIN.
+
 ## Config Block Style
 
 Always at the top of every model file:
@@ -404,6 +410,32 @@ Always explicit PostgreSQL time zone conversion:
 (CURRENT_TIMESTAMP AT TIME ZONE 'MST')::DATE
 datetime_col AT TIME ZONE 'US/Eastern'
 ```
+
+### Timestamp Column Standard
+
+All dbt mart models must include a UTC timestamp, a `timezone` column, and a local timestamp so downstream consumers know the exact conversion. Column order: `_utc` → `timezone` → `_local`.
+
+```sql
+-- Column ordering
+forecast_execution_datetime_utc
+,'US/Eastern' AS timezone
+,forecast_execution_datetime_local
+```
+
+If the source only provides a local timestamp, compute the UTC equivalent:
+
+```sql
+datetime_local AT TIME ZONE 'US/Eastern' AT TIME ZONE 'UTC' AS datetime_utc
+```
+
+Rules:
+- UTC columns use a `_utc` suffix
+- The `timezone` column is an IANA timezone string (e.g., `'US/Eastern'`, `'America/Denver'`), placed after UTC and before local
+- Local columns use a `_local` suffix
+- Column order is always: `_utc` → `timezone` → `_local`
+- If both local and UTC are available from the source, carry both through
+- If all timestamps in a model share the same timezone, a single `timezone` column is sufficient
+- Downstream models (blob storage, APIs) should always have access to UTC for unambiguous timestamps
 
 ## Macros
 

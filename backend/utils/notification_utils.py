@@ -29,11 +29,11 @@ def already_notified(pipeline_name: str, target_date: str) -> bool:
 
 # ── Slack ────────────────────────────────────────────────────────────────────
 
-SEVERITY_EMOJI = {
-    "success": "✅",
-    "warning": "⚠️",
-    "error": "🚨",
-    "info": "ℹ️",
+SEVERITY_LABEL = {
+    "success": "OK",
+    "warning": "WARNING",
+    "error": "ERROR",
+    "info": "INFO",
 }
 
 
@@ -56,13 +56,19 @@ def send_slack_notification(
     if not webhook_url:
         raise ValueError("SLACK_DEFAULT_WEBHOOK_URL is not set")
 
-    emoji = SEVERITY_EMOJI.get(severity, "ℹ️")
-    header = f"{emoji}  {pipeline}" if pipeline else f"{emoji}  Alert"
+    label = SEVERITY_LABEL.get(severity, "INFO")
+    header = pipeline or "Alert"
 
     blocks = [
         {
             "type": "header",
-            "text": {"type": "plain_text", "text": header, "emoji": True},
+            "text": {"type": "plain_text", "text": header, "emoji": False},
+        },
+        {
+            "type": "context",
+            "elements": [
+                {"type": "mrkdwn", "text": f"*Status:* {label}"},
+            ],
         },
         {
             "type": "section",
@@ -81,7 +87,7 @@ def send_slack_notification(
 
     blocks.append({"type": "divider"})
 
-    payload = {"blocks": blocks, "text": f"{emoji} {message}"}
+    payload = {"blocks": blocks, "text": f"[{label}] {header}"}
     resp = requests.post(webhook_url, json=payload, timeout=10)
     resp.raise_for_status()
     logger.info(f"Slack notification sent: {message[:80]}")

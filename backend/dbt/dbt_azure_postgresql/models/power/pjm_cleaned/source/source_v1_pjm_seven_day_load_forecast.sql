@@ -10,7 +10,9 @@
 ---------------------------
 
 SELECT
-    evaluated_at_datetime_ept AS forecast_execution_datetime
+    evaluated_at_datetime_utc AS forecast_execution_datetime_utc
+    ,'US/Eastern' AS timezone
+    ,evaluated_at_datetime_ept AS forecast_execution_datetime_local
     ,evaluated_at_datetime_ept::DATE AS forecast_execution_date
 
     ,forecast_datetime_beginning_ept::DATE AS forecast_date

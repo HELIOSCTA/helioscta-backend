@@ -22,4 +22,4 @@ Tracks electricity flowing in and out of PJM through its interconnections with n
 
 ## Downstream
 
-- dbt: `pjm_cleaned.pjm_tie_flows_hourly`, `pjm_cleaned.pjm_tie_flows_daily`
+- dbt: `pjm_cleaned.pjm_tie_flows_hourly`

@@ -6,12 +6,17 @@
 
 ---------------------------
 -- DA Hourly Load (normalized)
--- Grain: 1 row per date Ã— hour Ã— region
+-- Grain: 1 row per date × hour × region
 ---------------------------
 
 WITH DA_BIDS AS (
     SELECT
-        date
+        datetime_beginning_utc
+        ,datetime_ending_utc
+        ,timezone
+        ,datetime_beginning_local
+        ,datetime_ending_local
+        ,date
         ,hour_ending
         ,mkt_region
         ,load_area
@@ -25,7 +30,12 @@ WITH DA_BIDS AS (
 
 SOUTH AS (
     SELECT
-        date
+        MAX(datetime_beginning_utc) AS datetime_beginning_utc
+        ,MAX(datetime_ending_utc) AS datetime_ending_utc
+        ,MAX(timezone) AS timezone
+        ,MAX(datetime_beginning_local) AS datetime_beginning_local
+        ,MAX(datetime_ending_local) AS datetime_ending_local
+        ,date
         ,hour_ending
         ,'SOUTH' AS mkt_region
         ,'SOUTH' AS load_area
@@ -40,7 +50,12 @@ SOUTH AS (
 
 FINAL AS (
     SELECT
-        date
+        datetime_beginning_utc
+        ,datetime_ending_utc
+        ,timezone
+        ,datetime_beginning_local
+        ,datetime_ending_local
+        ,date
         ,hour_ending
         ,load_area AS region
         ,da_load_mw
@@ -49,15 +64,17 @@ FINAL AS (
     UNION ALL
 
     SELECT
-        date
+        datetime_beginning_utc
+        ,datetime_ending_utc
+        ,timezone
+        ,datetime_beginning_local
+        ,datetime_ending_local
+        ,date
         ,hour_ending
         ,load_area AS region
         ,da_load_mw
     FROM SOUTH
 )
 
-SELECT
-    date + (hour_ending || ' hours')::interval AS datetime,
-    *
-FROM FINAL
-ORDER BY date DESC, hour_ending DESC, region
+SELECT * FROM FINAL
+ORDER BY datetime_ending_local DESC, region

@@ -26,4 +26,4 @@ Actual metered electricity load by load area. This is the "ground truth" for how
 
 ## Downstream
 
-- dbt: `pjm_cleaned.pjm_load_rt_metered_hourly`, `pjm_cleaned.pjm_load_rt_metered_daily`
+- dbt: `pjm_cleaned.pjm_load_rt_metered_hourly`

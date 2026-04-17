@@ -11,7 +11,12 @@
 
 WITH HOURLY AS (
     SELECT
-        date
+        datetime_beginning_utc
+        ,datetime_ending_utc
+        ,timezone
+        ,datetime_beginning_local
+        ,datetime_ending_local
+        ,date
         ,hour_ending
 
         ,coal
@@ -35,8 +40,5 @@ WITH HOURLY AS (
     FROM {{ ref('source_v1_gridstatus_pjm_fuel_mix_hourly') }}
 )
 
-SELECT
-    date + (hour_ending || ' hours')::interval AS datetime,
-    *
-FROM HOURLY
-ORDER BY date DESC, hour_ending DESC
+SELECT * FROM HOURLY
+ORDER BY datetime_ending_local DESC

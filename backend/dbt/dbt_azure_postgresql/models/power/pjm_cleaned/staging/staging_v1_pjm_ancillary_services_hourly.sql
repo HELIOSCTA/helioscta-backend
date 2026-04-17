@@ -16,7 +16,12 @@ WITH LONG AS (
 
 PIVOTED AS (
     SELECT
-        date
+        MAX(datetime_beginning_utc) AS datetime_beginning_utc
+        ,MAX(datetime_ending_utc) AS datetime_ending_utc
+        ,MAX(timezone) AS timezone
+        ,MAX(datetime_beginning_local) AS datetime_beginning_local
+        ,MAX(datetime_ending_local) AS datetime_ending_local
+        ,date
         ,hour_ending
 
         -- Reserve prices ($/MWh)
@@ -40,8 +45,5 @@ PIVOTED AS (
     GROUP BY date, hour_ending
 )
 
-SELECT
-    date + (hour_ending || ' hours')::interval AS datetime
-    ,*
-FROM PIVOTED
-ORDER BY date DESC, hour_ending DESC
+SELECT * FROM PIVOTED
+ORDER BY datetime_ending_local DESC

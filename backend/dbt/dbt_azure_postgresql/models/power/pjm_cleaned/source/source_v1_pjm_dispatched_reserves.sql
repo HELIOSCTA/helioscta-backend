@@ -12,8 +12,13 @@
 
 WITH RAW AS (
     SELECT
-        datetime_beginning_ept::DATE AS date
-        ,EXTRACT(HOUR FROM datetime_beginning_ept) + 1 AS hour_ending
+        DATE_TRUNC('hour', datetime_beginning_utc) AS datetime_beginning_utc
+        ,DATE_TRUNC('hour', datetime_beginning_utc) + INTERVAL '1 hour' AS datetime_ending_utc
+        ,'US/Eastern' AS timezone
+        ,DATE_TRUNC('hour', datetime_beginning_ept) AS datetime_beginning_local
+        ,DATE_TRUNC('hour', datetime_beginning_ept) + INTERVAL '1 hour' AS datetime_ending_local
+        ,datetime_beginning_ept::DATE AS date
+        ,(EXTRACT(HOUR FROM datetime_beginning_ept) + 1)::INT AS hour_ending
         ,area
         ,reserve_type
         ,reserve_quantity::NUMERIC AS reserve_quantity_mw
@@ -34,7 +39,12 @@ WITH RAW AS (
 
 HOURLY AS (
     SELECT
-        date
+        datetime_beginning_utc
+        ,datetime_ending_utc
+        ,timezone
+        ,datetime_beginning_local
+        ,datetime_ending_local
+        ,date
         ,hour_ending
         ,area
         ,reserve_type
@@ -46,8 +56,8 @@ HOURLY AS (
         ,MAX(market_clearing_price) AS market_clearing_price
         ,BOOL_OR(shortage_indicator) AS shortage_indicator
     FROM RAW
-    GROUP BY date, hour_ending, area, reserve_type
+    GROUP BY datetime_beginning_utc, datetime_ending_utc, timezone, datetime_beginning_local, datetime_ending_local, date, hour_ending, area, reserve_type
 )
 
 SELECT * FROM HOURLY
-ORDER BY date DESC, hour_ending DESC, area, reserve_type
+ORDER BY datetime_ending_local DESC, area, reserve_type

@@ -1,0 +1,27 @@
+name: helioscta-power-pjm
+
+prefect-version: 3.0.0
+
+build: null
+push: null
+
+pull:
+  - prefect.deployments.steps.set_working_directory:
+      directory: /app
+
+deployments:
+
+  # ────── PJM GridStatus Forecasts (Load, Solar, Wind) ──────
+  # Hourly scrape of latest GridStatus-sourced PJM forecasts (load 2x/hr, solar/wind ~10-min cadence)
+
+  - name: Power - PJM GridStatus Forecasts
+    entrypoint: schedulers/prefect/power/pjm/pjm_gridstatus_forecasts_flows.py:pjm_gridstatus_forecasts
+    work_pool:
+      name: default-agent-pool
+      work_queue_name: default
+    tags: [pjm, power, gridstatus, forecast]
+    schedules:
+
+      # ────── Hourly at the top of the hour ──────
+      - cron: "0 * * * *"
+        timezone: "America/Denver"

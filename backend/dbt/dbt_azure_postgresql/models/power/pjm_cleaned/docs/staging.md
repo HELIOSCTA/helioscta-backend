@@ -48,7 +48,6 @@ Day-ahead cleared load from PJM demand bids, broken down by region.
 | Model | Grain |
 |-------|-------|
 | `staging_v1_pjm_load_da_hourly` | date × hour_ending × region |
-| `staging_v1_pjm_load_da_daily` | date × region × period |
 
 {% enddocs %}
 
@@ -76,9 +75,7 @@ Three tiers of real-time load data, each with different latency and accuracy:
 | Model | Grain |
 |-------|-------|
 | `staging_v1_pjm_load_rt_metered_hourly` | date × hour_ending × region |
-| `staging_v1_pjm_load_rt_metered_daily` | date × region × period |
 | `staging_v1_pjm_load_rt_prelim_hourly` | date × hour_ending × region |
-| `staging_v1_pjm_load_rt_prelim_daily` | date × region × period |
 | `staging_v1_pjm_load_rt_instantaneous_hourly` | date × hour_ending × region |
 
 {% enddocs %}
@@ -106,7 +103,6 @@ revisions are issued per day; models retain all revisions ranked by issue time
 | Model | Grain |
 |-------|-------|
 | `staging_v1_pjm_load_forecast_hourly` | forecast_rank × forecast_date × hour_ending × region |
-| `staging_v1_pjm_load_forecast_daily` | forecast_rank × forecast_date × region × period |
 | `staging_v1_gridstatus_pjm_load_forecast_hourly` | forecast_rank × forecast_date × hour_ending × region |
 
 {% enddocs %}
@@ -135,7 +131,6 @@ Hourly and daily generation by fuel type across the PJM RTO footprint.
 | Model | Grain |
 |-------|-------|
 | `staging_v1_pjm_fuel_mix_hourly` | date × hour_ending |
-| `staging_v1_pjm_fuel_mix_daily` | date × period |
 
 {% enddocs %}
 
@@ -184,7 +179,6 @@ neighboring systems.
 | Model | Grain |
 |-------|-------|
 | `staging_v1_pjm_tie_flows_hourly` | date × hour_ending × tie_flow_name |
-| `staging_v1_pjm_tie_flows_daily` | date × tie_flow_name × period |
 
 ### Columns
 - **actual_mw** — measured power flow
@@ -230,9 +224,7 @@ Hourly ancillary services prices pivoted from long format into wide columns.
 Hourly dispatched reserve data with clearing price, shortage indicator, and reserve margin.
 
 ### Data Sources
-- PJM Data Miner 2 `dispatched_reserves` — 5-min updates, aggregated to hourly (primary)
-- PJM Data Miner 2 `operational_reserves` — 15-sec real-time snapshots
-- PJM Data Miner 2 `real_time_dispatched_reserves` — daily archival with deficit MW
+- PJM Data Miner 2 `dispatched_reserves` — 5-min updates, aggregated to hourly
 
 ### Key Transformations
 - 5-minute `dispatched_reserves` aggregated to hourly: AVG for MW, MAX for clearing price, `BOOL_OR` for shortage
@@ -254,31 +246,23 @@ Hourly dispatched reserve data with clearing price, shortage indicator, and rese
 {% enddocs %}
 
 
-{% docs pjm_five_min_lmps %}
+{% docs pjm_lmps_rt_five_min %}
 
 ## 5-Minute Real-Time LMPs
 
-Sub-hourly LMP data revealing intra-hour price spike severity masked by hourly averages.
+5-minute RT LMPs by hub, exposed at the native 5-min grain (no hourly aggregation).
 
 ### Data Source
-- PJM Data Miner 2 `unverified_five_min_lmps` — filtered to `type = hub` at ingestion
-
-### Key Transformations
-- 5-minute intervals aggregated to hourly: AVG, MAX, MIN, and range per hub
-- **Spike ratio** computed as `MAX / AVG` — values >> 1 indicate masked spikes
+- PJM Data Miner 2 `unverified_five_min_lmps` — filtered to `type = HUB` at ingestion
 
 ### Models
 
 | Model | Grain |
 |-------|-------|
-| `staging_v1_pjm_five_min_lmps_hourly` | date × hour_ending × hub |
+| `staging_v1_pjm_lmps_rt_five_min` | datetime_beginning_utc × hub |
 
 ### Key Columns
-- **rt_lmp_avg** — hourly average of 5-min intervals
-- **rt_lmp_max** — maximum 5-min LMP in the hour (spike severity)
-- **rt_lmp_min** — minimum 5-min LMP in the hour
-- **rt_lmp_range** — max minus min (intra-hour volatility)
-- **spike_ratio** — max / avg (>> 1 = masked spike)
+- **rt_lmp** — 5-minute real-time LMP ($/MWh)
 
 {% enddocs %}
 
@@ -300,8 +284,8 @@ Sub-hourly LMP data revealing intra-hour price spike severity masked by hourly a
 
 | Model | Grain | Key Columns |
 |-------|-------|-------------|
-| `staging_v1_pjm_solar_forecast_hourly` | forecast_rank × forecast_date × hour_ending | `solar_forecast`, `solar_forecast_btm` |
-| `staging_v1_pjm_wind_forecast_hourly` | forecast_rank × forecast_date × hour_ending | `wind_forecast` |
+| `staging_v1_gridstatus_pjm_solar_forecast_hourly` | forecast_rank × forecast_date × hour_ending | `solar_forecast`, `solar_forecast_btm` |
+| `staging_v1_gridstatus_pjm_wind_forecast_hourly` | forecast_rank × forecast_date × hour_ending | `wind_forecast` |
 
 ### Solar Components
 - **solar_forecast** — front-of-meter (utility-scale) solar generation

@@ -92,17 +92,36 @@ marts/           Analysis-ready views (VIEW, 9 models)
 
 Meteologica publishes forecast updates **2-4 times per day** per content. Each update produces
 a multi-day forward forecast horizon. All vintages are retained and ranked by issue time
-(earliest first) via `DENSE_RANK` on `forecast_execution_datetime` (forecasts) or
-`update_datetime` (observations, projections, normals).
+(earliest first) via `DENSE_RANK` on `forecast_execution_datetime_local` (forecasts) or
+`update_datetime_local` (observations, projections, normals).
 
 ## Timezone Handling
 
-Raw Meteologica data (`issue_date`, `forecast_period_start`) is stored in **EPT**
-(Eastern Prevailing Time). Staging models extract date and hour components directly —
-no timezone conversion is needed.
+Every mart exposes a **UTC / timezone / local triplet** for each timestamp, per the
+project-wide `_utc → timezone → _local` standard. `timezone` is always `'US/Eastern'`
+(Eastern Prevailing Time — EPT).
 
-All columns in the final views are in EPT:
-- `forecast_date` / `observation_date` / `projection_date` / `normal_date` / `hour_ending` — EPT
+- Raw `issue_date` is a UTC string; staging casts it naive-UTC → naive-EPT to produce
+  `*_datetime_utc` + `*_datetime_local`.
+- Raw `forecast_period_start` is a naive EPT `TIMESTAMP` at the start of each clock hour;
+  the hour-ending target triplet is `forecast_period_start + INTERVAL '1 hour'` (local) and
+  the equivalent value in UTC.
+- Interval-target columns (hour-ending or 5-min-block timestamps) use the `_datetime_ending_*`
+  suffix: `forecast_datetime_ending_*`, `observation_datetime_ending_*`,
+  `projection_datetime_ending_*`, `normal_datetime_ending_*`.
+- Point-in-time issue-time columns stay unsuffixed: `forecast_execution_datetime_*` and
+  `update_datetime_*`.
+- Date columns carry local semantics: `forecast_date`, `observation_date`, `projection_date`,
+  `normal_date`, `forecast_execution_date`, `update_date` are EPT dates.
+
+### 5-min Demand Observation Exception
+
+`staging_v1_meteologica_pjm_demand_observation` / `meteologica_pjm_demand_observation_5min`
+expose `observation_datetime_ending_utc` and `observation_datetime_ending_local` whose values
+actually represent the **start** of each 5-minute block (matching prior semantics). The
+`_ending` name is used for consistency with the hourly marts; shifting the values forward
+would break the downstream hourly rollup in `meteologica_pjm_demand_observation_hourly`,
+which relies on `EXTRACT(HOUR FROM observation_datetime_ending_local) + 1 = hour_ending`.
 
 ## Known Issues
 
@@ -124,8 +143,10 @@ forecast_date should handle this gracefully.
 
 ### Raw Columns Stored as VARCHAR
 
-The `issue_date` column in raw Meteologica tables is stored as `VARCHAR`, not `TIMESTAMP`.
-Staging models cast explicitly with `issue_date::TIMESTAMP`.
-The `forecast_period_start` column is natively `TIMESTAMP`.
+The `issue_date` column in raw Meteologica tables is stored as `VARCHAR` (UTC),
+not `TIMESTAMP`. Staging models cast explicitly with `issue_date::TIMESTAMP` and then apply
+`AT TIME ZONE 'UTC' AT TIME ZONE 'America/New_York'` to derive the `_local` variant.
+The `forecast_period_start` column is natively `TIMESTAMP` (naive EPT at the hour boundary;
+naive UTC for the 5-min demand observation source).
 
 {% enddocs %}

@@ -1,8 +1,11 @@
 select
   update_rank
-  ,update_datetime
+  ,update_datetime_utc
+  ,timezone
+  ,update_datetime_local
   ,update_date
-  ,projection_datetime
+  ,projection_datetime_ending_utc
+  ,projection_datetime_ending_local
   ,projection_date
   ,hour_ending
   ,region

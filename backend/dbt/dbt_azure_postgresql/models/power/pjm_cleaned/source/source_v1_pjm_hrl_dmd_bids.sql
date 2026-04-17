@@ -11,8 +11,13 @@
 
 WITH DA_BIDS AS (
     SELECT
-        DATE(datetime_beginning_ept) AS date
-        ,EXTRACT(HOUR FROM datetime_beginning_ept) + 1 AS hour_ending
+        datetime_beginning_utc
+        ,datetime_beginning_utc + INTERVAL '1 hour' AS datetime_ending_utc
+        ,'US/Eastern' AS timezone
+        ,datetime_beginning_ept AS datetime_beginning_local
+        ,datetime_beginning_ept + INTERVAL '1 hour' AS datetime_ending_local
+        ,DATE(datetime_beginning_ept) AS date
+        ,(EXTRACT(HOUR FROM datetime_beginning_ept) + 1)::INT AS hour_ending
 
         ,CASE
             WHEN area = 'PJM_RTO' THEN 'RTO'
@@ -36,4 +41,4 @@ WITH DA_BIDS AS (
 
 SELECT * FROM DA_BIDS
 WHERE mkt_region IS NOT NULL
-ORDER BY date DESC, hour_ending DESC, load_area
+ORDER BY datetime_ending_local DESC, load_area

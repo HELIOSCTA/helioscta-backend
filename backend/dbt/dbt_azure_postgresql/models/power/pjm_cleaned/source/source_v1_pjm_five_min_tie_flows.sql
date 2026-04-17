@@ -11,8 +11,11 @@
 
 WITH FIVE_MIN AS (
     SELECT
-        datetime_beginning_ept::DATE AS date
-        ,EXTRACT(HOUR FROM datetime_beginning_ept) + 1 AS hour_ending
+        datetime_beginning_utc
+        ,'US/Eastern' AS timezone
+        ,datetime_beginning_ept AS datetime_beginning_local
+        ,datetime_beginning_ept::DATE AS date
+        ,(EXTRACT(HOUR FROM datetime_beginning_ept) + 1)::INT AS hour_ending
 
         ,tie_flow_name
         ,actual_mw::NUMERIC AS actual_mw
@@ -24,4 +27,4 @@ WITH FIVE_MIN AS (
 )
 
 SELECT * FROM FIVE_MIN
-ORDER BY date DESC, hour_ending DESC, tie_flow_name
+ORDER BY datetime_beginning_local DESC, tie_flow_name

@@ -11,8 +11,13 @@
 
 WITH DA_LMPS AS (
     SELECT
-        DATE(datetime_beginning_ept) AS date
-        ,EXTRACT(HOUR FROM datetime_beginning_ept) + 1 AS hour_ending
+        datetime_beginning_utc
+        ,datetime_beginning_utc + INTERVAL '1 hour' AS datetime_ending_utc
+        ,'US/Eastern' AS timezone
+        ,datetime_beginning_ept AS datetime_beginning_local
+        ,datetime_beginning_ept + INTERVAL '1 hour' AS datetime_ending_local
+        ,DATE(datetime_beginning_ept) AS date
+        ,(EXTRACT(HOUR FROM datetime_beginning_ept) + 1)::INT AS hour_ending
 
         ,pnode_name AS hub
 

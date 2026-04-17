@@ -11,12 +11,18 @@ models:
     columns:
       - name: forecast_rank
         description: '{{ doc("col_meteologica_forecast_rank") }}'
-      - name: forecast_execution_datetime
-        description: '{{ doc("col_forecast_execution_datetime") }}'
+      - name: forecast_execution_datetime_utc
+        description: '{{ doc("col_forecast_execution_datetime_utc") }}'
+      - name: timezone
+        description: '{{ doc("col_timezone") }}'
+      - name: forecast_execution_datetime_local
+        description: '{{ doc("col_forecast_execution_datetime_local") }}'
       - name: forecast_execution_date
         description: '{{ doc("col_forecast_execution_date") }}'
-      - name: forecast_datetime
-        description: '{{ doc("col_forecast_datetime") }}'
+      - name: forecast_datetime_ending_utc
+        description: '{{ doc("col_forecast_datetime_ending_utc") }}'
+      - name: forecast_datetime_ending_local
+        description: '{{ doc("col_forecast_datetime_ending_local") }}'
       - name: forecast_date
         description: '{{ doc("col_forecast_date") }}'
       - name: hour_ending
@@ -37,16 +43,26 @@ models:
         description: '{{ doc("col_meteologica_forecast_rank") }}'
         tests:
           - not_null
-      - name: forecast_execution_datetime
-        description: '{{ doc("col_forecast_execution_datetime") }}'
+      - name: forecast_execution_datetime_utc
+        description: '{{ doc("col_forecast_execution_datetime_utc") }}'
+        tests:
+          - not_null
+      - name: timezone
+        description: '{{ doc("col_timezone") }}'
+        tests:
+          - not_null
+      - name: forecast_execution_datetime_local
+        description: '{{ doc("col_forecast_execution_datetime_local") }}'
         tests:
           - not_null
       - name: forecast_execution_date
         description: '{{ doc("col_forecast_execution_date") }}'
         tests:
           - not_null
-      - name: forecast_datetime
-        description: '{{ doc("col_forecast_datetime") }}'
+      - name: forecast_datetime_ending_utc
+        description: '{{ doc("col_forecast_datetime_ending_utc") }}'
+      - name: forecast_datetime_ending_local
+        description: '{{ doc("col_forecast_datetime_ending_local") }}'
       - name: forecast_date
         description: '{{ doc("col_forecast_date") }}'
         tests:
@@ -115,16 +131,26 @@ models:
         description: '{{ doc("col_meteologica_forecast_rank") }}'
         tests:
           - not_null
-      - name: forecast_execution_datetime
-        description: '{{ doc("col_forecast_execution_datetime") }}'
+      - name: forecast_execution_datetime_utc
+        description: '{{ doc("col_forecast_execution_datetime_utc") }}'
+        tests:
+          - not_null
+      - name: timezone
+        description: '{{ doc("col_timezone") }}'
+        tests:
+          - not_null
+      - name: forecast_execution_datetime_local
+        description: '{{ doc("col_forecast_execution_datetime_local") }}'
         tests:
           - not_null
       - name: forecast_execution_date
         description: '{{ doc("col_forecast_execution_date") }}'
         tests:
           - not_null
-      - name: forecast_datetime
-        description: '{{ doc("col_forecast_datetime") }}'
+      - name: forecast_datetime_ending_utc
+        description: '{{ doc("col_forecast_datetime_ending_utc") }}'
+      - name: forecast_datetime_ending_local
+        description: '{{ doc("col_forecast_datetime_ending_local") }}'
       - name: forecast_date
         description: '{{ doc("col_forecast_date") }}'
         tests:
@@ -171,16 +197,26 @@ models:
         description: '{{ doc("col_meteologica_forecast_rank") }}'
         tests:
           - not_null
-      - name: forecast_execution_datetime
-        description: '{{ doc("col_forecast_execution_datetime") }}'
+      - name: forecast_execution_datetime_utc
+        description: '{{ doc("col_forecast_execution_datetime_utc") }}'
+        tests:
+          - not_null
+      - name: timezone
+        description: '{{ doc("col_timezone") }}'
+        tests:
+          - not_null
+      - name: forecast_execution_datetime_local
+        description: '{{ doc("col_forecast_execution_datetime_local") }}'
         tests:
           - not_null
       - name: forecast_execution_date
         description: '{{ doc("col_forecast_execution_date") }}'
         tests:
           - not_null
-      - name: forecast_datetime
-        description: '{{ doc("col_forecast_datetime") }}'
+      - name: forecast_datetime_ending_utc
+        description: '{{ doc("col_forecast_datetime_ending_utc") }}'
+      - name: forecast_datetime_ending_local
+        description: '{{ doc("col_forecast_datetime_ending_local") }}'
       - name: forecast_date
         description: '{{ doc("col_forecast_date") }}'
         tests:
@@ -212,7 +248,7 @@ models:
         description: '{{ doc("col_forecast_da_price") }}'
 
   # ===========================
-  # Demand Observation
+  # Demand Observation (5-min)
   # ===========================
 
   - name: staging_v1_meteologica_pjm_demand_observation
@@ -220,14 +256,20 @@ models:
     columns:
       - name: update_rank
         description: "Dense rank of observation update by issue time (earliest = 1)"
-      - name: update_datetime
-        description: "When Meteologica published this observation (EPT)"
+      - name: update_datetime_utc
+        description: '{{ doc("col_update_datetime_utc") }}'
+      - name: timezone
+        description: '{{ doc("col_timezone") }}'
+      - name: update_datetime_local
+        description: '{{ doc("col_update_datetime_local") }}'
       - name: update_date
-        description: "Date portion of update_datetime"
-      - name: observation_datetime
-        description: "5-minute observation timestamp (EPT)"
+        description: '{{ doc("col_update_date") }}'
+      - name: observation_datetime_ending_utc
+        description: '{{ doc("col_observation_datetime_ending_utc_5min") }}'
+      - name: observation_datetime_ending_local
+        description: '{{ doc("col_observation_datetime_ending_local_5min") }}'
       - name: observation_date
-        description: "Date of the observation"
+        description: "Date of the observation (EPT)"
       - name: region
         description: "PJM demand zone"
         tests:
@@ -283,18 +325,28 @@ models:
         description: "Dense rank of observation update by issue time (earliest = 1)"
         tests:
           - not_null
-      - name: update_datetime
-        description: "When Meteologica published this observation (EPT)"
+      - name: update_datetime_utc
+        description: '{{ doc("col_update_datetime_utc") }}'
+        tests:
+          - not_null
+      - name: timezone
+        description: '{{ doc("col_timezone") }}'
+        tests:
+          - not_null
+      - name: update_datetime_local
+        description: '{{ doc("col_update_datetime_local") }}'
         tests:
           - not_null
       - name: update_date
-        description: "Date portion of update_datetime"
+        description: '{{ doc("col_update_date") }}'
         tests:
           - not_null
-      - name: observation_datetime
-        description: "Observation hour slot (EPT)"
+      - name: observation_datetime_ending_utc
+        description: '{{ doc("col_observation_datetime_ending_utc") }}'
+      - name: observation_datetime_ending_local
+        description: '{{ doc("col_observation_datetime_ending_local") }}'
       - name: observation_date
-        description: "Date of the observation"
+        description: "Date of the observation (EPT)"
         tests:
           - not_null
       - name: hour_ending
@@ -331,18 +383,28 @@ models:
         description: "Dense rank of observation update by issue time (earliest = 1)"
         tests:
           - not_null
-      - name: update_datetime
-        description: "When Meteologica published this observation (EPT)"
+      - name: update_datetime_utc
+        description: '{{ doc("col_update_datetime_utc") }}'
+        tests:
+          - not_null
+      - name: timezone
+        description: '{{ doc("col_timezone") }}'
+        tests:
+          - not_null
+      - name: update_datetime_local
+        description: '{{ doc("col_update_datetime_local") }}'
         tests:
           - not_null
       - name: update_date
-        description: "Date portion of update_datetime"
+        description: '{{ doc("col_update_date") }}'
         tests:
           - not_null
-      - name: observation_datetime
-        description: "Observation hour slot (EPT)"
+      - name: observation_datetime_ending_utc
+        description: '{{ doc("col_observation_datetime_ending_utc") }}'
+      - name: observation_datetime_ending_local
+        description: '{{ doc("col_observation_datetime_ending_local") }}'
       - name: observation_date
-        description: "Date of the observation"
+        description: "Date of the observation (EPT)"
         tests:
           - not_null
       - name: hour_ending
@@ -382,18 +444,28 @@ models:
         description: "Dense rank of projection update by issue time (earliest = 1)"
         tests:
           - not_null
-      - name: update_datetime
-        description: "When Meteologica published this projection (EPT)"
+      - name: update_datetime_utc
+        description: '{{ doc("col_update_datetime_utc") }}'
+        tests:
+          - not_null
+      - name: timezone
+        description: '{{ doc("col_timezone") }}'
+        tests:
+          - not_null
+      - name: update_datetime_local
+        description: '{{ doc("col_update_datetime_local") }}'
         tests:
           - not_null
       - name: update_date
-        description: "Date portion of update_datetime"
+        description: '{{ doc("col_update_date") }}'
         tests:
           - not_null
-      - name: projection_datetime
-        description: "Projection hour slot (EPT)"
+      - name: projection_datetime_ending_utc
+        description: '{{ doc("col_projection_datetime_ending_utc") }}'
+      - name: projection_datetime_ending_local
+        description: '{{ doc("col_projection_datetime_ending_local") }}'
       - name: projection_date
-        description: "Date of the projection"
+        description: "Date of the projection (EPT)"
         tests:
           - not_null
       - name: hour_ending
@@ -453,18 +525,28 @@ models:
         description: "Dense rank of normal update by issue time (earliest = 1)"
         tests:
           - not_null
-      - name: update_datetime
-        description: "When Meteologica published this normal (EPT)"
+      - name: update_datetime_utc
+        description: '{{ doc("col_update_datetime_utc") }}'
+        tests:
+          - not_null
+      - name: timezone
+        description: '{{ doc("col_timezone") }}'
+        tests:
+          - not_null
+      - name: update_datetime_local
+        description: '{{ doc("col_update_datetime_local") }}'
         tests:
           - not_null
       - name: update_date
-        description: "Date portion of update_datetime"
+        description: '{{ doc("col_update_date") }}'
         tests:
           - not_null
-      - name: normal_datetime
-        description: "Normal hour slot (EPT)"
+      - name: normal_datetime_ending_utc
+        description: '{{ doc("col_normal_datetime_ending_utc") }}'
+      - name: normal_datetime_ending_local
+        description: '{{ doc("col_normal_datetime_ending_local") }}'
       - name: normal_date
-        description: "Date of the normal"
+        description: "Date of the normal (EPT)"
         tests:
           - not_null
       - name: hour_ending

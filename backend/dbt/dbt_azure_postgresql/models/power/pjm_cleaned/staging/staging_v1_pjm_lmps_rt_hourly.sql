@@ -12,7 +12,12 @@
 
 WITH RT_VERIFIED AS (
     SELECT
-        date
+        datetime_beginning_utc
+        ,datetime_ending_utc
+        ,timezone
+        ,datetime_beginning_local
+        ,datetime_ending_local
+        ,date
         ,hour_ending
         ,hub
         ,'verified' AS source_table
@@ -25,7 +30,12 @@ WITH RT_VERIFIED AS (
 
 RT_UNVERIFIED AS (
     SELECT
-        date
+        datetime_beginning_utc
+        ,datetime_ending_utc
+        ,timezone
+        ,datetime_beginning_local
+        ,datetime_ending_local
+        ,date
         ,hour_ending
         ,hub
         ,'unverified' AS source_table
@@ -58,7 +68,12 @@ RT_RANKED AS (
 
 FINAL AS (
     SELECT
-        date
+        datetime_beginning_utc
+        ,datetime_ending_utc
+        ,timezone
+        ,datetime_beginning_local
+        ,datetime_ending_local
+        ,date
         ,hour_ending
         ,hub
         ,rt_lmp_total
@@ -69,8 +84,5 @@ FINAL AS (
     WHERE priority_rank = 1
 )
 
-SELECT
-    date + (hour_ending || ' hours')::interval AS datetime,
-    *
-FROM FINAL
+SELECT * FROM FINAL
 ORDER BY date DESC, hour_ending DESC, hub

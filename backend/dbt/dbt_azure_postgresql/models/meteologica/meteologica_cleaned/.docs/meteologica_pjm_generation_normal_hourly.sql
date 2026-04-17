@@ -1,8 +1,11 @@
 select
   update_rank
-  ,update_datetime
+  ,update_datetime_utc
+  ,timezone
+  ,update_datetime_local
   ,update_date
-  ,normal_datetime
+  ,normal_datetime_ending_utc
+  ,normal_datetime_ending_local
   ,normal_date
   ,hour_ending
   ,source

@@ -6,8 +6,8 @@
 
 ---------------------------
 -- Meteologica PJM Generation Forecast (Hourly)
--- UNIONs 17 raw tables (solar, wind, hydro × RTO + sub-regions), normalizes to EPT date + hour_ending,
--- filters to complete 24h forecasts, ranks by issue time (earliest first)
+-- UNIONs 17 raw tables (solar, wind, hydro × RTO + sub-regions), produces UTC/timezone/local
+-- triplets for issue time and hour-ending target time, ranks by issue time (earliest first).
 -- Grain: 1 row per forecast_rank × forecast_date × hour_ending × source × region
 ---------------------------
 
@@ -251,17 +251,23 @@ WITH UNIONED AS (
 ),
 
 ---------------------------
--- NORMALIZE TIMESTAMPS TO EPT
+-- NORMALIZE TIMESTAMPS (UTC + timezone + local triplets)
 ---------------------------
 
 NORMALIZED AS (
     SELECT
         source
         ,region
-        ,(issue_date::TIMESTAMP AT TIME ZONE 'UTC' AT TIME ZONE 'America/New_York') AS forecast_execution_datetime
+        ,issue_date::TIMESTAMP AS forecast_execution_datetime_utc
+        ,'US/Eastern' AS timezone
+        ,(issue_date::TIMESTAMP AT TIME ZONE 'UTC' AT TIME ZONE 'America/New_York') AS forecast_execution_datetime_local
         ,(issue_date::TIMESTAMP AT TIME ZONE 'UTC' AT TIME ZONE 'America/New_York')::DATE AS forecast_execution_date
+
+        ,((forecast_period_start + INTERVAL '1 hour') AT TIME ZONE 'America/New_York' AT TIME ZONE 'UTC') AS forecast_datetime_ending_utc
+        ,(forecast_period_start + INTERVAL '1 hour') AS forecast_datetime_ending_local
         ,forecast_period_start::DATE AS forecast_date
         ,EXTRACT(HOUR FROM forecast_period_start)::INT + 1 AS hour_ending
+
         ,forecast_mw::NUMERIC AS forecast_mw
     FROM UNIONED
 ),
@@ -275,15 +281,15 @@ FORECAST_RANK AS (
         forecast_date
         ,source
         ,region
-        ,forecast_execution_datetime
+        ,forecast_execution_datetime_local
 
         ,DENSE_RANK() OVER (
             PARTITION BY forecast_date, source, region
-            ORDER BY forecast_execution_datetime ASC
+            ORDER BY forecast_execution_datetime_local ASC
         ) AS forecast_rank
 
     FROM (
-        SELECT DISTINCT forecast_execution_datetime, forecast_date, source, region
+        SELECT DISTINCT forecast_execution_datetime_local, forecast_date, source, region
         FROM NORMALIZED
     ) sub
 ),
@@ -295,10 +301,13 @@ FINAL AS (
     SELECT
         r.forecast_rank
 
-        ,n.forecast_execution_datetime
+        ,n.forecast_execution_datetime_utc
+        ,n.timezone
+        ,n.forecast_execution_datetime_local
         ,n.forecast_execution_date
 
-        ,(n.forecast_date + INTERVAL '1 hour' * (n.hour_ending - 1)) AS forecast_datetime
+        ,n.forecast_datetime_ending_utc
+        ,n.forecast_datetime_ending_local
         ,n.forecast_date
         ,n.hour_ending
 
@@ -308,13 +317,13 @@ FINAL AS (
 
     FROM NORMALIZED n
     JOIN FORECAST_RANK r
-        ON n.forecast_execution_datetime = r.forecast_execution_datetime
+        ON n.forecast_execution_datetime_local = r.forecast_execution_datetime_local
         AND n.forecast_date = r.forecast_date
         AND n.source = r.source
         AND n.region = r.region
 )
 
 SELECT * FROM FINAL
-ORDER BY forecast_date DESC, forecast_execution_datetime DESC, hour_ending, source, region
+ORDER BY forecast_date DESC, forecast_execution_datetime_local DESC, hour_ending, source, region
 
 

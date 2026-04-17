@@ -59,21 +59,22 @@ models:
   - name: staging_v1_pjm_load_da_hourly
     description: '{{ doc("pjm_load_da") }}'
     columns:
+      - name: datetime_beginning_utc
+        description: "Start of the hour interval (UTC)."
+      - name: datetime_ending_utc
+        description: "End of the hour interval (UTC)."
+      - name: timezone
+        description: "IANA timezone of all local timestamps (e.g., US/Eastern)."
+      - name: datetime_beginning_local
+        description: "Start of the hour interval (local time, see timezone column)."
+      - name: datetime_ending_local
+        description: "End of the hour interval (local time, see timezone column)."
       - name: date
       - name: hour_ending
       - name: region
         description: '{{ doc("col_region") }}'
       - name: da_load_mw
         description: "Day-ahead cleared load (MW)"
-
-  - name: staging_v1_pjm_load_da_daily
-    description: "Daily day-ahead load by region and period. Grain: date x region x period."
-    columns:
-      - name: date
-      - name: region
-      - name: period
-      - name: da_load
-        description: "Day-ahead load aggregate for the period (MW)"
 
   # ===========================
   # Load — Real-Time
@@ -82,42 +83,54 @@ models:
   - name: staging_v1_pjm_load_rt_metered_hourly
     description: '{{ doc("pjm_load_rt") }}'
     columns:
+      - name: datetime_beginning_utc
+        description: "Start of the hour interval (UTC)."
+      - name: datetime_ending_utc
+        description: "End of the hour interval (UTC)."
+      - name: timezone
+        description: "IANA timezone of all local timestamps (e.g., US/Eastern)."
+      - name: datetime_beginning_local
+        description: "Start of the hour interval (local time, see timezone column)."
+      - name: datetime_ending_local
+        description: "End of the hour interval (local time, see timezone column)."
       - name: date
       - name: hour_ending
       - name: region
       - name: rt_load_mw
         description: "Real-time metered load (MW)"
 
-  - name: staging_v1_pjm_load_rt_metered_daily
-    description: "Daily real-time metered load by region and period. Holiday-aware OnPeak/OffPeak. Grain: date x region x period."
-    columns:
-      - name: date
-      - name: region
-      - name: period
-      - name: rt_load_mw
-        description: "Real-time metered load aggregate for the period (MW)"
-
   - name: staging_v1_pjm_load_rt_prelim_hourly
     description: "Hourly real-time preliminary load by region. Same-day with ~1 hour lag. Grain: date x hour_ending x region."
     columns:
+      - name: datetime_beginning_utc
+        description: "Start of the hour interval (UTC)."
+      - name: datetime_ending_utc
+        description: "End of the hour interval (UTC)."
+      - name: timezone
+        description: "IANA timezone of all local timestamps (e.g., US/Eastern)."
+      - name: datetime_beginning_local
+        description: "Start of the hour interval (local time, see timezone column)."
+      - name: datetime_ending_local
+        description: "End of the hour interval (local time, see timezone column)."
       - name: date
       - name: hour_ending
       - name: region
       - name: rt_load_mw
         description: "Real-time preliminary load (MW)"
 
-  - name: staging_v1_pjm_load_rt_prelim_daily
-    description: "Daily real-time preliminary load by region and period. Holiday-aware OnPeak/OffPeak. Grain: date x region x period."
-    columns:
-      - name: date
-      - name: region
-      - name: period
-      - name: rt_load_mw
-        description: "Real-time preliminary load aggregate for the period (MW)"
-
   - name: staging_v1_pjm_load_rt_instantaneous_hourly
     description: "Hourly real-time instantaneous load (5-min averaged to hourly) by region. Near real-time. Grain: date x hour_ending x region."
     columns:
+      - name: datetime_beginning_utc
+        description: "Start of the hour interval (UTC)."
+      - name: datetime_ending_utc
+        description: "End of the hour interval (UTC)."
+      - name: timezone
+        description: "IANA timezone of all local timestamps (e.g., US/Eastern)."
+      - name: datetime_beginning_local
+        description: "Start of the hour interval (local time, see timezone column)."
+      - name: datetime_ending_local
+        description: "End of the hour interval (local time, see timezone column)."
       - name: date
       - name: hour_ending
       - name: region
@@ -133,8 +146,12 @@ models:
     columns:
       - name: forecast_rank
         description: '{{ doc("col_forecast_rank") }}'
-      - name: forecast_execution_datetime
-        description: "When the forecast was issued"
+      - name: forecast_execution_datetime_utc
+        description: "When the forecast was issued (UTC)."
+      - name: timezone
+        description: "IANA timezone of all local timestamps (e.g., US/Eastern)."
+      - name: forecast_execution_datetime_local
+        description: "When the forecast was issued (local time, see timezone column)."
       - name: forecast_date
         description: "The date being forecasted"
       - name: hour_ending
@@ -142,19 +159,15 @@ models:
       - name: forecast_load_mw
         description: "Forecasted load (MW)"
 
-  - name: staging_v1_pjm_load_forecast_daily
-    description: "PJM 7-day daily load forecast by region and period. Holiday-aware OnPeak/OffPeak. Grain: forecast_rank x forecast_date x region x period."
-    columns:
-      - name: forecast_rank
-      - name: forecast_date
-      - name: region
-      - name: period
-      - name: forecast_load_mw
-        description: "Forecasted load aggregate for the period (MW)"
-
   - name: staging_v1_gridstatus_pjm_load_forecast_hourly
     description: "PJM 7-day hourly load forecast (from GridStatus). Complete forecasts only, ranked by issue time (earliest first). Grain: forecast_rank x forecast_date x hour_ending x region."
     columns:
+      - name: forecast_execution_datetime_utc
+        description: "When the forecast was issued (UTC)."
+      - name: timezone
+        description: "IANA timezone of all local timestamps (e.g., US/Eastern)."
+      - name: forecast_execution_datetime_local
+        description: "When the forecast was issued (local time, see timezone column)."
       - name: forecast_rank
       - name: forecast_date
       - name: hour_ending
@@ -169,6 +182,16 @@ models:
   - name: staging_v1_pjm_fuel_mix_hourly
     description: '{{ doc("pjm_fuel_mix") }}'
     columns:
+      - name: datetime_beginning_utc
+        description: "Start of the hour interval (UTC)."
+      - name: datetime_ending_utc
+        description: "End of the hour interval (UTC)."
+      - name: timezone
+        description: "IANA timezone of all local timestamps (e.g., US/Eastern)."
+      - name: datetime_beginning_local
+        description: "Start of the hour interval (local time, see timezone column)."
+      - name: datetime_ending_local
+        description: "End of the hour interval (local time, see timezone column)."
       - name: date
       - name: hour_ending
       - name: total
@@ -177,12 +200,6 @@ models:
         description: "Total thermal generation (MW)"
       - name: renewables
         description: "Total renewable generation (MW)"
-
-  - name: staging_v1_pjm_fuel_mix_daily
-    description: "PJM daily fuel mix generation by period. RTO-level only. Grain: date x period."
-    columns:
-      - name: date
-      - name: period
 
   # ===========================
   # Outages
@@ -219,6 +236,16 @@ models:
   - name: staging_v1_pjm_tie_flows_hourly
     description: '{{ doc("pjm_tie_flows") }}'
     columns:
+      - name: datetime_beginning_utc
+        description: "Start of the hour interval (UTC)."
+      - name: datetime_ending_utc
+        description: "End of the hour interval (UTC)."
+      - name: timezone
+        description: "IANA timezone of all local timestamps (e.g., US/Eastern)."
+      - name: datetime_beginning_local
+        description: "Start of the hour interval (local time, see timezone column)."
+      - name: datetime_ending_local
+        description: "End of the hour interval (local time, see timezone column)."
       - name: date
       - name: hour_ending
       - name: tie_flow_name
@@ -228,22 +255,11 @@ models:
       - name: scheduled_mw
         description: "Scheduled tie flow (MW)"
 
-  - name: staging_v1_pjm_tie_flows_daily
-    description: "PJM daily tie flows by interface and period. Grain: date x tie_flow_name x period."
-    columns:
-      - name: date
-      - name: tie_flow_name
-      - name: period
-      - name: actual_mw
-        description: "Average actual tie flow for the period (MW)"
-      - name: scheduled_mw
-        description: "Average scheduled tie flow for the period (MW)"
-
   # ===========================
   # Solar & Wind Forecasts
   # ===========================
 
-  - name: staging_v1_pjm_solar_forecast_hourly
+  - name: staging_v1_gridstatus_pjm_solar_forecast_hourly
     description: '{{ doc("pjm_solar_wind_forecast") }}'
     columns:
       - name: forecast_rank
@@ -254,7 +270,7 @@ models:
       - name: solar_forecast_btm
         description: "Behind-the-meter solar forecast (MW)"
 
-  - name: staging_v1_pjm_wind_forecast_hourly
+  - name: staging_v1_gridstatus_pjm_wind_forecast_hourly
     description: "PJM 2-day hourly wind generation forecast. Complete forecasts only, ranked by issue time (earliest first). Grain: forecast_rank x forecast_date x hour_ending."
     columns:
       - name: forecast_rank
@@ -270,6 +286,16 @@ models:
   - name: staging_v1_pjm_ancillary_services_hourly
     description: '{{ doc("pjm_ancillary_services") }}'
     columns:
+      - name: datetime_beginning_utc
+        description: "Start of the hour interval (UTC)."
+      - name: datetime_ending_utc
+        description: "End of the hour interval (UTC)."
+      - name: timezone
+        description: "IANA timezone of all local timestamps (e.g., US/Eastern)."
+      - name: datetime_beginning_local
+        description: "Start of the hour interval (local time, see timezone column)."
+      - name: datetime_ending_local
+        description: "End of the hour interval (local time, see timezone column)."
       - name: date
         description: '{{ doc("col_date") }}'
       - name: hour_ending
@@ -294,6 +320,16 @@ models:
   - name: staging_v1_pjm_reserves_hourly
     description: '{{ doc("pjm_reserves") }}'
     columns:
+      - name: datetime_beginning_utc
+        description: "Start of the hour interval (UTC)."
+      - name: datetime_ending_utc
+        description: "End of the hour interval (UTC)."
+      - name: timezone
+        description: "IANA timezone of all local timestamps (e.g., US/Eastern)."
+      - name: datetime_beginning_local
+        description: "Start of the hour interval (local time, see timezone column)."
+      - name: datetime_ending_local
+        description: "End of the hour interval (local time, see timezone column)."
       - name: date
         description: '{{ doc("col_date") }}'
       - name: hour_ending
@@ -317,22 +353,20 @@ models:
   # 5-Min LMPs
   # ===========================
 
-  - name: staging_v1_pjm_five_min_lmps_hourly
-    description: '{{ doc("pjm_five_min_lmps") }}'
+  - name: staging_v1_pjm_lmps_rt_five_min
+    description: '{{ doc("pjm_lmps_rt_five_min") }}'
     columns:
+      - name: datetime_beginning_utc
+        description: "Start of the 5-minute interval (UTC)."
+      - name: timezone
+        description: "IANA timezone of all local timestamps (e.g., US/Eastern)."
+      - name: datetime_beginning_local
+        description: "Start of the 5-minute interval (local time, see timezone column)."
       - name: date
         description: '{{ doc("col_date") }}'
       - name: hour_ending
         description: '{{ doc("col_hour_ending") }}'
       - name: hub
         description: "PJM pricing hub name."
-      - name: rt_lmp_avg
-        description: "Average 5-min RT LMP for the hour ($/MWh)."
-      - name: rt_lmp_max
-        description: "Maximum 5-min RT LMP for the hour ($/MWh). Reveals spike severity."
-      - name: rt_lmp_min
-        description: "Minimum 5-min RT LMP for the hour ($/MWh)."
-      - name: rt_lmp_range
-        description: "Max minus min 5-min RT LMP for the hour ($/MWh). Volatility indicator."
-      - name: spike_ratio
-        description: "Max / avg ratio. Values >> 1 indicate intra-hour spikes masked by hourly average."
+      - name: rt_lmp
+        description: "5-minute real-time LMP ($/MWh)."

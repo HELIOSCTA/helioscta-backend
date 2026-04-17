@@ -17,4 +17,4 @@ Near-real-time preliminary load data by area. Used for intraday load monitoring 
 
 ## Downstream
 
-- dbt: `pjm_cleaned.pjm_load_rt_prelim_hourly`, `pjm_cleaned.pjm_load_rt_prelim_daily`
+- dbt: `pjm_cleaned.pjm_load_rt_prelim_hourly`

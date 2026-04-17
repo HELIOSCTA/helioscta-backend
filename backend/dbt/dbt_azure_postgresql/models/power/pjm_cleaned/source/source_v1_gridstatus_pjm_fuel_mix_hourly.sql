@@ -11,8 +11,13 @@
 
 WITH HOURLY AS (
     SELECT
-        interval_start_local::DATE AS date
-        ,EXTRACT(HOUR FROM interval_start_local) + 1 AS hour_ending
+        interval_start_utc AS datetime_beginning_utc
+        ,interval_start_utc + INTERVAL '1 hour' AS datetime_ending_utc
+        ,'US/Eastern' AS timezone
+        ,interval_start_local AS datetime_beginning_local
+        ,interval_start_local + INTERVAL '1 hour' AS datetime_ending_local
+        ,interval_start_local::DATE AS date
+        ,(EXTRACT(HOUR FROM interval_start_local) + 1)::INT AS hour_ending
 
         ,coal::NUMERIC AS coal
         ,gas::NUMERIC AS gas
@@ -37,7 +42,12 @@ WITH HOURLY AS (
 
 SUPPLY AS (
     SELECT
-        date
+        datetime_beginning_utc
+        ,datetime_ending_utc
+        ,timezone
+        ,datetime_beginning_local
+        ,datetime_ending_local
+        ,date
         ,hour_ending
 
         ,coal
@@ -82,4 +92,4 @@ SUPPLY AS (
 )
 
 SELECT * FROM SUPPLY
-ORDER BY date DESC, hour_ending DESC
+ORDER BY datetime_ending_local DESC

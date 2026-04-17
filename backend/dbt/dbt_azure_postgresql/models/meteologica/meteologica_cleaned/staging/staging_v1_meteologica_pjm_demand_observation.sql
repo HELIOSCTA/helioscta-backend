@@ -5,10 +5,13 @@
 }}
 
 ---------------------------
--- Meteologica PJM Demand Observation
--- UNIONs 36 raw tables (RTO + 3 macro regions + 32 sub-regions), normalizes to EPT,
--- ranks by issue time (earliest first)
--- Grain: 1 row per update_rank x observation_datetime x region  (5-min intervals)
+-- Meteologica PJM Demand Observation (5-min)
+-- UNIONs 36 raw tables, produces UTC/timezone/local triplets for issue time and 5-min
+-- observation time, ranks by issue time (earliest first).
+-- Grain: 1 row per update_rank x observation_datetime_ending_local x region  (5-min intervals)
+-- NOTE: 5-min `observation_datetime_ending_*` values preserve the prior naive timestamp
+-- semantics (actually represent the start of each 5-min block) to avoid regressing downstream
+-- hourly rollup logic in `meteologica_pjm_demand_observation_hourly`.
 ---------------------------
 
 WITH UNIONED AS (
@@ -446,16 +449,23 @@ WITH UNIONED AS (
 ),
 
 ---------------------------
--- NORMALIZE TIMESTAMPS TO EPT
+-- NORMALIZE TIMESTAMPS (UTC + timezone + local triplets)
+-- 5-min exception: observation_datetime_ending_* keep the prior naive timestamp values
+-- unchanged (so EXTRACT(HOUR) + 1 rollups in the hourly mart still produce hour_ending 1-24).
 ---------------------------
 
 NORMALIZED AS (
     SELECT
         region
-        ,(issue_date::TIMESTAMP AT TIME ZONE 'UTC' AT TIME ZONE 'America/New_York') AS update_datetime
+        ,issue_date::TIMESTAMP AS update_datetime_utc
+        ,'US/Eastern' AS timezone
+        ,(issue_date::TIMESTAMP AT TIME ZONE 'UTC' AT TIME ZONE 'America/New_York') AS update_datetime_local
         ,(issue_date::TIMESTAMP AT TIME ZONE 'UTC' AT TIME ZONE 'America/New_York')::DATE AS update_date
-        ,(forecast_period_start::TIMESTAMP AT TIME ZONE 'UTC' AT TIME ZONE 'America/New_York') AS observation_datetime
+
+        ,forecast_period_start::TIMESTAMP AS observation_datetime_ending_utc
+        ,(forecast_period_start::TIMESTAMP AT TIME ZONE 'UTC' AT TIME ZONE 'America/New_York') AS observation_datetime_ending_local
         ,(forecast_period_start::TIMESTAMP AT TIME ZONE 'UTC' AT TIME ZONE 'America/New_York')::DATE AS observation_date
+
         ,observation_mw::NUMERIC AS observation_mw
     FROM UNIONED
 ),
@@ -468,15 +478,15 @@ UPDATE_RANK AS (
     SELECT
         observation_date
         ,region
-        ,update_datetime
+        ,update_datetime_local
 
         ,DENSE_RANK() OVER (
             PARTITION BY observation_date, region
-            ORDER BY update_datetime ASC
+            ORDER BY update_datetime_local ASC
         ) AS update_rank
 
     FROM (
-        SELECT DISTINCT update_datetime, observation_date, region
+        SELECT DISTINCT update_datetime_local, observation_date, region
         FROM NORMALIZED
     ) sub
 ),
@@ -488,10 +498,13 @@ FINAL AS (
     SELECT
         r.update_rank
 
-        ,n.update_datetime
+        ,n.update_datetime_utc
+        ,n.timezone
+        ,n.update_datetime_local
         ,n.update_date
 
-        ,n.observation_datetime
+        ,n.observation_datetime_ending_utc
+        ,n.observation_datetime_ending_local
         ,n.observation_date
 
         ,n.region
@@ -499,10 +512,10 @@ FINAL AS (
 
     FROM NORMALIZED n
     JOIN UPDATE_RANK r
-        ON n.update_datetime = r.update_datetime
+        ON n.update_datetime_local = r.update_datetime_local
         AND n.observation_date = r.observation_date
         AND n.region = r.region
 )
 
 SELECT * FROM FINAL
-ORDER BY observation_date DESC, update_datetime DESC, observation_datetime, region
+ORDER BY observation_date DESC, update_datetime_local DESC, observation_datetime_ending_local, region

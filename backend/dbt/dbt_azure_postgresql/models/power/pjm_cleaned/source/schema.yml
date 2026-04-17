@@ -4,6 +4,16 @@ models:
   - name: source_v1_gridstatus_pjm_fuel_mix_hourly
     description: "Normalized GridStatus PJM fuel mix feed at hourly grain."
     columns:
+      - name: datetime_beginning_utc
+        description: "Start of the hour interval (UTC)."
+      - name: datetime_ending_utc
+        description: "End of the hour interval (UTC)."
+      - name: timezone
+        description: "IANA timezone of all local timestamps (e.g., US/Eastern)."
+      - name: datetime_beginning_local
+        description: "Start of the hour interval (local time, see timezone column)."
+      - name: datetime_ending_local
+        description: "End of the hour interval (local time, see timezone column)."
       - name: date
         description: '{{ doc("col_date") }}'
       - name: hour_ending
@@ -12,8 +22,12 @@ models:
   - name: source_v1_gridstatus_pjm_load_forecast
     description: "Normalized GridStatus PJM 7-day load forecast at forecast run x hour x region grain."
     columns:
-      - name: forecast_execution_datetime
-        description: "Timestamp when the forecast run was published."
+      - name: forecast_execution_datetime_utc
+        description: "Timestamp when the forecast run was published (UTC)."
+      - name: timezone
+        description: "IANA timezone of all local timestamps (e.g., US/Eastern)."
+      - name: forecast_execution_datetime_local
+        description: "Timestamp when the forecast run was published (local time, see timezone column)."
       - name: forecast_date
         description: "Target operating date being forecasted."
       - name: hour_ending
@@ -24,8 +38,12 @@ models:
   - name: source_v1_gridstatus_pjm_solar_forecast_hourly
     description: "Normalized GridStatus PJM solar forecast, aggregated from 10-minute to hourly."
     columns:
-      - name: forecast_execution_datetime
-        description: "Timestamp when the forecast run was published (hour-truncated)."
+      - name: forecast_execution_datetime_utc
+        description: "Timestamp when the forecast run was published (UTC, hour-truncated)."
+      - name: timezone
+        description: "IANA timezone of all local timestamps (e.g., US/Eastern)."
+      - name: forecast_execution_datetime_local
+        description: "Timestamp when the forecast run was published (local time, hour-truncated)."
       - name: forecast_date
         description: "Target operating date being forecasted."
       - name: hour_ending
@@ -34,8 +52,12 @@ models:
   - name: source_v1_gridstatus_pjm_wind_forecast_hourly
     description: "Normalized GridStatus PJM wind forecast, aggregated from 10-minute to hourly."
     columns:
-      - name: forecast_execution_datetime
-        description: "Timestamp when the forecast run was published (hour-truncated)."
+      - name: forecast_execution_datetime_utc
+        description: "Timestamp when the forecast run was published (UTC, hour-truncated)."
+      - name: timezone
+        description: "IANA timezone of all local timestamps (e.g., US/Eastern)."
+      - name: forecast_execution_datetime_local
+        description: "Timestamp when the forecast run was published (local time, hour-truncated)."
       - name: forecast_date
         description: "Target operating date being forecasted."
       - name: hour_ending
@@ -54,8 +76,12 @@ models:
   - name: source_v1_pjm_five_min_load
     description: "Normalized PJM 5-minute instantaneous load with market-region and load-area mappings."
     columns:
-      - name: datetime_beginning_ept
-        description: "Original 5-minute interval timestamp in EPT."
+      - name: datetime_beginning_utc
+        description: "Start of the 5-minute interval (UTC)."
+      - name: timezone
+        description: "IANA timezone of all local timestamps (e.g., US/Eastern)."
+      - name: datetime_beginning_local
+        description: "Start of the 5-minute interval (local time, see timezone column)."
       - name: date
         description: '{{ doc("col_date") }}'
       - name: hour_ending
@@ -68,6 +94,12 @@ models:
   - name: source_v1_pjm_five_min_tie_flows
     description: "Normalized PJM 5-minute tie flow measurements by interface."
     columns:
+      - name: datetime_beginning_utc
+        description: "Start of the 5-minute interval (UTC)."
+      - name: timezone
+        description: "IANA timezone of all local timestamps (e.g., US/Eastern)."
+      - name: datetime_beginning_local
+        description: "Start of the 5-minute interval (local time, see timezone column)."
       - name: date
         description: '{{ doc("col_date") }}'
       - name: hour_ending
@@ -78,6 +110,16 @@ models:
   - name: source_v1_pjm_hrl_dmd_bids
     description: "Normalized PJM day-ahead hourly demand bids by region/load area."
     columns:
+      - name: datetime_beginning_utc
+        description: "Start of the hour interval (UTC)."
+      - name: datetime_ending_utc
+        description: "End of the hour interval (UTC)."
+      - name: timezone
+        description: "IANA timezone of all local timestamps (e.g., US/Eastern)."
+      - name: datetime_beginning_local
+        description: "Start of the hour interval (local time, see timezone column)."
+      - name: datetime_ending_local
+        description: "End of the hour interval (local time, see timezone column)."
       - name: date
         description: '{{ doc("col_date") }}'
       - name: hour_ending
@@ -90,6 +132,16 @@ models:
   - name: source_v1_pjm_hrl_load_metered
     description: "Normalized PJM metered hourly load with deduping and regional rollups."
     columns:
+      - name: datetime_beginning_utc
+        description: "Start of the hour interval (UTC)."
+      - name: datetime_ending_utc
+        description: "End of the hour interval (UTC)."
+      - name: timezone
+        description: "IANA timezone of all local timestamps (e.g., US/Eastern)."
+      - name: datetime_beginning_local
+        description: "Start of the hour interval (local time, see timezone column)."
+      - name: datetime_ending_local
+        description: "End of the hour interval (local time, see timezone column)."
       - name: date
         description: '{{ doc("col_date") }}'
       - name: hour_ending
@@ -102,6 +154,16 @@ models:
   - name: source_v1_pjm_hrl_load_prelim
     description: "Normalized PJM preliminary hourly load with derived RTO/WEST/SOUTH regional aggregates."
     columns:
+      - name: datetime_beginning_utc
+        description: "Start of the hour interval (UTC)."
+      - name: datetime_ending_utc
+        description: "End of the hour interval (UTC)."
+      - name: timezone
+        description: "IANA timezone of all local timestamps (e.g., US/Eastern)."
+      - name: datetime_beginning_local
+        description: "Start of the hour interval (local time, see timezone column)."
+      - name: datetime_ending_local
+        description: "End of the hour interval (local time, see timezone column)."
       - name: date
         description: '{{ doc("col_date") }}'
       - name: hour_ending
@@ -134,8 +196,12 @@ models:
   - name: source_v1_pjm_seven_day_load_forecast
     description: "Normalized PJM API 7-day load forecast by region at hourly grain."
     columns:
-      - name: forecast_execution_datetime
-        description: "Timestamp when the forecast run was evaluated."
+      - name: forecast_execution_datetime_utc
+        description: "Timestamp when the forecast run was evaluated (UTC)."
+      - name: timezone
+        description: "IANA timezone of all local timestamps (e.g., US/Eastern)."
+      - name: forecast_execution_datetime_local
+        description: "Timestamp when the forecast run was evaluated (local time, see timezone column)."
       - name: forecast_date
         description: "Target operating date being forecasted."
       - name: hour_ending
@@ -156,6 +222,16 @@ models:
   - name: source_v1_pjm_ancillary_services
     description: "Normalized PJM ancillary services prices (SR, non-SR, secondary reserve, regulation, mileage ratio) at hourly grain."
     columns:
+      - name: datetime_beginning_utc
+        description: "Start of the hour interval (UTC)."
+      - name: datetime_ending_utc
+        description: "End of the hour interval (UTC)."
+      - name: timezone
+        description: "IANA timezone of all local timestamps (e.g., US/Eastern)."
+      - name: datetime_beginning_local
+        description: "Start of the hour interval (local time, see timezone column)."
+      - name: datetime_ending_local
+        description: "End of the hour interval (local time, see timezone column)."
       - name: date
         description: '{{ doc("col_date") }}'
       - name: hour_ending
@@ -166,6 +242,16 @@ models:
   - name: source_v1_pjm_dispatched_reserves
     description: "Normalized PJM dispatched reserves aggregated to hourly. Includes clearing price, shortage indicator, and requirement vs. quantity."
     columns:
+      - name: datetime_beginning_utc
+        description: "Start of the hour interval (UTC)."
+      - name: datetime_ending_utc
+        description: "End of the hour interval (UTC)."
+      - name: timezone
+        description: "IANA timezone of all local timestamps (e.g., US/Eastern)."
+      - name: datetime_beginning_local
+        description: "Start of the hour interval (local time, see timezone column)."
+      - name: datetime_ending_local
+        description: "End of the hour interval (local time, see timezone column)."
       - name: date
         description: '{{ doc("col_date") }}'
       - name: hour_ending
@@ -175,31 +261,15 @@ models:
       - name: reserve_type
         description: "Reserve product type (Synchronized Reserve, Primary Reserve, etc.)."
 
-  - name: source_v1_pjm_operational_reserves
-    description: "Normalized PJM operational reserves aggregated to hourly. Real-time snapshot of reserve MW by product."
-    columns:
-      - name: date
-        description: '{{ doc("col_date") }}'
-      - name: hour_ending
-        description: '{{ doc("col_hour_ending") }}'
-      - name: reserve_name
-        description: "Reserve product name (e.g., Mid-Atlantic/Dominion Contingency (Primary) Reserve Total)."
-
-  - name: source_v1_pjm_rt_dispatched_reserves
-    description: "Normalized PJM real-time dispatched reserves. Archival feed with deficit MW and extended requirements."
-    columns:
-      - name: date
-        description: '{{ doc("col_date") }}'
-      - name: hour_ending
-        description: '{{ doc("col_hour_ending") }}'
-      - name: area
-        description: "PJM reserve zone."
-      - name: reserve_type
-        description: "Reserve product type."
-
   - name: source_v1_pjm_unverified_five_min_lmps
     description: "Normalized PJM 5-minute real-time LMPs by hub."
     columns:
+      - name: datetime_beginning_utc
+        description: "Start of the 5-minute interval (UTC)."
+      - name: timezone
+        description: "IANA timezone of all local timestamps (e.g., US/Eastern)."
+      - name: datetime_beginning_local
+        description: "Start of the 5-minute interval (local time, see timezone column)."
       - name: date
         description: '{{ doc("col_date") }}'
       - name: hour_ending

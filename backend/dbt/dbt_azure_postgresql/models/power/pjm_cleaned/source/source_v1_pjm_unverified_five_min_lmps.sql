@@ -12,9 +12,11 @@
 
 WITH RAW AS (
     SELECT
-        datetime_beginning_ept::DATE AS date
-        ,EXTRACT(HOUR FROM datetime_beginning_ept) + 1 AS hour_ending
-        ,datetime_beginning_ept AS datetime_ept
+        datetime_beginning_utc
+        ,'US/Eastern' AS timezone
+        ,datetime_beginning_ept AS datetime_beginning_local
+        ,datetime_beginning_ept::DATE AS date
+        ,(EXTRACT(HOUR FROM datetime_beginning_ept) + 1)::INT AS hour_ending
         ,name AS hub
         ,type
         ,five_min_rtlmp::NUMERIC AS five_min_rt_lmp
@@ -23,4 +25,4 @@ WITH RAW AS (
 )
 
 SELECT * FROM RAW
-ORDER BY date DESC, datetime_ept DESC, hub
+ORDER BY datetime_beginning_local DESC, hub

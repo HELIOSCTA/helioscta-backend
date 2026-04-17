@@ -17,4 +17,4 @@ PJM's official 7-day hourly load forecast by forecast area. Updated multiple tim
 
 ## Downstream
 
-- dbt: `pjm_cleaned.pjm_load_forecast_hourly`, `pjm_cleaned.pjm_load_forecast_daily`
+- dbt: `pjm_cleaned.pjm_load_forecast_hourly`

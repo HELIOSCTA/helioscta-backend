@@ -5,14 +5,12 @@ exposures:
   - name: pjm_dashboard
     type: dashboard
     description: >
-      PJM overview dashboard showing daily LMPs, DA load, fuel mix, and outage actuals.
+      PJM overview dashboard showing daily LMPs, fuel mix, and outage actuals.
     owner:
       name: "Helios CTA"
       email: "engineering@helioscta.com"
     depends_on:
       - ref('pjm_lmps_daily')
-      - ref('pjm_load_da_daily')
-      - ref('pjm_fuel_mix_daily')
       - ref('pjm_outages_actual_daily')
 
   - name: pjm_lmps_hourly_page

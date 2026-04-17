@@ -30,10 +30,6 @@ sources:
         description: "Ancillary services prices (synchronized reserve, non-synchronized reserve, secondary reserve, regulation) from PJM Data Miner 2. Hourly grain."
       - name: dispatched_reserves
         description: "Dispatched reserve quantity, requirement, clearing price, and shortage indicator by area and reserve type from PJM Data Miner 2. 5-minute updates, 30-day retention."
-      - name: operational_reserves
-        description: "Real-time operational reserve MW by reserve product from PJM Data Miner 2. 15-second updates, 15-day retention."
-      - name: real_time_dispatched_reserves
-        description: "Real-time dispatched reserves with requirement, deficit, and extended requirement by area and reserve type from PJM Data Miner 2. Daily on business days, indefinite retention."
       - name: unverified_five_min_lmps
         description: "Unverified 5-minute real-time LMPs by pricing hub from PJM Data Miner 2. Reveals intra-hour spike severity masked by hourly averages."
 

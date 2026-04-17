@@ -27,8 +27,13 @@ WITH MKT_REGION_LOOKUP AS (
 
 PRELIM AS (
     SELECT
-        datetime_beginning_ept::DATE AS date
-        ,EXTRACT(HOUR FROM datetime_beginning_ept) + 1 AS hour_ending
+        prelim.datetime_beginning_utc
+        ,prelim.datetime_beginning_utc + INTERVAL '1 hour' AS datetime_ending_utc
+        ,'US/Eastern' AS timezone
+        ,prelim.datetime_beginning_ept AS datetime_beginning_local
+        ,prelim.datetime_beginning_ept + INTERVAL '1 hour' AS datetime_ending_local
+        ,prelim.datetime_beginning_ept::DATE AS date
+        ,(EXTRACT(HOUR FROM prelim.datetime_beginning_ept) + 1)::INT AS hour_ending
 
         ,lookup.mkt_region
         ,prelim.load_area
@@ -38,7 +43,7 @@ PRELIM AS (
     FROM {{ source('pjm_v1', 'hourly_load_prelim') }} prelim
     LEFT JOIN MKT_REGION_LOOKUP lookup ON prelim.load_area = lookup.load_area
     WHERE
-        datetime_beginning_ept::DATE >= current_date - 14
+        prelim.datetime_beginning_ept::DATE >= current_date - 14
 ),
 
 --------------------------------
@@ -47,7 +52,12 @@ PRELIM AS (
 
 RTO AS (
     SELECT
-        date, hour_ending
+        MAX(datetime_beginning_utc) AS datetime_beginning_utc
+        ,MAX(datetime_ending_utc) AS datetime_ending_utc
+        ,MAX(timezone) AS timezone
+        ,MAX(datetime_beginning_local) AS datetime_beginning_local
+        ,MAX(datetime_ending_local) AS datetime_ending_local
+        ,date, hour_ending
         ,'RTO' AS mkt_region
         ,'RTO' AS load_area
         ,SUM(load_mw) AS load_mw
@@ -58,7 +68,12 @@ RTO AS (
 
 WEST AS (
     SELECT
-        date, hour_ending, mkt_region
+        MAX(datetime_beginning_utc) AS datetime_beginning_utc
+        ,MAX(datetime_ending_utc) AS datetime_ending_utc
+        ,MAX(timezone) AS timezone
+        ,MAX(datetime_beginning_local) AS datetime_beginning_local
+        ,MAX(datetime_ending_local) AS datetime_ending_local
+        ,date, hour_ending, mkt_region
         ,'WEST' AS load_area
         ,SUM(load_mw) AS load_mw
     FROM PRELIM
@@ -68,7 +83,12 @@ WEST AS (
 
 SOUTH AS (
     SELECT
-        date, hour_ending, mkt_region
+        MAX(datetime_beginning_utc) AS datetime_beginning_utc
+        ,MAX(datetime_ending_utc) AS datetime_ending_utc
+        ,MAX(timezone) AS timezone
+        ,MAX(datetime_beginning_local) AS datetime_beginning_local
+        ,MAX(datetime_ending_local) AS datetime_ending_local
+        ,date, hour_ending, mkt_region
         ,'SOUTH' AS load_area
         ,SUM(load_mw) AS load_mw
     FROM PRELIM
@@ -77,7 +97,7 @@ SOUTH AS (
 ),
 
 FINAL AS (
-    SELECT date, hour_ending, mkt_region, load_area, load_mw FROM PRELIM
+    SELECT datetime_beginning_utc, datetime_ending_utc, timezone, datetime_beginning_local, datetime_ending_local, date, hour_ending, mkt_region, load_area, load_mw FROM PRELIM
     UNION ALL
     SELECT * FROM RTO
     UNION ALL
@@ -87,4 +107,4 @@ FINAL AS (
 )
 
 SELECT * FROM FINAL
-ORDER BY date DESC, hour_ending DESC, mkt_region, load_area
+ORDER BY datetime_ending_local DESC, mkt_region, load_area

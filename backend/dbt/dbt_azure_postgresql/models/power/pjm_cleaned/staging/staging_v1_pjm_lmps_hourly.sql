@@ -6,12 +6,17 @@
 
 ---------------------------
 -- Hourly LMPs (normalized)
--- Grain: 1 row per date Ã— hour Ã— hub Ã— market
+-- Grain: 1 row per date × hour × hub × market
 ---------------------------
 
 WITH DA AS (
     SELECT
-        date
+        datetime_beginning_utc
+        ,datetime_ending_utc
+        ,timezone
+        ,datetime_beginning_local
+        ,datetime_ending_local
+        ,date
         ,hour_ending
         ,hub
         ,da_lmp_total
@@ -23,7 +28,12 @@ WITH DA AS (
 
 RT AS (
     SELECT
-        date
+        datetime_beginning_utc
+        ,datetime_ending_utc
+        ,timezone
+        ,datetime_beginning_local
+        ,datetime_ending_local
+        ,date
         ,hour_ending
         ,hub
         ,rt_lmp_total
@@ -39,7 +49,12 @@ RT AS (
 
 DA_ROWS AS (
     SELECT
-        date
+        datetime_beginning_utc
+        ,datetime_ending_utc
+        ,timezone
+        ,datetime_beginning_local
+        ,datetime_ending_local
+        ,date
         ,hour_ending
         ,hub
         ,'da' AS market
@@ -52,7 +67,12 @@ DA_ROWS AS (
 
 RT_ROWS AS (
     SELECT
-        date
+        datetime_beginning_utc
+        ,datetime_ending_utc
+        ,timezone
+        ,datetime_beginning_local
+        ,datetime_ending_local
+        ,date
         ,hour_ending
         ,hub
         ,'rt' AS market
@@ -65,7 +85,12 @@ RT_ROWS AS (
 
 DART_ROWS AS (
     SELECT
-        da.date
+        da.datetime_beginning_utc
+        ,da.datetime_ending_utc
+        ,da.timezone
+        ,da.datetime_beginning_local
+        ,da.datetime_ending_local
+        ,da.date
         ,da.hour_ending
         ,da.hub
         ,'dart' AS market
@@ -85,8 +110,5 @@ LMPS AS (
     SELECT * FROM DART_ROWS
 )
 
-SELECT
-    date + (hour_ending || ' hours')::interval AS datetime,
-    *
-FROM LMPS
+SELECT * FROM LMPS
 ORDER BY date DESC, hour_ending DESC, hub, market

@@ -6,8 +6,8 @@
 
 ---------------------------
 -- Meteologica PJM Demand Projection (Hourly)
--- UNIONs 33 raw tables (RTO + 32 sub-regions), normalizes to EPT date + hour_ending,
--- ranks by issue time (earliest first)
+-- UNIONs 33 raw tables (RTO + 32 sub-regions), produces UTC/timezone/local triplets for
+-- issue time and hour-ending target time, ranks by issue time (earliest first).
 -- Grain: 1 row per update_rank x projection_date x hour_ending x region
 ---------------------------
 
@@ -410,16 +410,22 @@ WITH UNIONED AS (
 ),
 
 ---------------------------
--- NORMALIZE TIMESTAMPS TO EPT
+-- NORMALIZE TIMESTAMPS (UTC + timezone + local triplets)
 ---------------------------
 
 NORMALIZED AS (
     SELECT
         region
-        ,(issue_date::TIMESTAMP AT TIME ZONE 'UTC' AT TIME ZONE 'America/New_York') AS update_datetime
+        ,issue_date::TIMESTAMP AS update_datetime_utc
+        ,'US/Eastern' AS timezone
+        ,(issue_date::TIMESTAMP AT TIME ZONE 'UTC' AT TIME ZONE 'America/New_York') AS update_datetime_local
         ,(issue_date::TIMESTAMP AT TIME ZONE 'UTC' AT TIME ZONE 'America/New_York')::DATE AS update_date
+
+        ,((forecast_period_start + INTERVAL '1 hour') AT TIME ZONE 'America/New_York' AT TIME ZONE 'UTC') AS projection_datetime_ending_utc
+        ,(forecast_period_start + INTERVAL '1 hour') AS projection_datetime_ending_local
         ,forecast_period_start::DATE AS projection_date
         ,EXTRACT(HOUR FROM forecast_period_start)::INT + 1 AS hour_ending
+
         ,normal_mw::NUMERIC AS normal_mw
     FROM UNIONED
 ),
@@ -432,15 +438,15 @@ UPDATE_RANK AS (
     SELECT
         projection_date
         ,region
-        ,update_datetime
+        ,update_datetime_local
 
         ,DENSE_RANK() OVER (
             PARTITION BY projection_date, region
-            ORDER BY update_datetime ASC
+            ORDER BY update_datetime_local ASC
         ) AS update_rank
 
     FROM (
-        SELECT DISTINCT update_datetime, projection_date, region
+        SELECT DISTINCT update_datetime_local, projection_date, region
         FROM NORMALIZED
     ) sub
 ),
@@ -452,10 +458,13 @@ FINAL AS (
     SELECT
         r.update_rank
 
-        ,n.update_datetime
+        ,n.update_datetime_utc
+        ,n.timezone
+        ,n.update_datetime_local
         ,n.update_date
 
-        ,(n.projection_date + INTERVAL '1 hour' * (n.hour_ending - 1)) AS projection_datetime
+        ,n.projection_datetime_ending_utc
+        ,n.projection_datetime_ending_local
         ,n.projection_date
         ,n.hour_ending
 
@@ -464,10 +473,10 @@ FINAL AS (
 
     FROM NORMALIZED n
     JOIN UPDATE_RANK r
-        ON n.update_datetime = r.update_datetime
+        ON n.update_datetime_local = r.update_datetime_local
         AND n.projection_date = r.projection_date
         AND n.region = r.region
 )
 
 SELECT * FROM FINAL
-ORDER BY projection_date DESC, update_datetime DESC, hour_ending, region
+ORDER BY projection_date DESC, update_datetime_local DESC, hour_ending, region

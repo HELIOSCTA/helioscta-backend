@@ -12,7 +12,11 @@
 ---------------------------
 
 SELECT
-    date + (hour_ending || ' hours')::interval AS datetime
+    datetime_beginning_utc
+    ,datetime_ending_utc
+    ,timezone
+    ,datetime_beginning_local
+    ,datetime_ending_local
     ,date
     ,hour_ending
     ,area
@@ -29,4 +33,4 @@ SELECT
     ,(reserve_quantity_mw - reserve_requirement_mw) AS reserve_margin_mw
 
 FROM {{ ref('source_v1_pjm_dispatched_reserves') }}
-ORDER BY date DESC, hour_ending DESC, area, reserve_type
+ORDER BY datetime_ending_local DESC, area, reserve_type

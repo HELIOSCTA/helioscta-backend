@@ -1,5 +1,9 @@
 select
-  datetime
+  datetime_beginning_utc
+  ,datetime_ending_utc
+  ,timezone
+  ,datetime_beginning_local
+  ,datetime_ending_local
   ,date
   ,hour_ending
   ,tie_flow_name

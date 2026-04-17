@@ -1,0 +1,80 @@
+version: 2
+
+models:
+  - name: pjm_modelling_load_forecast_hourly_da_cutoff
+    description: >
+      PJM load forecast — latest revision issued before 10 AM EPT per
+      forecast_date x hour_ending x region (RTO, MIDATL, WEST, SOUTH).
+      Bias-safe for training a DA model.
+    columns:
+      - name: forecast_execution_datetime_utc
+        description: "When the load forecast was issued (UTC)."
+      - name: timezone
+        description: "IANA timezone of all local timestamps (e.g., US/Eastern)."
+      - name: forecast_execution_datetime_local
+        description: "When the load forecast was issued (local time, see timezone column)."
+      - name: forecast_rank
+        description: '{{ doc("col_forecast_rank") }}'
+      - name: forecast_execution_date
+        description: "Date the load forecast was issued."
+      - name: forecast_datetime
+        description: "Start of the forecasted hour (local time) — forecast_date + (hour_ending - 1) hours."
+      - name: forecast_date
+        description: "Target operating date being forecasted."
+      - name: hour_ending
+        description: '{{ doc("col_hour_ending") }}'
+      - name: region
+        description: '{{ doc("col_region") }}'
+      - name: forecast_load_mw
+        description: "Forecasted load (MW) for the region from the latest pre-10 AM EPT revision."
+
+  - name: pjm_modelling_solar_forecast_hourly_da_cutoff
+    description: >
+      GridStatus PJM solar forecast (front-of-meter + BTM) — latest revision
+      issued before 10 AM EPT per forecast_date x hour_ending. Bias-safe for
+      training a DA model.
+    columns:
+      - name: forecast_execution_datetime_utc
+        description: "When the solar forecast was issued (UTC)."
+      - name: timezone
+        description: "IANA timezone of all local timestamps (e.g., US/Eastern)."
+      - name: forecast_execution_datetime_local
+        description: "When the solar forecast was issued (local time, see timezone column)."
+      - name: forecast_rank
+        description: '{{ doc("col_forecast_rank") }}'
+      - name: forecast_execution_date
+        description: "Date the solar forecast was issued."
+      - name: forecast_datetime
+        description: "Start of the forecasted hour (local time) — forecast_date + (hour_ending - 1) hours."
+      - name: forecast_date
+        description: "Target operating date being forecasted."
+      - name: hour_ending
+        description: '{{ doc("col_hour_ending") }}'
+      - name: solar_forecast
+        description: "Front-of-meter solar forecast (MW)."
+      - name: solar_forecast_btm
+        description: "Behind-the-meter solar forecast (MW)."
+
+  - name: pjm_modelling_wind_forecast_hourly_da_cutoff
+    description: >
+      GridStatus PJM wind forecast — latest revision issued before 10 AM EPT
+      per forecast_date x hour_ending. Bias-safe for training a DA model.
+    columns:
+      - name: forecast_execution_datetime_utc
+        description: "When the wind forecast was issued (UTC)."
+      - name: timezone
+        description: "IANA timezone of all local timestamps (e.g., US/Eastern)."
+      - name: forecast_execution_datetime_local
+        description: "When the wind forecast was issued (local time, see timezone column)."
+      - name: forecast_rank
+        description: '{{ doc("col_forecast_rank") }}'
+      - name: forecast_execution_date
+        description: "Date the wind forecast was issued."
+      - name: forecast_datetime
+        description: "Start of the forecasted hour (local time) — forecast_date + (hour_ending - 1) hours."
+      - name: forecast_date
+        description: "Target operating date being forecasted."
+      - name: hour_ending
+        description: '{{ doc("col_hour_ending") }}'
+      - name: wind_forecast
+        description: "Wind forecast (MW)."

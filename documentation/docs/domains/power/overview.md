@@ -85,18 +85,14 @@ All PJM dbt views live in the `pjm_cleaned` schema. See [dbt views detail](dbt-v
 | `pjm_load_da_hourly` | Hour x Region | Day-ahead cleared load |
 | `pjm_load_da_daily` | Day x Region | Daily DA load totals |
 | `pjm_load_rt_metered_hourly` | Hour x Region | Metered (actual) load |
-| `pjm_load_rt_metered_daily` | Day x Region | Daily metered load |
 | `pjm_load_rt_prelim_hourly` | Hour x Region | Preliminary real-time load |
-| `pjm_load_rt_prelim_daily` | Day x Region | Daily preliminary load |
 | `pjm_load_rt_instantaneous_hourly` | Hour x Region | Hourly average of 5-min instantaneous load |
 | `pjm_load_forecast_hourly` | Hour x Region | PJM 7-day load forecast |
-| `pjm_load_forecast_daily` | Day x Region | Daily load forecast |
 | `pjm_gridstatus_load_forecast_hourly` | Hour x Region | GridStatus-sourced load forecast |
 | `pjm_fuel_mix_hourly` | Hour x Fuel Type | Hourly generation by fuel |
 | `pjm_fuel_mix_daily` | Day x Fuel Type | Daily generation by fuel |
 | `pjm_outages_actual_daily` | Day x Region | Actual outage MW by type |
 | `pjm_outages_forecast_daily` | Day x Region | Forecast outage MW by type |
 | `pjm_tie_flows_hourly` | Hour x Interface | Hourly tie flows |
-| `pjm_tie_flows_daily` | Day x Interface | Daily tie flows |
 | `pjm_solar_forecast_hourly` | Hour | Solar generation forecast |
 | `pjm_wind_forecast_hourly` | Hour | Wind generation forecast |

@@ -45,9 +45,11 @@ WITH MKT_REGION_LOOKUP AS (
 
 FINAL AS (
     SELECT
-        datetime_beginning_ept
-        ,datetime_beginning_ept::DATE AS date
-        ,EXTRACT(HOUR FROM datetime_beginning_ept) + 1 AS hour_ending
+        load.datetime_beginning_utc
+        ,'US/Eastern' AS timezone
+        ,load.datetime_beginning_ept AS datetime_beginning_local
+        ,load.datetime_beginning_ept::DATE AS date
+        ,(EXTRACT(HOUR FROM load.datetime_beginning_ept) + 1)::INT AS hour_ending
 
         ,load.area AS zone
         ,lookup.mkt_region
@@ -58,8 +60,8 @@ FINAL AS (
     FROM {{ source('pjm_v1', 'five_min_instantaneous_load_v1_2025_oct_15') }} load
     LEFT JOIN MKT_REGION_LOOKUP lookup ON load.area = lookup.area
     WHERE
-        datetime_beginning_ept::DATE >= current_date - 14
+        load.datetime_beginning_ept::DATE >= current_date - 14
 )
 
 SELECT * FROM FINAL
-ORDER BY datetime_beginning_ept DESC, mkt_region, load_area
+ORDER BY datetime_beginning_local DESC, mkt_region, load_area

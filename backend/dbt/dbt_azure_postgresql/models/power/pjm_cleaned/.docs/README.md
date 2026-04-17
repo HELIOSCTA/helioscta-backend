@@ -12,30 +12,24 @@ Consumer-facing PJM power market views exposing LMPs, load (DA, RT metered, RT p
 | `pjm_lmps_daily` | `date x hub x period x market` |
 | `pjm_lmps_rt_hourly` | `date x hour_ending x hub` |
 | `pjm_load_da_hourly` | `date x hour_ending x region` |
-| `pjm_load_da_daily` | `date x region` |
 | `pjm_load_rt_metered_hourly` | `date x hour_ending x region` |
-| `pjm_load_rt_metered_daily` | `date x region` |
 | `pjm_load_rt_prelim_hourly` | `date x hour_ending x region` |
-| `pjm_load_rt_prelim_daily` | `date x region` |
 | `pjm_load_rt_instantaneous_hourly` | `date x hour_ending x region` |
 | `pjm_load_forecast_hourly` | `date x hour_ending x region x forecast_date` |
-| `pjm_load_forecast_daily` | `date x region x forecast_date` |
 | `pjm_gridstatus_load_forecast_hourly` | `date x hour_ending x region x forecast_date` |
 | `pjm_fuel_mix_hourly` | `date x hour_ending x fuel_type` |
-| `pjm_fuel_mix_daily` | `date x fuel_type` |
 | `pjm_outages_actual_daily` | `date x fuel_type` |
 | `pjm_outages_forecast_daily` | `date x fuel_type` |
 | `pjm_tie_flows_hourly` | `date x hour_ending x interface` |
-| `pjm_tie_flows_daily` | `date x interface` |
-| `pjm_solar_forecast_hourly` | `date x hour_ending x region x forecast_date` |
-| `pjm_wind_forecast_hourly` | `date x hour_ending x region x forecast_date` |
+| `pjm_gridstatus_solar_forecast_hourly` | `date x hour_ending x region x forecast_date` |
+| `pjm_gridstatus_wind_forecast_hourly` | `date x hour_ending x region x forecast_date` |
 
 ## Source Relations
 
 | Source | Upstream Staging Model |
 |--------|----------------------|
 | PJM Data Miner 2 | `staging_v1_pjm_lmps_hourly`, `staging_v1_pjm_lmps_daily`, `staging_v1_pjm_load_da_*`, `staging_v1_pjm_load_rt_*`, `staging_v1_pjm_load_forecast_*`, `staging_v1_pjm_outages_*`, `staging_v1_pjm_tie_flows_*` |
-| GridStatus (open-source) | `staging_v1_pjm_fuel_mix_*`, `staging_v1_pjm_solar_forecast_hourly`, `staging_v1_pjm_wind_forecast_hourly`, `staging_v1_pjm_gridstatus_load_forecast_hourly` |
+| GridStatus (open-source) | `staging_v1_pjm_fuel_mix_*`, `staging_v1_gridstatus_pjm_solar_forecast_hourly`, `staging_v1_gridstatus_pjm_wind_forecast_hourly`, `staging_v1_gridstatus_pjm_load_forecast_hourly` |
 | GridStatus.io (paid API) | `staging_v1_pjm_lmps_rt_hourly` |
 
 ## Key Columns

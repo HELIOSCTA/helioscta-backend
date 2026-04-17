@@ -1,6 +1,8 @@
 select
-  forecast_rank
-  ,forecast_execution_datetime
+  forecast_execution_datetime_utc
+  ,timezone
+  ,forecast_execution_datetime_local
+  ,forecast_rank
   ,forecast_execution_date
   ,forecast_datetime
   ,forecast_date

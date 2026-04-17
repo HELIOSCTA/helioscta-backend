@@ -84,17 +84,6 @@ Source and staging models are **ephemeral** (not materialized as tables/views). 
 | **Refresh** | View -- refreshes on query |
 | **SQL** | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/power/pjm_cleaned/.docs/pjm_load_rt_metered_hourly.sql) |
 
-### pjm_load_rt_metered_daily
-
-| Field | Value |
-|-------|-------|
-| **Business Definition** | Daily metered load by region and period (flat/peak/onpeak/offpeak) |
-| **Grain** | One row per date x region x period |
-| **Primary Keys** | `date`, `region`, `period` |
-| **Upstream** | `staging_v1_pjm_load_rt_metered_daily` |
-| **Refresh** | View -- refreshes on query |
-| **SQL** | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/power/pjm_cleaned/.docs/pjm_load_rt_metered_daily.sql) |
-
 ### pjm_load_rt_prelim_hourly
 
 | Field | Value |
@@ -106,17 +95,6 @@ Source and staging models are **ephemeral** (not materialized as tables/views). 
 | **Use Cases** | Intraday load tracking before metered data is available |
 | **Refresh** | View -- refreshes on query |
 | **SQL** | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/power/pjm_cleaned/.docs/pjm_load_rt_prelim_hourly.sql) |
-
-### pjm_load_rt_prelim_daily
-
-| Field | Value |
-|-------|-------|
-| **Business Definition** | Daily preliminary load by region and period (flat/peak/onpeak/offpeak) |
-| **Grain** | One row per date x region x period |
-| **Primary Keys** | `date`, `region`, `period` |
-| **Upstream** | `staging_v1_pjm_load_rt_prelim_daily` |
-| **Refresh** | View -- refreshes on query |
-| **SQL** | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/power/pjm_cleaned/.docs/pjm_load_rt_prelim_daily.sql) |
 
 ### pjm_load_rt_instantaneous_hourly
 
@@ -142,17 +120,6 @@ Source and staging models are **ephemeral** (not materialized as tables/views). 
 | **Use Cases** | Compare against Meteologica/trader forecasts, anticipate demand |
 | **Refresh** | View -- refreshes on query |
 | **SQL** | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/power/pjm_cleaned/.docs/pjm_load_forecast_hourly.sql) |
-
-### pjm_load_forecast_daily
-
-| Field | Value |
-|-------|-------|
-| **Business Definition** | Daily load forecast by region and period (flat/peak/onpeak/offpeak), holiday-aware |
-| **Grain** | One row per forecast_rank x forecast_date x region x period |
-| **Primary Keys** | `forecast_rank`, `forecast_date`, `region`, `period` |
-| **Upstream** | `staging_v1_pjm_load_forecast_daily` |
-| **Refresh** | View -- refreshes on query |
-| **SQL** | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/power/pjm_cleaned/.docs/pjm_load_forecast_daily.sql) |
 
 ### pjm_gridstatus_load_forecast_hourly
 
@@ -222,17 +189,6 @@ Source and staging models are **ephemeral** (not materialized as tables/views). 
 | **Use Cases** | Import/export tracking, cross-ISO flow analysis |
 | **Refresh** | View -- refreshes on query |
 | **SQL** | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/power/pjm_cleaned/.docs/pjm_tie_flows_hourly.sql) |
-
-### pjm_tie_flows_daily
-
-| Field | Value |
-|-------|-------|
-| **Business Definition** | Daily net tie flows by interface and period (flat/onpeak/offpeak) |
-| **Grain** | One row per date x tie_flow_name x period |
-| **Primary Keys** | `date`, `tie_flow_name`, `period` |
-| **Upstream** | `staging_v1_pjm_tie_flows_daily` |
-| **Refresh** | View -- refreshes on query |
-| **SQL** | [GitHub](https://github.com/helioscta/helioscta-backend/blob/main/backend/dbt/dbt_azure_postgresql/models/power/pjm_cleaned/.docs/pjm_tie_flows_daily.sql) |
 
 ### pjm_solar_forecast_hourly
 

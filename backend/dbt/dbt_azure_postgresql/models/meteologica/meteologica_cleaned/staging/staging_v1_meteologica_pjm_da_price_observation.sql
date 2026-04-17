@@ -6,8 +6,8 @@
 
 ---------------------------
 -- Meteologica PJM Day-Ahead Price Observation
--- UNIONs 13 raw tables (system + 12 hubs), normalizes to EPT date + hour_ending,
--- ranks by issue time (earliest first)
+-- UNIONs 13 raw tables (system + 12 hubs), produces UTC/timezone/local triplets for issue
+-- time and hour-ending observation time, ranks by issue time (earliest first).
 -- Grain: 1 row per update_rank x observation_date x hour_ending x hub
 ---------------------------
 
@@ -170,16 +170,22 @@ WITH UNIONED AS (
 ),
 
 ---------------------------
--- NORMALIZE TIMESTAMPS TO EPT
+-- NORMALIZE TIMESTAMPS (UTC + timezone + local triplets)
 ---------------------------
 
 NORMALIZED AS (
     SELECT
         hub
-        ,(issue_date::TIMESTAMP AT TIME ZONE 'UTC' AT TIME ZONE 'America/New_York') AS update_datetime
+        ,issue_date::TIMESTAMP AS update_datetime_utc
+        ,'US/Eastern' AS timezone
+        ,(issue_date::TIMESTAMP AT TIME ZONE 'UTC' AT TIME ZONE 'America/New_York') AS update_datetime_local
         ,(issue_date::TIMESTAMP AT TIME ZONE 'UTC' AT TIME ZONE 'America/New_York')::DATE AS update_date
+
+        ,((forecast_period_start + INTERVAL '1 hour') AT TIME ZONE 'America/New_York' AT TIME ZONE 'UTC') AS observation_datetime_ending_utc
+        ,(forecast_period_start + INTERVAL '1 hour') AS observation_datetime_ending_local
         ,forecast_period_start::DATE AS observation_date
         ,EXTRACT(HOUR FROM forecast_period_start)::INT + 1 AS hour_ending
+
         ,dayahead::NUMERIC AS observation_da_price
     FROM UNIONED
 ),
@@ -192,15 +198,15 @@ UPDATE_RANK AS (
     SELECT
         observation_date
         ,hub
-        ,update_datetime
+        ,update_datetime_local
 
         ,DENSE_RANK() OVER (
             PARTITION BY observation_date, hub
-            ORDER BY update_datetime ASC
+            ORDER BY update_datetime_local ASC
         ) AS update_rank
 
     FROM (
-        SELECT DISTINCT update_datetime, observation_date, hub
+        SELECT DISTINCT update_datetime_local, observation_date, hub
         FROM NORMALIZED
     ) sub
 ),
@@ -212,10 +218,13 @@ FINAL AS (
     SELECT
         r.update_rank
 
-        ,n.update_datetime
+        ,n.update_datetime_utc
+        ,n.timezone
+        ,n.update_datetime_local
         ,n.update_date
 
-        ,(n.observation_date + INTERVAL '1 hour' * (n.hour_ending - 1)) AS observation_datetime
+        ,n.observation_datetime_ending_utc
+        ,n.observation_datetime_ending_local
         ,n.observation_date
         ,n.hour_ending
 
@@ -224,10 +233,10 @@ FINAL AS (
 
     FROM NORMALIZED n
     JOIN UPDATE_RANK r
-        ON n.update_datetime = r.update_datetime
+        ON n.update_datetime_local = r.update_datetime_local
         AND n.observation_date = r.observation_date
         AND n.hub = r.hub
 )
 
 SELECT * FROM FINAL
-ORDER BY observation_date DESC, update_datetime DESC, hour_ending, hub
+ORDER BY observation_date DESC, update_datetime_local DESC, hour_ending, hub

@@ -19,8 +19,8 @@ Raw Meteologica tables (meteologica schema, ~234 PJM tables)
 | Field | Value |
 |-------|-------|
 | **Business Definition** | Meteologica's hourly demand forecasts for PJM, covering RTO-level and all sub-regions |
-| **Grain** | One row per forecast_execution_datetime x forecast_date x hour_ending x region |
-| **Primary Keys** | `forecast_rank`, `forecast_execution_datetime`, `forecast_execution_date`, `forecast_date`, `hour_ending`, `region` |
+| **Grain** | One row per forecast_execution_datetime_local x forecast_date x hour_ending x region |
+| **Primary Keys** | `forecast_rank`, `forecast_execution_datetime_local`, `forecast_execution_date`, `forecast_date`, `hour_ending`, `region` |
 | **Upstream** | `staging_v1_meteologica_pjm_demand_forecast_hourly` (36 source tables) |
 | **Use Cases** | Compare against PJM's own load forecast, identify demand surprises |
 | **Refresh** | View -- refreshes on query |
@@ -33,8 +33,8 @@ Raw Meteologica tables (meteologica schema, ~234 PJM tables)
 | Field | Value |
 |-------|-------|
 | **Business Definition** | Meteologica's hourly generation forecasts for PJM solar, wind, and hydro |
-| **Grain** | One row per forecast_execution_datetime x forecast_date x hour_ending x source x region |
-| **Primary Keys** | `forecast_rank`, `forecast_execution_datetime`, `forecast_execution_date`, `forecast_date`, `hour_ending`, `source`, `region` |
+| **Grain** | One row per forecast_execution_datetime_local x forecast_date x hour_ending x source x region |
+| **Primary Keys** | `forecast_rank`, `forecast_execution_datetime_local`, `forecast_execution_date`, `forecast_date`, `hour_ending`, `source`, `region` |
 | **Upstream** | `staging_v1_meteologica_pjm_gen_forecast_hourly` (14 source tables) |
 | **Use Cases** | Renewable generation outlook, net load forecasting |
 | **Refresh** | View -- refreshes on query |
@@ -47,8 +47,8 @@ Raw Meteologica tables (meteologica schema, ~234 PJM tables)
 | Field | Value |
 |-------|-------|
 | **Business Definition** | Meteologica's hourly day-ahead price forecasts for PJM system and 12 trading hubs |
-| **Grain** | One row per forecast_execution_datetime x forecast_date x hour_ending x hub |
-| **Primary Keys** | `forecast_rank`, `forecast_execution_datetime`, `forecast_execution_date`, `forecast_date`, `hour_ending`, `hub` |
+| **Grain** | One row per forecast_execution_datetime_local x forecast_date x hour_ending x hub |
+| **Primary Keys** | `forecast_rank`, `forecast_execution_datetime_local`, `forecast_execution_date`, `forecast_date`, `hour_ending`, `hub` |
 | **Upstream** | `staging_v1_meteologica_pjm_da_price_forecast_hourly` (13 source tables) |
 | **Use Cases** | Independent price signals for DA trading, compare against actual DA LMPs |
 | **Refresh** | View -- refreshes on query |
@@ -61,8 +61,8 @@ Raw Meteologica tables (meteologica schema, ~234 PJM tables)
 | Field | Value |
 |-------|-------|
 | **Business Definition** | Meteologica's ECMWF-ENS ensemble hourly demand forecasts for PJM, covering RTO-level and all sub-regions |
-| **Grain** | One row per forecast_execution_datetime x forecast_date x hour_ending x region |
-| **Primary Keys** | `forecast_rank`, `forecast_execution_datetime`, `forecast_execution_date`, `forecast_date`, `hour_ending`, `region` |
+| **Grain** | One row per forecast_execution_datetime_local x forecast_date x hour_ending x region |
+| **Primary Keys** | `forecast_rank`, `forecast_execution_datetime_local`, `forecast_execution_date`, `forecast_date`, `hour_ending`, `region` |
 | **Upstream** | `staging_v1_meteo_pjm_demand_fcst_ecmwf_ens_hourly` (36 source tables) |
 | **Use Cases** | Ensemble-based demand outlook, compare against deterministic forecasts and actuals |
 | **Refresh** | View -- refreshes on query |

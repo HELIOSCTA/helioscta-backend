@@ -4,6 +4,16 @@ models:
   - name: pjm_lmps_hourly
     description: '{{ doc("pjm_mart_lmps_hourly") }}'
     columns:
+      - name: datetime_beginning_utc
+        description: "Start of the hour interval (UTC)."
+      - name: datetime_ending_utc
+        description: "End of the hour interval (UTC)."
+      - name: timezone
+        description: "IANA timezone of all local timestamps (e.g., US/Eastern)."
+      - name: datetime_beginning_local
+        description: "Start of the hour interval (local time, see timezone column)."
+      - name: datetime_ending_local
+        description: "End of the hour interval (local time, see timezone column)."
       - name: date
         description: '{{ doc("col_date") }}'
       - name: hour_ending
@@ -28,72 +38,96 @@ models:
   - name: pjm_load_da_hourly
     description: '{{ doc("pjm_mart_load_da_hourly") }}'
     columns:
+      - name: datetime_beginning_utc
+        description: "Start of the hour interval (UTC)."
+      - name: datetime_ending_utc
+        description: "End of the hour interval (UTC)."
+      - name: timezone
+        description: "IANA timezone of all local timestamps (e.g., US/Eastern)."
+      - name: datetime_beginning_local
+        description: "Start of the hour interval (local time, see timezone column)."
+      - name: datetime_ending_local
+        description: "End of the hour interval (local time, see timezone column)."
       - name: date
         description: '{{ doc("col_date") }}'
       - name: hour_ending
         description: '{{ doc("col_hour_ending") }}'
       - name: region
         description: '{{ doc("col_region") }}'
-
-  - name: pjm_load_da_daily
-    description: '{{ doc("pjm_mart_load_da_daily") }}'
-    columns:
-      - name: date
-        description: '{{ doc("col_date") }}'
-      - name: region
-        description: '{{ doc("col_region") }}'
-      - name: period
-        description: '{{ doc("col_period") }}'
+      - name: da_load_mw
+        description: "Day-ahead cleared load (MW)."
 
   - name: pjm_load_rt_metered_hourly
     description: '{{ doc("pjm_mart_load_rt_metered_hourly") }}'
     columns:
+      - name: datetime_beginning_utc
+        description: "Start of the hour interval (UTC)."
+      - name: datetime_ending_utc
+        description: "End of the hour interval (UTC)."
+      - name: timezone
+        description: "IANA timezone of all local timestamps (e.g., US/Eastern)."
+      - name: datetime_beginning_local
+        description: "Start of the hour interval (local time, see timezone column)."
+      - name: datetime_ending_local
+        description: "End of the hour interval (local time, see timezone column)."
       - name: date
         description: '{{ doc("col_date") }}'
       - name: hour_ending
         description: '{{ doc("col_hour_ending") }}'
       - name: region
         description: '{{ doc("col_region") }}'
+      - name: rt_load_mw
+        description: "Metered real-time load (MW)."
 
   - name: pjm_load_rt_prelim_hourly
     description: '{{ doc("pjm_mart_load_rt_prelim_hourly") }}'
     columns:
+      - name: datetime_beginning_utc
+        description: "Start of the hour interval (UTC)."
+      - name: datetime_ending_utc
+        description: "End of the hour interval (UTC)."
+      - name: timezone
+        description: "IANA timezone of all local timestamps (e.g., US/Eastern)."
+      - name: datetime_beginning_local
+        description: "Start of the hour interval (local time, see timezone column)."
+      - name: datetime_ending_local
+        description: "End of the hour interval (local time, see timezone column)."
       - name: date
         description: '{{ doc("col_date") }}'
       - name: hour_ending
         description: '{{ doc("col_hour_ending") }}'
       - name: region
         description: '{{ doc("col_region") }}'
+      - name: rt_load_mw
+        description: "Preliminary real-time metered load (MW)."
 
   - name: pjm_load_forecast_hourly
     description: '{{ doc("pjm_mart_load_forecast_hourly") }}'
     columns:
       - name: forecast_rank
         description: '{{ doc("col_forecast_rank") }}'
+      - name: forecast_execution_datetime_utc
+        description: "When PJM issued this forecast (UTC)."
+      - name: forecast_execution_datetime_local
+        description: "When PJM issued this forecast (local time, see timezone column)."
+      - name: timezone
+        description: "IANA timezone of all local timestamps (e.g., US/Eastern)."
       - name: forecast_date
         description: "Target operating date being forecasted."
       - name: hour_ending
         description: '{{ doc("col_hour_ending") }}'
       - name: region
         description: '{{ doc("col_region") }}'
-
-  - name: pjm_load_forecast_hourly_historicals
-    description: "Historical PJM load forecasts: latest revision per forecast_execution_date, forecast_date, hour_ending, and region."
-    columns:
-      - name: forecast_date
-        description: "Target operating date being forecasted."
-      - name: hour_ending
-        description: '{{ doc("col_hour_ending") }}'
-      - name: region
-        description: '{{ doc("col_region") }}'
-      - name: forecast_rank
-        description: '{{ doc("col_forecast_rank") }}'
-      - name: forecast_load_mw
-        description: "Forecasted load (MW)."
 
   - name: pjm_gridstatus_load_forecast_hourly
     description: '{{ doc("pjm_mart_gridstatus_load_forecast_hourly") }}'
     columns:
+      - name: forecast_execution_datetime_utc
+        description: "When the forecast was issued (UTC)."
+      - name: timezone
+        description: "IANA timezone of all local timestamps (e.g., US/Eastern)."
+      - name: forecast_execution_datetime_local
+        description: "When the forecast was issued (local time, see timezone column)."
       - name: forecast_rank
         description: '{{ doc("col_forecast_rank") }}'
       - name: forecast_date
@@ -117,14 +151,6 @@ models:
       - name: forecast_load_mw
         description: "Forecasted load (MW)."
 
-  - name: pjm_fuel_mix_daily
-    description: '{{ doc("pjm_mart_fuel_mix_daily") }}'
-    columns:
-      - name: date
-        description: '{{ doc("col_date") }}'
-      - name: period
-        description: '{{ doc("col_period") }}'
-
   - name: pjm_outages_actual_daily
     description: '{{ doc("pjm_mart_outages_actual_daily") }}'
     columns:
@@ -136,6 +162,16 @@ models:
   - name: pjm_fuel_mix_hourly
     description: '{{ doc("pjm_mart_fuel_mix_hourly") }}'
     columns:
+      - name: datetime_beginning_utc
+        description: "Start of the hour interval (UTC)."
+      - name: datetime_ending_utc
+        description: "End of the hour interval (UTC)."
+      - name: timezone
+        description: "IANA timezone of all local timestamps (e.g., US/Eastern)."
+      - name: datetime_beginning_local
+        description: "Start of the hour interval (local time, see timezone column)."
+      - name: datetime_ending_local
+        description: "End of the hour interval (local time, see timezone column)."
       - name: date
         description: '{{ doc("col_date") }}'
       - name: hour_ending
@@ -144,6 +180,16 @@ models:
   - name: pjm_lmps_rt_hourly
     description: '{{ doc("pjm_mart_lmps_rt_hourly") }}'
     columns:
+      - name: datetime_beginning_utc
+        description: "Start of the hour interval (UTC)."
+      - name: datetime_ending_utc
+        description: "End of the hour interval (UTC)."
+      - name: timezone
+        description: "IANA timezone of all local timestamps (e.g., US/Eastern)."
+      - name: datetime_beginning_local
+        description: "Start of the hour interval (local time, see timezone column)."
+      - name: datetime_ending_local
+        description: "End of the hour interval (local time, see timezone column)."
       - name: date
         description: '{{ doc("col_date") }}'
       - name: hour_ending
@@ -151,47 +197,27 @@ models:
       - name: hub
         description: "PJM pricing hub name."
 
-  - name: pjm_load_forecast_daily
-    description: '{{ doc("pjm_mart_load_forecast_daily") }}'
-    columns:
-      - name: forecast_rank
-        description: '{{ doc("col_forecast_rank") }}'
-      - name: forecast_date
-        description: "Target operating date being forecasted."
-      - name: region
-        description: '{{ doc("col_region") }}'
-      - name: period
-        description: '{{ doc("col_period") }}'
-
   - name: pjm_load_rt_instantaneous_hourly
     description: '{{ doc("pjm_mart_load_rt_instantaneous_hourly") }}'
     columns:
+      - name: datetime_beginning_utc
+        description: "Start of the hour interval (UTC)."
+      - name: datetime_ending_utc
+        description: "End of the hour interval (UTC)."
+      - name: timezone
+        description: "IANA timezone of all local timestamps (e.g., US/Eastern)."
+      - name: datetime_beginning_local
+        description: "Start of the hour interval (local time, see timezone column)."
+      - name: datetime_ending_local
+        description: "End of the hour interval (local time, see timezone column)."
       - name: date
         description: '{{ doc("col_date") }}'
       - name: hour_ending
         description: '{{ doc("col_hour_ending") }}'
       - name: region
         description: '{{ doc("col_region") }}'
-
-  - name: pjm_load_rt_metered_daily
-    description: '{{ doc("pjm_mart_load_rt_metered_daily") }}'
-    columns:
-      - name: date
-        description: '{{ doc("col_date") }}'
-      - name: region
-        description: '{{ doc("col_region") }}'
-      - name: period
-        description: '{{ doc("col_period") }}'
-
-  - name: pjm_load_rt_prelim_daily
-    description: '{{ doc("pjm_mart_load_rt_prelim_daily") }}'
-    columns:
-      - name: date
-        description: '{{ doc("col_date") }}'
-      - name: region
-        description: '{{ doc("col_region") }}'
-      - name: period
-        description: '{{ doc("col_period") }}'
+      - name: rt_load_mw
+        description: "Instantaneous real-time load (MW), hourly average of 5-minute readings."
 
   - name: pjm_outages_forecast_daily
     description: '{{ doc("pjm_mart_outages_forecast_daily") }}'
@@ -208,6 +234,16 @@ models:
   - name: pjm_tie_flows_hourly
     description: '{{ doc("pjm_mart_tie_flows_hourly") }}'
     columns:
+      - name: datetime_beginning_utc
+        description: "Start of the hour interval (UTC)."
+      - name: datetime_ending_utc
+        description: "End of the hour interval (UTC)."
+      - name: timezone
+        description: "IANA timezone of all local timestamps (e.g., US/Eastern)."
+      - name: datetime_beginning_local
+        description: "Start of the hour interval (local time, see timezone column)."
+      - name: datetime_ending_local
+        description: "End of the hour interval (local time, see timezone column)."
       - name: date
         description: '{{ doc("col_date") }}'
       - name: hour_ending
@@ -215,19 +251,15 @@ models:
       - name: tie_flow_name
         description: "PJM tie flow interface name."
 
-  - name: pjm_tie_flows_daily
-    description: '{{ doc("pjm_mart_tie_flows_daily") }}'
+  - name: pjm_gridstatus_solar_forecast_hourly
+    description: '{{ doc("pjm_mart_gridstatus_solar_forecast_hourly") }}'
     columns:
-      - name: date
-        description: '{{ doc("col_date") }}'
-      - name: tie_flow_name
-        description: "PJM tie flow interface name."
-      - name: period
-        description: '{{ doc("col_period") }}'
-
-  - name: pjm_solar_forecast_hourly
-    description: '{{ doc("pjm_mart_solar_forecast_hourly") }}'
-    columns:
+      - name: forecast_execution_datetime_utc
+        description: "When the forecast was issued (UTC)."
+      - name: timezone
+        description: "IANA timezone of all local timestamps (e.g., US/Eastern)."
+      - name: forecast_execution_datetime_local
+        description: "When the forecast was issued (local time, see timezone column)."
       - name: forecast_rank
         description: '{{ doc("col_forecast_rank") }}'
       - name: forecast_date
@@ -235,9 +267,15 @@ models:
       - name: hour_ending
         description: '{{ doc("col_hour_ending") }}'
 
-  - name: pjm_wind_forecast_hourly
-    description: '{{ doc("pjm_mart_wind_forecast_hourly") }}'
+  - name: pjm_gridstatus_wind_forecast_hourly
+    description: '{{ doc("pjm_mart_gridstatus_wind_forecast_hourly") }}'
     columns:
+      - name: forecast_execution_datetime_utc
+        description: "When the forecast was issued (UTC)."
+      - name: timezone
+        description: "IANA timezone of all local timestamps (e.g., US/Eastern)."
+      - name: forecast_execution_datetime_local
+        description: "When the forecast was issued (local time, see timezone column)."
       - name: forecast_rank
         description: '{{ doc("col_forecast_rank") }}'
       - name: forecast_date
@@ -254,14 +292,34 @@ models:
   - name: pjm_dates_hourly
     description: '{{ doc("pjm_mart_dates_hourly") }}'
     columns:
-      - name: datetime
-        description: "Hourly timestamp."
+      - name: datetime_beginning_utc
+        description: "Start of the hour interval (UTC)."
+      - name: datetime_ending_utc
+        description: "End of the hour interval (UTC)."
+      - name: timezone
+        description: "IANA timezone of all local timestamps (e.g., US/Eastern)."
+      - name: datetime_beginning_local
+        description: "Start of the hour interval (local time, see timezone column)."
+      - name: datetime_ending_local
+        description: "End of the hour interval (local time, see timezone column)."
+      - name: date
+        description: '{{ doc("col_date") }}'
       - name: hour_ending
         description: '{{ doc("col_hour_ending") }}'
 
   - name: pjm_ancillary_services_hourly
     description: '{{ doc("pjm_mart_ancillary_services_hourly") }}'
     columns:
+      - name: datetime_beginning_utc
+        description: "Start of the hour interval (UTC)."
+      - name: datetime_ending_utc
+        description: "End of the hour interval (UTC)."
+      - name: timezone
+        description: "IANA timezone of all local timestamps (e.g., US/Eastern)."
+      - name: datetime_beginning_local
+        description: "Start of the hour interval (local time, see timezone column)."
+      - name: datetime_ending_local
+        description: "End of the hour interval (local time, see timezone column)."
       - name: date
         description: '{{ doc("col_date") }}'
       - name: hour_ending
@@ -274,6 +332,16 @@ models:
   - name: pjm_reserves_hourly
     description: '{{ doc("pjm_mart_reserves_hourly") }}'
     columns:
+      - name: datetime_beginning_utc
+        description: "Start of the hour interval (UTC)."
+      - name: datetime_ending_utc
+        description: "End of the hour interval (UTC)."
+      - name: timezone
+        description: "IANA timezone of all local timestamps (e.g., US/Eastern)."
+      - name: datetime_beginning_local
+        description: "Start of the hour interval (local time, see timezone column)."
+      - name: datetime_ending_local
+        description: "End of the hour interval (local time, see timezone column)."
       - name: date
         description: '{{ doc("col_date") }}'
       - name: hour_ending
@@ -287,16 +355,20 @@ models:
       - name: shortage_indicator
         description: "TRUE if shortage pricing was active."
 
-  - name: pjm_five_min_lmps_hourly
-    description: '{{ doc("pjm_mart_five_min_lmps_hourly") }}'
+  - name: pjm_lmps_rt_five_min
+    description: '{{ doc("pjm_mart_lmps_rt_five_min") }}'
     columns:
+      - name: datetime_beginning_utc
+        description: "Start of the 5-minute interval (UTC)."
+      - name: timezone
+        description: "IANA timezone of all local timestamps (e.g., US/Eastern)."
+      - name: datetime_beginning_local
+        description: "Start of the 5-minute interval (local time, see timezone column)."
       - name: date
         description: '{{ doc("col_date") }}'
       - name: hour_ending
         description: '{{ doc("col_hour_ending") }}'
       - name: hub
         description: "PJM pricing hub name."
-      - name: rt_lmp_max
-        description: "Maximum 5-min RT LMP for the hour ($/MWh)."
-      - name: spike_ratio
-        description: "Max / avg ratio. Values >> 1 indicate intra-hour spikes."
+      - name: rt_lmp
+        description: "5-minute real-time LMP ($/MWh)."

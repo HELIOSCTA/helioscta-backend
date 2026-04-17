@@ -9,9 +9,10 @@ Hourly demand (load) forecasts for PJM by region, from Meteologica's weather-dri
 
 ### Key Transformations
 - UNIONs 36 region-specific tables with a `region` label
-- Converts `issue_date` (VARCHAR, UTC) to `forecast_execution_datetime` (TIMESTAMP, EPT)
+- Produces `forecast_execution_datetime_utc` / `timezone` / `forecast_execution_datetime_local` triplet from UTC `issue_date`
+- Produces hour-ending target triplet `forecast_datetime_ending_utc` / `forecast_datetime_ending_local` from `forecast_period_start + INTERVAL '1 hour'`
 - Extracts `forecast_date` + `hour_ending` from `forecast_period_start` (already EPT)
-- Ranks vintages by issue time (earliest first) via `DENSE_RANK()` partitioned by `(forecast_date, region)`
+- Ranks vintages by issue time (earliest first) via `DENSE_RANK()` partitioned by `(forecast_date, region)`, ordered on `forecast_execution_datetime_local ASC`
 - No completeness filter — partial vintages are retained (see overview for rationale)
 
 ### Model
@@ -27,8 +28,8 @@ Hourly demand (load) forecasts for PJM by region, from Meteologica's weather-dri
 
 | Raw Column | Staging Column |
 |------------|---------------|
-| `issue_date` | `forecast_execution_datetime`, `forecast_execution_date` |
-| `forecast_period_start` | `forecast_date`, `hour_ending`, `forecast_datetime` |
+| `issue_date` | `forecast_execution_datetime_utc`, `timezone`, `forecast_execution_datetime_local`, `forecast_execution_date` |
+| `forecast_period_start` | `forecast_date`, `hour_ending`, `forecast_datetime_ending_utc`, `forecast_datetime_ending_local` |
 | `forecast_mw` | `forecast_load_mw` |
 
 {% enddocs %}
@@ -48,10 +49,11 @@ for quantifying forecast uncertainty.
 
 ### Key Transformations
 - UNIONs 36 region-specific tables with a `region` label
-- Converts `issue_date` (VARCHAR, UTC) to `forecast_execution_datetime` (TIMESTAMP, EPT)
+- Produces `forecast_execution_datetime_utc` / `timezone` / `forecast_execution_datetime_local` triplet from UTC `issue_date`
+- Produces hour-ending target triplet `forecast_datetime_ending_utc` / `forecast_datetime_ending_local` from `forecast_period_start + INTERVAL '1 hour'`
 - Extracts `forecast_date` + `hour_ending` from `forecast_period_start` (already EPT)
 - Casts all 54 MW columns (3 summary + 51 ensemble) from VARCHAR to NUMERIC
-- Ranks vintages by issue time (earliest first) via `DENSE_RANK()` partitioned by `(forecast_date, region)`
+- Ranks vintages by issue time (earliest first) via `DENSE_RANK()` partitioned by `(forecast_date, region)`, ordered on `forecast_execution_datetime_local ASC`
 - No completeness filter — partial vintages are retained (see overview for rationale)
 
 ### Model
@@ -67,8 +69,8 @@ for quantifying forecast uncertainty.
 
 | Raw Column | Staging Column |
 |------------|---------------|
-| `issue_date` | `forecast_execution_datetime`, `forecast_execution_date` |
-| `forecast_period_start` | `forecast_date`, `hour_ending`, `forecast_datetime` |
+| `issue_date` | `forecast_execution_datetime_utc`, `timezone`, `forecast_execution_datetime_local`, `forecast_execution_date` |
+| `forecast_period_start` | `forecast_date`, `hour_ending`, `forecast_datetime_ending_utc`, `forecast_datetime_ending_local` |
 | `average_mw` | `forecast_load_average_mw` |
 | `bottom_mw` | `forecast_load_bottom_mw` |
 | `top_mw` | `forecast_load_top_mw` |
@@ -93,14 +95,14 @@ weather-driven model.
 
 ### Key Transformations
 - UNIONs 17 tables with `source` (solar/wind/hydro) and `region` labels
-- Same timestamp normalization and ranking as the demand model
-- Ranked by issue time (earliest first) via `DENSE_RANK()` partitioned by `(forecast_date, source, region)`
+- Same UTC/timezone/local triplet normalization and ranking as the demand model
+- Ranked by issue time (earliest first) via `DENSE_RANK()` partitioned by `(forecast_date, source, region)`, ordered on `forecast_execution_datetime_local ASC`
 
 ### Model
 
 | Layer | Model | Materialization |
 |-------|-------|-----------------|
-| Staging | `staging_v1_meteologica_pjm_generation_forecast_hourly` | ephemeral |
+| Staging | `staging_v1_meteologica_pjm_gen_forecast_hourly` | ephemeral |
 | Mart | `meteologica_pjm_generation_forecast_hourly` | view |
 
 **Grain:** forecast_rank x forecast_date x hour_ending x source x region
@@ -109,8 +111,8 @@ weather-driven model.
 
 | Raw Column | Staging Column |
 |------------|---------------|
-| `issue_date` | `forecast_execution_datetime`, `forecast_execution_date` |
-| `forecast_period_start` | `forecast_date`, `hour_ending`, `forecast_datetime` |
+| `issue_date` | `forecast_execution_datetime_utc`, `timezone`, `forecast_execution_datetime_local`, `forecast_execution_date` |
+| `forecast_period_start` | `forecast_date`, `hour_ending`, `forecast_datetime_ending_utc`, `forecast_datetime_ending_local` |
 | `forecast_mw` | `forecast_generation_mw` |
 
 {% enddocs %}
@@ -131,8 +133,8 @@ Hourly DA electricity price forecasts for PJM by pricing hub, from Meteologica's
 
 ### Key Transformations
 - UNIONs 13 hub-specific tables with a `hub` label
-- Same timestamp normalization and ranking as the demand model
-- Ranked by issue time (earliest first) via `DENSE_RANK()` partitioned by `(forecast_date, hub)`
+- Same UTC/timezone/local triplet normalization and ranking as the demand model
+- Ranked by issue time (earliest first) via `DENSE_RANK()` partitioned by `(forecast_date, hub)`, ordered on `forecast_execution_datetime_local ASC`
 
 ### Model
 
@@ -147,8 +149,8 @@ Hourly DA electricity price forecasts for PJM by pricing hub, from Meteologica's
 
 | Raw Column | Staging Column |
 |------------|---------------|
-| `issue_date` | `forecast_execution_datetime`, `forecast_execution_date` |
-| `forecast_period_start` | `forecast_date`, `hour_ending`, `forecast_datetime` |
+| `issue_date` | `forecast_execution_datetime_utc`, `timezone`, `forecast_execution_datetime_local`, `forecast_execution_date` |
+| `forecast_period_start` | `forecast_date`, `hour_ending`, `forecast_datetime_ending_utc`, `forecast_datetime_ending_local` |
 | `day_ahead_price` | `forecast_da_price` |
 
 {% enddocs %}
@@ -165,9 +167,11 @@ Hourly DA electricity price forecasts for PJM by pricing hub, from Meteologica's
 
 ### Key Transformations
 - UNIONs 36 region-specific tables with a `region` label
-- Converts `issue_date` (VARCHAR, UTC) to `update_datetime` (TIMESTAMP, EPT)
-- Converts `forecast_period_start` (UTC) to `observation_datetime` (TIMESTAMP, EPT) and derives `observation_date`
-- Ranks updates by issue time (earliest first) via `DENSE_RANK()` partitioned by `(observation_date, region)`
+- Produces `update_datetime_utc` / `timezone` / `update_datetime_local` triplet from UTC `issue_date`
+- Produces `observation_datetime_ending_utc` / `observation_datetime_ending_local` triplet from `forecast_period_start` (treated as naive UTC → naive EPT)
+- Ranks updates by issue time (earliest first) via `DENSE_RANK()` partitioned by `(observation_date, region)`, ordered on `update_datetime_local ASC`
+
+**5-min exception:** the `observation_datetime_ending_*` values are *not* shifted forward one slot — they preserve the prior naive timestamp semantics (actually start-of-5-min-block) so the hourly rollup in `meteologica_pjm_demand_observation_hourly` continues to produce correct `hour_ending` values via `EXTRACT(HOUR FROM observation_datetime_ending_local) + 1`. The `_ending` suffix is used for naming consistency with the hourly marts.
 
 ### Model
 
@@ -176,14 +180,14 @@ Hourly DA electricity price forecasts for PJM by pricing hub, from Meteologica's
 | Staging | `staging_v1_meteologica_pjm_demand_observation` | ephemeral |
 | Mart | `meteologica_pjm_demand_observation_5min` | incremental (delete+insert) |
 
-**Grain:** update_rank x observation_datetime x region
+**Grain:** update_rank x observation_datetime_ending_local x region
 
 ### Column Mapping (raw -> staging)
 
 | Raw Column | Staging Column |
 |------------|---------------|
-| `issue_date` | `update_datetime`, `update_date` |
-| `forecast_period_start` | `observation_datetime`, `observation_date` |
+| `issue_date` | `update_datetime_utc`, `timezone`, `update_datetime_local`, `update_date` |
+| `forecast_period_start` | `observation_datetime_ending_utc`, `observation_datetime_ending_local`, `observation_date` |
 | `observation_mw` | `observation_load_mw` |
 
 {% enddocs %}
@@ -205,16 +209,17 @@ xTraders API.
 
 ### Key Transformations
 - UNIONs 9 tables with `source` (solar/wind/hydro) and `region` labels
-- Converts `issue_date` (VARCHAR, UTC) to `update_datetime` (TIMESTAMP, EPT)
+- Produces `update_datetime_utc` / `timezone` / `update_datetime_local` triplet from UTC `issue_date`
+- Produces hour-ending observation triplet `observation_datetime_ending_utc` / `observation_datetime_ending_local` from `forecast_period_start + INTERVAL '1 hour'`
 - Extracts `observation_date` + `hour_ending` from `forecast_period_start` (already EPT)
-- Ranks updates by issue time (earliest first) via `DENSE_RANK()` partitioned by `(observation_date, source, region)`
+- Ranks updates by issue time (earliest first) via `DENSE_RANK()` partitioned by `(observation_date, source, region)`, ordered on `update_datetime_local ASC`
 
 ### Model
 
 | Layer | Model | Materialization |
 |-------|-------|-----------------|
-| Staging | `staging_v1_meteologica_pjm_generation_observation_hourly` | ephemeral |
-| Mart | `meteologica_pjm_generation_observation_hourly` | view |
+| Staging | `staging_v1_meteologica_pjm_gen_observation` | ephemeral |
+| Mart | `meteologica_pjm_generation_observation` | view |
 
 **Grain:** update_rank x observation_date x hour_ending x source x region
 
@@ -222,8 +227,8 @@ xTraders API.
 
 | Raw Column | Staging Column |
 |------------|---------------|
-| `issue_date` | `update_datetime`, `update_date` |
-| `forecast_period_start` | `observation_date`, `hour_ending`, `observation_datetime` |
+| `issue_date` | `update_datetime_utc`, `timezone`, `update_datetime_local`, `update_date` |
+| `forecast_period_start` | `observation_date`, `hour_ending`, `observation_datetime_ending_utc`, `observation_datetime_ending_local` |
 | `observation_mw` | `observation_generation_mw` |
 
 {% enddocs %}
@@ -245,16 +250,17 @@ xTraders API.
 
 ### Key Transformations
 - UNIONs 13 hub-specific tables with a `hub` label
-- Converts `issue_date` (VARCHAR, UTC) to `update_datetime` (TIMESTAMP, EPT)
+- Produces `update_datetime_utc` / `timezone` / `update_datetime_local` triplet from UTC `issue_date`
+- Produces hour-ending observation triplet `observation_datetime_ending_utc` / `observation_datetime_ending_local` from `forecast_period_start + INTERVAL '1 hour'`
 - Extracts `observation_date` + `hour_ending` from `forecast_period_start` (already EPT)
-- Ranks updates by issue time (earliest first) via `DENSE_RANK()` partitioned by `(observation_date, hub)`
+- Ranks updates by issue time (earliest first) via `DENSE_RANK()` partitioned by `(observation_date, hub)`, ordered on `update_datetime_local ASC`
 
 ### Model
 
 | Layer | Model | Materialization |
 |-------|-------|-----------------|
-| Staging | `staging_v1_meteologica_pjm_da_price_observation_hourly` | ephemeral |
-| Mart | `meteologica_pjm_da_price_observation_hourly` | view |
+| Staging | `staging_v1_meteologica_pjm_da_price_observation` | ephemeral |
+| Mart | `meteologica_pjm_da_price_observation` | view |
 
 **Grain:** update_rank x observation_date x hour_ending x hub
 
@@ -262,9 +268,9 @@ xTraders API.
 
 | Raw Column | Staging Column |
 |------------|---------------|
-| `issue_date` | `update_datetime`, `update_date` |
-| `forecast_period_start` | `observation_date`, `hour_ending`, `observation_datetime` |
-| `observation` | `observation_da_price` |
+| `issue_date` | `update_datetime_utc`, `timezone`, `update_datetime_local`, `update_date` |
+| `forecast_period_start` | `observation_date`, `hour_ending`, `observation_datetime_ending_utc`, `observation_datetime_ending_local` |
+| `dayahead` | `observation_da_price` |
 
 {% enddocs %}
 
@@ -281,9 +287,10 @@ Hourly demand (load) projections for PJM by region, from Meteologica's demand no
 
 ### Key Transformations
 - UNIONs 33 region-specific tables with a `region` label
-- Converts `issue_date` (VARCHAR, UTC) to `update_datetime` (TIMESTAMP, EPT)
+- Produces `update_datetime_utc` / `timezone` / `update_datetime_local` triplet from UTC `issue_date`
+- Produces hour-ending projection triplet `projection_datetime_ending_utc` / `projection_datetime_ending_local` from `forecast_period_start + INTERVAL '1 hour'`
 - Extracts `projection_date` + `hour_ending` from `forecast_period_start` (already EPT)
-- Ranks updates by issue time (earliest first) via `DENSE_RANK()` partitioned by `(projection_date, region)`
+- Ranks updates by issue time (earliest first) via `DENSE_RANK()` partitioned by `(projection_date, region)`, ordered on `update_datetime_local ASC`
 
 ### Model
 
@@ -298,8 +305,8 @@ Hourly demand (load) projections for PJM by region, from Meteologica's demand no
 
 | Raw Column | Staging Column |
 |------------|---------------|
-| `issue_date` | `update_datetime`, `update_date` |
-| `forecast_period_start` | `projection_date`, `hour_ending`, `projection_datetime` |
+| `issue_date` | `update_datetime_utc`, `timezone`, `update_datetime_local`, `update_date` |
+| `forecast_period_start` | `projection_date`, `hour_ending`, `projection_datetime_ending_utc`, `projection_datetime_ending_local` |
 | `normal_mw` | `projection_load_mw` |
 
 {% enddocs %}
@@ -320,15 +327,16 @@ xTraders API.
 
 ### Key Transformations
 - UNIONs 9 tables with `source` (solar/wind/hydro) and `region` labels
-- Converts `issue_date` (VARCHAR, UTC) to `update_datetime` (TIMESTAMP, EPT)
+- Produces `update_datetime_utc` / `timezone` / `update_datetime_local` triplet from UTC `issue_date`
+- Produces hour-ending normal triplet `normal_datetime_ending_utc` / `normal_datetime_ending_local` from `forecast_period_start + INTERVAL '1 hour'`
 - Extracts `normal_date` + `hour_ending` from `forecast_period_start` (already EPT)
-- Ranks updates by issue time (earliest first) via `DENSE_RANK()` partitioned by `(normal_date, source, region)`
+- Ranks updates by issue time (earliest first) via `DENSE_RANK()` partitioned by `(normal_date, source, region)`, ordered on `update_datetime_local ASC`
 
 ### Model
 
 | Layer | Model | Materialization |
 |-------|-------|-----------------|
-| Staging | `staging_v1_meteologica_pjm_generation_normal_hourly` | ephemeral |
+| Staging | `staging_v1_meteologica_pjm_gen_normal_hourly` | ephemeral |
 | Mart | `meteologica_pjm_generation_normal_hourly` | view |
 
 **Grain:** update_rank x normal_date x hour_ending x source x region
@@ -337,8 +345,8 @@ xTraders API.
 
 | Raw Column | Staging Column |
 |------------|---------------|
-| `issue_date` | `update_datetime`, `update_date` |
-| `forecast_period_start` | `normal_date`, `hour_ending`, `normal_datetime` |
+| `issue_date` | `update_datetime_utc`, `timezone`, `update_datetime_local`, `update_date` |
+| `forecast_period_start` | `normal_date`, `hour_ending`, `normal_datetime_ending_utc`, `normal_datetime_ending_local` |
 | `normal_mw` | `normal_generation_mw` |
 
 {% enddocs %}

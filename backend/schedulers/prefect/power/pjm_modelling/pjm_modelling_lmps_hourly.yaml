@@ -1,0 +1,28 @@
+name: helioscta-power-pjm-modelling
+
+prefect-version: 3.0.0
+
+build: null
+push: null
+
+pull:
+  - prefect.deployments.steps.set_working_directory:
+      directory: /app
+
+deployments:
+
+  # ────── PJM Modelling LMPs Hourly ──────
+  # Refreshes the pjm_modelling.pjm_modelling_lmps_hourly view and syncs to blob.
+  # Runs early morning so the DA feature snapshot is ready before the DA model.
+
+  - name: Power - PJM Modelling LMPs Hourly
+    entrypoint: schedulers/prefect/power/pjm_modelling/pjm_modelling_lmps_hourly_flows.py:pjm_modelling_lmps_hourly
+    work_pool:
+      name: default-agent-pool
+      work_queue_name: default
+    tags: [pjm, power, pjm_modelling, lmps_hourly]
+    schedules:
+
+      # ────── Daily at 4:00 AM MST (6:00 AM EPT), before DA model run ──────
+      - cron: "0 4 * * *"
+        timezone: "America/Denver"

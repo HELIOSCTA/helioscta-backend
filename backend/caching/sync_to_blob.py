@@ -4,6 +4,7 @@ import time
 from pathlib import Path
 
 import pandas as pd
+import pyarrow as pa
 
 from backend import secrets
 from backend.utils import (
@@ -22,6 +23,67 @@ logger = logging_utils.init_logging(
 
 AZURE_OPTS = {"connection_string": secrets.AZURE_STORAGE_CONNECTION_STRING}
 CONTAINER = secrets.AZURE_CONTAINER_NAME
+
+
+# ── PostgreSQL → PyArrow type mapping ──────────────────────────────────────────
+
+PG_TO_PYARROW = {
+    "bigint":                       pa.int64(),
+    "integer":                      pa.int32(),
+    "smallint":                     pa.int16(),
+    "double precision":             pa.float64(),
+    "real":                         pa.float32(),
+    "numeric":                      pa.float64(),
+    "boolean":                      pa.bool_(),
+    "date":                         pa.date32(),
+    "timestamp without time zone":  pa.timestamp("us"),
+    "timestamp with time zone":     pa.timestamp("us", tz="UTC"),
+    "character varying":            pa.string(),
+    "text":                         pa.string(),
+}
+
+
+def _get_pyarrow_schema(schema: str, table: str) -> pa.Schema | None:
+    """Query information_schema.columns and return a PyArrow schema."""
+    df = azure_postgresql.pull_from_db(
+        query=(
+            f"SELECT column_name, data_type "
+            f"FROM information_schema.columns "
+            f"WHERE table_schema = '{schema}' AND table_name = '{table}' "
+            f"ORDER BY ordinal_position"
+        )
+    )
+    if df is None or df.empty:
+        return None
+
+    fields = []
+    for _, row in df.iterrows():
+        pa_type = PG_TO_PYARROW.get(row["data_type"], pa.string())
+        fields.append(pa.field(row["column_name"], pa_type))
+
+    return pa.schema(fields)
+
+
+def _cast_df_to_schema(df: pd.DataFrame, pa_schema: pa.Schema) -> pd.DataFrame:
+    """Cast DataFrame columns to match the PyArrow schema."""
+    for field in pa_schema:
+        col = field.name
+        if col not in df.columns:
+            continue
+
+        if pa.types.is_date(field.type):
+            df[col] = pd.to_datetime(df[col]).dt.date
+        elif pa.types.is_timestamp(field.type):
+            df[col] = pd.to_datetime(df[col])
+        elif pa.types.is_integer(field.type):
+            df[col] = pd.array(df[col], dtype=pd.Int64Dtype())
+        elif pa.types.is_boolean(field.type):
+            df[col] = df[col].astype(pd.BooleanDtype())
+
+    return df
+
+
+# ── Sync ───────────────────────────────────────────────────────────────────────
 
 
 def sync_to_blob(
@@ -44,6 +106,8 @@ def sync_to_blob(
         The blob path written to (e.g. "az://helioscta/pjm_cleaned/pjm_lmps_hourly.parquet").
     """
     logger.header("Syncing to Azure Blob Storage")
+
+    # ────── Pull data from PostgreSQL ──────
     logger.section(f"Pulling {schema}.{table} from PostgreSQL ...")
     t0 = time.perf_counter()
     df = azure_postgresql.pull_from_db(
@@ -54,16 +118,28 @@ def sync_to_blob(
         raise RuntimeError(f"No data returned from {schema}.{table}")
     logger.info(f"Pulled {len(df):,} rows in {elapsed:.1f}s")
 
+    # ────── Cast data types from PostgreSQL schema ──────
+    pa_schema = _get_pyarrow_schema(schema, table)
+    if pa_schema:
+        logger.section("Casting data types from PostgreSQL schema ...")
+        df = _cast_df_to_schema(df, pa_schema)
+        for field in pa_schema:
+            logger.info(f"  {field.name}: {field.type}")
+    else:
+        logger.info("Could not resolve schema — writing with pandas defaults")
+
     if sort_by:
         logger.section(f"Sorting by {sort_by} ...")
         df = df.sort_values(sort_by).reset_index(drop=True)
 
+    # ────── Upload to Azure Blob Storage ──────
     logger.section(f"Uploading to Azure Blob Storage ...")
     blob_path = f"az://{CONTAINER}/{schema}/{table}.parquet"
     df.to_parquet(
         blob_path,
         index=False,
         engine="pyarrow",
+        schema=pa_schema,
         row_group_size=row_group_size,
         storage_options=AZURE_OPTS,
     )
@@ -108,8 +184,11 @@ def pull_from_blob(
 
 if __name__ == "__main__":
 
+    # table = "pjm_lmps_hourly"
+    table = 'pjm_fuel_mix_hourly'
+
     # upsert to blob
-    sync_to_blob(schema="pjm_cleaned", table="pjm_tie_flows_hourly")
-    
+    sync_to_blob(schema="pjm_cleaned", table=table)
+
     # pull from blob
-    df = pull_from_blob(schema="pjm_cleaned", table="pjm_tie_flows_hourly")
+    df = pull_from_blob(schema="pjm_cleaned", table=table)
