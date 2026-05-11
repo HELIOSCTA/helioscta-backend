@@ -49,6 +49,13 @@ PJM_POWER_FUTURES_PRODUCTS: list[dict] = [
         "contract_type": "futures",
         "region": "pjm",
     },
+    {
+        "product": "OPJ",
+        "description": "PJM Western Hub RT OffPeak (1 MW)",
+        "product_type": "power",
+        "contract_type": "futures",
+        "region": "pjm",
+    },
 ]
 
 

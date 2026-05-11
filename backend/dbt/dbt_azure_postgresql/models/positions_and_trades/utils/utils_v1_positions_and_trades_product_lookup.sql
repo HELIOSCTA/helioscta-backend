@@ -62,11 +62,16 @@ SELECT * FROM (
     -- GAS - OPTIONS - CME
     ('NG', 'LN',  'NG', 'GAS_OPTIONS', 'HENRY_HUB',                 'NYM EUR NATURAL GAS', 'EUR NAT GAS'),
     ('NG', 'LN',  'NG', 'GAS_OPTIONS', 'HENRY_HUB',                 'NATURAL GAS CLEARPORT', 'EUR NAT GAS'),
+    
+    -- GAS - OPTIONS - WEEKLY - CME
     ('NGW', 'LN1', 'NG', 'GAS_OPTIONS', 'HENRY_HUB',                'NATURAL GAS FINANCIAL Week 1', 'NAT GAS FIN WKLY WK1'),
     ('NGW', 'LN2', 'NG', 'GAS_OPTIONS', 'HENRY_HUB',                'NATURAL GAS FINANCIAL Week 2', 'NAT GAS FIN WKLY WK2'),
     ('NGW', 'LN3', 'NG', 'GAS_OPTIONS', 'HENRY_HUB',                'NATURAL GAS FINANCIAL Week 3', 'NAT GAS FIN WKLY WK3'),
     ('NGW', 'LN4', 'NG', 'GAS_OPTIONS', 'HENRY_HUB',                'NATURAL GAS FINANCIAL Week 4', 'NAT GAS FIN WKLY WK4'),
     ('NGW', 'LN5', 'NG', 'GAS_OPTIONS', 'HENRY_HUB',                'NATURAL GAS FINANCIAL Week 5', 'NAT GAS FIN WKLY WK5'),
+
+    -- GAS - OPTIONS - DAILY - CME
+    ('HZI', 'KN4', 'NG', 'GAS_OPTIONS', 'HENRY_HUB',                'NATURAL GAS FINANCIAL Week 4', 'NAT GAS FIN WKLY WK4'),
 
     -- GAS - OPTIONS - CAL SPREADS - CME
     (NULL, 'G3', 'NG', 'GAS_OPTIONS', 'HENRY_HUB',                 'NATURAL GAS 3M CSO', 'NAT GAS CAL SPRD FIN 3MO'),
@@ -136,7 +141,11 @@ SELECT * FROM (
     (NULL, 'SPM', NULL, 'POWER_FUTURES', 'CAISO',                  'ICE SP 15 PEAK_384', 'CAISO SP15 PEAK FIXED'),
     (NULL, 'SPM', NULL, 'POWER_FUTURES', 'CAISO',                  'ICE SP 15 PEAK_400', 'CAISO SP15 PEAK FIXED'),
     (NULL, 'SPM', NULL, 'POWER_FUTURES', 'CAISO',                  'ICE SP 15 PEAK_416', 'CAISO SP15 PEAK FIXED'),
+    (NULL, 'SPM', NULL, 'POWER_FUTURES', 'CAISO',                  'ICE SP 15 PEAK_432', 'CAISO SP15 PEAK FIXED'),
+    (NULL, 'NPM', NULL, 'POWER_FUTURES', 'CAISO',                  'ICE NP 15 PEAK', 'CAISO NP15 PEAK FIXED'),
+    (NULL, 'NPM', NULL, 'POWER_FUTURES', 'CAISO',                  'ICE NP 15 PEAK_384', 'CAISO NP15 PEAK FIXED'),
     (NULL, 'NPM', NULL, 'POWER_FUTURES', 'CAISO',                  'ICE NP 15 PEAK_416', 'CAISO NP15 PEAK FIXED'),
+    (NULL, 'NPM', NULL, 'POWER_FUTURES', 'CAISO',                  'ICE NP 15 PEAK_432', 'CAISO NP15 PEAK FIXED'),
 
     -- PAC NW
     (NULL, 'MDC', NULL, 'POWER_FUTURES', 'PAC_NW',                  'ICE MID-C PEAK', 'MID C FIN PEAK ELEC'),

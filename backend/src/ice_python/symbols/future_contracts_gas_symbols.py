@@ -59,6 +59,13 @@ GAS_FUTURES_PRODUCTS: list[dict] = [
         "region": "southeast",
     },
     {
+        "product": "TFL",
+        "description": "TGP 500L Basis",
+        "product_type": "gas",
+        "contract_type": "futures",
+        "region": "southeast",
+    },
+    {
         "product": "CGB",
         "description": "Columbia Gulf Basis",
         "product_type": "gas",

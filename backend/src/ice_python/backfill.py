@@ -13,8 +13,7 @@ def _load_module(module_name: str):
 def main(
     run_next_day_gas: bool = False,
     run_balmo: bool = False,
-    run_future_contracts: bool = False,
-    run_future_contracts_v2: bool = True,
+    run_future_contracts: bool = True,
 ) -> None:
     executed: list[str] = []
     try:
@@ -56,19 +55,6 @@ def main(
             )
             executed.append("future_contracts_v1_2025_dec_16")
 
-        if run_future_contracts_v2:
-            print("Backfilling future contracts (v2)...")
-            future_contracts_v2_module = _load_module(
-                "backend.src.ice_python.future_contracts.future_contracts_v2_2026_mar_10"
-            )
-            future_contracts_v2_module.main(
-                start_date=datetime(2019, 1, 1),
-                end_date=datetime(2028, 12, 31),
-                include_expired=True,
-                contract_start_year=2020,
-                contract_end_year=2028,
-            )
-            executed.append("future_contracts_v2_2026_mar_10")
 
         print(f"Completed pipelines: {', '.join(executed) if executed else 'none'}")
 

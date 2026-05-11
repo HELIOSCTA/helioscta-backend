@@ -162,6 +162,9 @@ TRADES_WITH_CME_EXCEL AS (
             -- WEEKLY
             WHEN exch_comm_cd in ('LN1', 'LN2', 'LN3', 'LN4', 'LN5') THEN CONCAT('1|', 'G', '|', 'XNYM:O:KN', SUBSTRING(exch_comm_cd, 3, 2), ':', contract_year_month, ':', put_call, ':', RTRIM(TO_CHAR(strike_price, 'FM999999999.999'), '.'))
 
+            -- DAILY
+            WHEN exch_comm_cd in ('KN4') THEN CONCAT('1|', 'G', '|', 'XNYM:O:KN', SUBSTRING(exch_comm_cd, 3, 2), ':', contract_year_month, ':', put_call, ':', RTRIM(TO_CHAR(strike_price, 'FM999999999.999'), '.'))
+
             -- TODO: CAL SPREAD
             WHEN exch_comm_cd in ('G3', 'G4') THEN ''
 
@@ -234,6 +237,18 @@ TRADES_WITH_BBG_CODES AS (
                     ' ',
                     RTRIM(TO_CHAR(strike_price, 'FM999999999.999'), '.'),
                     ' COMB'
+                )
+            
+            -- DAILY
+            WHEN exch_comm_cd in ('KN4') THEN
+                CONCAT(
+                    bbg_exchange_code,
+                    futures_contract_month_yy,
+                    put_call,
+                    SUBSTRING(exch_comm_cd, 3, 2),  -- day number
+                    ' ',
+                    RTRIM(TO_CHAR(strike_price, 'FM999999999.999'), '.'),
+                    ' Comdty'
                 )
 
             ELSE NULL
