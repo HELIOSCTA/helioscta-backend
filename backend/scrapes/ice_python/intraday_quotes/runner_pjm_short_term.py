@@ -112,7 +112,7 @@ def _upsert(
 def main(
     symbols: list[str] | None = None,
     fields: list[str] | None = None,
-) -> pd.DataFrame:
+) -> dict:
     """Capture a single quote snapshot for PJM symbols.
 
     Parameters
@@ -141,15 +141,15 @@ def main(
         raw_data = _pull(symbols=selected_symbols, fields=fields)
         if not raw_data or len(raw_data) <= 1:
             logger.warning("No quote data returned from ICE")
-            run.success(
-                rows_processed=0,
-                metadata={
-                    "symbols_requested": len(selected_symbols),
-                    "symbols_returned": 0,
-                    "symbols_selected": selected_symbols,
-                },
-            )
-            return ice_intraday_quotes_utils.empty_intraday_quotes_frame()
+            empty_metadata = {
+                "symbols_requested": len(selected_symbols),
+                "symbols_returned": 0,
+                "symbols_selected": selected_symbols,
+                "rows_processed": 0,
+                "latest_trade_date": None,
+            }
+            run.success(rows_processed=0, metadata=empty_metadata)
+            return empty_metadata
 
         # Format
         snapshot_at = ice_intraday_quotes_utils.current_snapshot_at_mst()
@@ -157,15 +157,15 @@ def main(
 
         if df.empty:
             logger.warning("All rows dropped during formatting")
-            run.success(
-                rows_processed=0,
-                metadata={
-                    "symbols_requested": len(selected_symbols),
-                    "symbols_returned": 0,
-                    "symbols_selected": selected_symbols,
-                },
-            )
-            return ice_intraday_quotes_utils.empty_intraday_quotes_frame()
+            empty_metadata = {
+                "symbols_requested": len(selected_symbols),
+                "symbols_returned": 0,
+                "symbols_selected": selected_symbols,
+                "rows_processed": 0,
+                "latest_trade_date": None,
+            }
+            run.success(rows_processed=0, metadata=empty_metadata)
+            return empty_metadata
 
         # Audit symbol coverage
         returned_symbols = set(df["symbol"].unique())
@@ -190,21 +190,21 @@ def main(
         _upsert(df=df)
         logger.success("Snapshot upserted successfully")
 
-        run.success(
-            rows_processed=len(df),
-            metadata={
-                "symbols_requested": len(requested_symbols),
-                "symbols_returned": len(returned_symbols),
-                "symbols_selected": selected_symbols,
-                "symbols_missing": sorted(missing_symbols),
-                "data_types_requested": sorted(requested_fields),
-                "data_types_returned": sorted(returned_data_types),
-                "data_types_missing": sorted(missing_data_types),
-                "trade_date": snapshot_at.date().isoformat(),
-                "snapshot_at": snapshot_at.isoformat(),
-            },
-        )
-        return df
+        metadata = {
+            "symbols_requested": len(requested_symbols),
+            "symbols_returned": len(returned_symbols),
+            "symbols_selected": selected_symbols,
+            "symbols_missing": sorted(missing_symbols),
+            "data_types_requested": sorted(requested_fields),
+            "data_types_returned": sorted(returned_data_types),
+            "data_types_missing": sorted(missing_data_types),
+            "trade_date": snapshot_at.date().isoformat(),
+            "latest_trade_date": snapshot_at.date().isoformat(),
+            "snapshot_at": snapshot_at.isoformat(),
+            "rows_processed": len(df),
+        }
+        run.success(rows_processed=len(df), metadata=metadata)
+        return metadata
 
     except Exception as exc:
         logger.exception(f"Pipeline failed: {exc}")

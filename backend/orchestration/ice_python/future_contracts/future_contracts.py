@@ -2,12 +2,16 @@
 
 Wraps `backend.scrapes.ice_python.future_contracts.future_contracts_v1_2025_dec_16`
 with:
-  1. A trading-hours gate (weekday 05:00-16:00 MT). Backstops off-schedule
-     fires; the .ps1 already constrains the window to 12:15-15:45 MT.
+  1. A post-pull freshness check. If the scrape did not return any rows for
+     today's MT trade date, the run is marked degraded (warning logged) but
+     not failed — ICE may simply not have published yet. Task Scheduler's
+     .ps1 owns the firing cadence; this wrapper no longer pre-empts on the
+     wall clock.
   2. A narrow ICE-transient retry for cold-start COM failures.
 
-Intended cadence: every 30 min 12:15-15:45 MT, daily. Task Scheduler owns
-the window via .ps1; this gate only catches off-schedule invocations.
+Intended cadence: every 30 min 12:15-15:45 MT, daily. Off-schedule fires
+(manual reruns, backstops) are allowed through so the orchestration can
+catch settles published just before/after the .ps1 window.
 
 Usage (local Windows host, via Task Scheduler):
     python -m backend.orchestration.ice_python.future_contracts
@@ -19,13 +23,11 @@ concurrent processes (each gets its own ICE XL / COM apartment).
 """
 from __future__ import annotations
 
-from datetime import datetime
 from pathlib import Path
 
 from backend.orchestration.ice_python._policies import (
     ice_transient_retry_policy,
-    is_within_trading_hours,
-    TRADING_TZ,
+    is_today_landed,
 )
 from backend.scrapes.ice_python.future_contracts import future_contracts_v1_2025_dec_16
 from backend.scrapes.ice_python.symbols.futures.gas import get_gas_futures_products
@@ -42,8 +44,8 @@ logger = logging_utils.init_logging(
 
 
 @ice_transient_retry_policy(attempts=2)
-def _run_scrape(specific_products: list[str] | None) -> None:
-    future_contracts_v1_2025_dec_16.main(specific_products=specific_products)
+def _run_scrape(specific_products: list[str] | None) -> dict:
+    return future_contracts_v1_2025_dec_16.main(specific_products=specific_products)
 
 
 def _log_products(specific_products: list[str] | None) -> None:
@@ -84,21 +86,25 @@ def run(
     try:
         logger.header(label)
 
-        now = datetime.now(TRADING_TZ)
-        if not is_within_trading_hours(now):
-            logger.info(
-                f"Outside trading hours ({now:%Y-%m-%d %H:%M %Z}, "
-                f"weekday={now.strftime('%a')}) - skipping."
-            )
-            return 0
-
         _log_products(specific_products)
 
-        logger.section(
-            f"Trading hours ({now:%Y-%m-%d %H:%M %Z}) - invoking {label}"
+        logger.section(f"Invoking {label}")
+        summary = _run_scrape(specific_products=specific_products)
+
+        is_fresh, today, latest = is_today_landed(
+            summary.get("latest_trade_date") if summary else None
         )
-        _run_scrape(specific_products=specific_products)
-        logger.success(f"{label} completed")
+        if is_fresh:
+            logger.success(
+                f"{label} completed -- today's settle landed "
+                f"(latest_trade_date={latest})"
+            )
+        else:
+            logger.warning(
+                f"{label} completed but today's settle did NOT land "
+                f"(today={today}, latest_trade_date={latest}) -- "
+                f"ICE may not have published yet, will catch on the next fire"
+            )
         return 0
 
     except Exception as exc:

@@ -1,10 +1,11 @@
 """Task Scheduler entry point for the PJM short-term ICE ticker data scrape.
 
-Wraps `backend.scrapes.ice_python.ticker_data.runner_pjm_short_term.main`
+Wraps `backend.scrapes.ice_python.intraday_quotes.runner_pjm_short_term`
 with:
-  1. A weekday + market-hours gate (05:00–16:00 MT). Off-hours fires exit 0
-     with a stdout note so Task Scheduler logs stay readable and the
-     pipeline_runs table doesn't fill with no-op rows.
+  1. A post-pull freshness check. If the snapshot produced no rows for
+     today's MT trade date, the run is marked degraded (warning logged) but
+     not failed. Task Scheduler's .ps1 owns the firing cadence; this wrapper
+     no longer pre-empts on the wall clock.
   2. A narrow ICE-transient retry for cold-start COM failures that raise
      before the per-symbol retry loop in get_timesales_batch can catch them.
 
@@ -13,17 +14,14 @@ Usage (local Windows host, via Task Scheduler):
 """
 from __future__ import annotations
 
-import logging
 import sys
-from datetime import datetime
 from pathlib import Path
 
 from backend.orchestration.ice_python._policies import (
     ice_transient_retry_policy,
-    is_within_trading_hours,
-    TRADING_TZ,
+    is_today_landed,
 )
-from backend.scrapes.ice_python.ticker_data import runner_pjm_short_term
+from backend.scrapes.ice_python.intraday_quotes import runner_pjm_short_term
 from backend.utils import logging_utils
 
 API_SCRAPE_NAME = "orchestration_ice_python_ticker_data"
@@ -37,28 +35,31 @@ logger = logging_utils.init_logging(
 
 
 @ice_transient_retry_policy(attempts=2)
-def _run_scrape() -> None:
-    runner_pjm_short_term.main()
+def _run_scrape() -> dict:
+    return runner_pjm_short_term.main()
 
 
 def main() -> int:
-    """Run the ICE ticker scrape if the market is open. Returns an exit code."""
+    """Run the ICE ticker scrape and verify today's snapshot landed."""
     try:
         logger.header(API_SCRAPE_NAME)
+        logger.section(f"Invoking {API_SCRAPE_NAME}")
+        summary = _run_scrape()
 
-        now = datetime.now(TRADING_TZ)
-        if not is_within_trading_hours(now):
-            logger.info(
-                f"Outside trading hours ({now:%Y-%m-%d %H:%M %Z}, "
-                f"weekday={now.strftime('%a')}) — skipping."
-            )
-            return 0
-
-        logger.section(
-            f"Trading hours ({now:%Y-%m-%d %H:%M %Z}) — invoking ticker scrape"
+        is_fresh, today, latest = is_today_landed(
+            summary.get("latest_trade_date") if summary else None
         )
-        _run_scrape()
-        logger.success("Ticker scrape completed")
+        if is_fresh:
+            logger.success(
+                f"Ticker scrape completed -- snapshot landed for today "
+                f"({latest}, rows={summary.get('rows_processed', 0)})"
+            )
+        else:
+            logger.warning(
+                f"Ticker scrape completed but no rows for today "
+                f"(today={today}, latest_trade_date={latest}) -- "
+                f"ICE may be quiet or off-hours, will catch on the next fire"
+            )
         return 0
 
     except Exception as exc:

@@ -2,8 +2,10 @@
 from __future__ import annotations
 
 import logging
-from datetime import datetime
+from datetime import date, datetime
+from typing import Any
 
+import pandas as pd
 import pytz
 from tenacity import (
     before_sleep_log,
@@ -42,6 +44,46 @@ def is_weekday(now: datetime | None = None) -> bool:
     if now.tzinfo is None:
         now = TRADING_TZ.localize(now)
     return now.weekday() < 5
+
+
+# ────── Post-pull data-freshness check ──────
+# Preferred over the wall-clock gate above for intraday-cadence ICE scrapes:
+# proceed with the pull, then ask "did today's settle land?" off the data the
+# scrape just returned. Avoids the false-negative case where today's settle
+# is published but the wall-clock fires after the window closes.
+
+def _coerce_to_date(value: Any) -> date | None:
+    """Best-effort coerce pd.Timestamp / datetime / date / ISO str → date."""
+    if value is None or (isinstance(value, float) and pd.isna(value)):
+        return None
+    if isinstance(value, pd.Timestamp):
+        return value.date()
+    if isinstance(value, datetime):
+        return value.date()
+    if isinstance(value, date):
+        return value
+    if isinstance(value, str):
+        return date.fromisoformat(value[:10])
+    raise TypeError(f"Cannot coerce {type(value).__name__} to date: {value!r}")
+
+
+def is_today_landed(
+    latest_trade_date: Any,
+    now: datetime | None = None,
+) -> tuple[bool, date, date | None]:
+    """Did the most recent row in the pull cover today's (MT) trade date?
+
+    Returns ``(is_fresh, today, latest)``. Pure function — no DB round-trip.
+    Callers pass the max trade_date observed during the scrape (or ``None``
+    if the scrape returned no rows).
+    """
+    now = now or datetime.now(TRADING_TZ)
+    if now.tzinfo is None:
+        now = TRADING_TZ.localize(now)
+    today = now.date()
+    latest = _coerce_to_date(latest_trade_date)
+    is_fresh = latest is not None and latest >= today
+    return is_fresh, today, latest
 
 
 # ────── Transient-error retry policy ──────

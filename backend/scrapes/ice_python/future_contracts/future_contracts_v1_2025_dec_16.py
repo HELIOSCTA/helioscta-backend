@@ -231,7 +231,7 @@ def main(
     specific_products: list[str] | None = None,
     max_retries: int = 3,
     completeness_threshold: float = COMPLETENESS_THRESHOLD,
-) -> pd.DataFrame:
+) -> dict:
     current_date = datetime.now()
     contract_start_year = contract_start_year or current_date.year
     contract_end_year = contract_end_year or (current_date.year + 3)
@@ -266,6 +266,7 @@ def main(
     expected_symbols: set[str] = set()
     field_row_counts: dict[str, int] = {field: 0 for field in data_types}
     audits: list[dict] = []
+    latest_trade_date = None  # pd.Timestamp | date | None — coerced at end
 
     try:
         logger.header(API_SCRAPE_NAME)
@@ -341,6 +342,9 @@ def main(
                         strip_batch.append(df)
                         field_row_counts[field] += len(df)
                         symbol_rows += len(df)
+                        df_max = df[date_col].max()
+                        if latest_trade_date is None or df_max > latest_trade_date:
+                            latest_trade_date = df_max
 
                     if symbol_rows == 0:
                         logger.warning(f"No data returned for {symbol} (all fields empty)")
@@ -412,6 +416,12 @@ def main(
         for field, count in field_row_counts.items():
             logger.info(f"  {field:<11} {count}")
 
+        if latest_trade_date is None:
+            latest_iso = None
+        elif hasattr(latest_trade_date, "date") and callable(latest_trade_date.date):
+            latest_iso = latest_trade_date.date().isoformat()
+        else:
+            latest_iso = latest_trade_date.isoformat()
         metadata = {
             "contracts_pulled": pulled_contracts,
             "contracts_skipped": skipped_contracts,
@@ -419,6 +429,8 @@ def main(
             "failed_symbols_count": len(failed_symbols),
             "failed_symbols_sample": failed_symbols[:10],
             "field_row_counts": field_row_counts,
+            "latest_trade_date": latest_iso,
+            "rows_processed": total_rows,
         }
 
         if overall_coverage < completeness_threshold:
@@ -429,10 +441,7 @@ def main(
             metadata["degraded"] = True
 
         run.success(rows_processed=total_rows, metadata=metadata)
-
-        # Return empty frame instead of accumulating everything in memory.
-        # The data is already in PostgreSQL.
-        return utils.empty_timeseries_frame(date_col=date_col)
+        return metadata
 
     except Exception as exc:
         logger.exception(f"Pipeline failed: {exc}")
