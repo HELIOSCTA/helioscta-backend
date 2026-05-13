@@ -35,6 +35,9 @@ SELECT * FROM (
     VALUES
 
         -- ACIM
+        ('ACIM', 'UBE 10051', 'NAV Position File'),
+        ('ACIM', '51014112.0', 'NAV Position File'),
+        ('ACIM', '51014112', 'NAV Position File'),
         ('ACIM', '10051', 'Marex Position File'),
         ('ACIM', 'UBE10051', 'Marex Allocated Trades'),
         -- 'EFD', ''

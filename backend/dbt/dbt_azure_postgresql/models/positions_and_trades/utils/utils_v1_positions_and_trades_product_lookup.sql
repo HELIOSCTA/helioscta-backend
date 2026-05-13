@@ -57,6 +57,7 @@ SELECT * FROM (
     -- GAS - OPTIONS - ICE
     (NULL, 'PHE', 'NG', 'GAS_OPTIONS', 'HENRY_HUB',                'ICE PHE', 'HENRY PENULT FIXED'),
     (NULL, 'PHE', 'NG', 'GAS_OPTIONS', 'HENRY_HUB',                'ICE HH EQ', 'HENRY PENULT FIXED'),
+    (NULL, 'PHE', 'NG', 'GAS_OPTIONS', 'HENRY_HUB',                'ICE NGAS PEN HENRY HUB', 'HENRY PENULT FIXED'),
     -- (NULL, 'PHE', 'NG', 'GAS_OPTIONS', 'HENRY_HUB',                'NATURAL GAS CLEARPORT', 'HENRY PENULT FIXED'),
 
     -- GAS - OPTIONS - CME

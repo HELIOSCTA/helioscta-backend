@@ -69,6 +69,16 @@ models:
         marts:
           +materialized: view
 
+      positions_cleaned_v2:
+        +schema: positions_cleaned_v2
+        +materialized: ephemeral
+        source:
+          +materialized: ephemeral
+        staging:
+          +materialized: ephemeral
+        marts:
+          +materialized: view
+
     # ── Meteologica ──────────────────────────────────────────────────────────────
     meteologica:
       meteologica_cleaned:

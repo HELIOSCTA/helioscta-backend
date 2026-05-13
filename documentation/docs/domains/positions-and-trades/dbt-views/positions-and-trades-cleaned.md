@@ -118,3 +118,9 @@ Each trade type goes through:
 | Table | Description |
 |-------|-------------|
 | `utils_v1_nerc_holidays` | NERC (North American Electric Reliability Corporation) holidays for business day calculations |
+
+---
+
+## v6 NAV Positions (`positions_cleaned_v2`)
+
+New v6 NAV-only pipeline being introduced alongside the existing v5 marex+nav pipeline. Same staging shape (source -> 4-step staging -> marts) but scoped to the 4 NAV funds (AGR, Moross, PNT, Titan) with per-fund mart views and grouped/latest aggregates.
