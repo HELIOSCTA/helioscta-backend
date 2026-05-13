@@ -1,8 +1,7 @@
 """
 Azure Blob Storage client for the backend.
 
-Migrated from .refactor/helioscta_api_scrapes_gas_ebbs/utils/azure_blob_storage_utils.py.
-Uses backend.secrets for credential loading instead of dotenv.
+Uses backend.credentials for credential loading.
 """
 
 import logging
@@ -12,7 +11,7 @@ from typing import Optional, Union
 from azure.storage.blob import BlobServiceClient, ContentSettings, BlobClient
 from azure.core.exceptions import AzureError
 
-from backend import secrets
+from backend import credentials
 
 
 class AzureBlobStorageClient:
@@ -24,9 +23,9 @@ class AzureBlobStorageClient:
         storage_account_name: str = None,
         container_name: str = None,
     ):
-        self.connection_string = connection_string or secrets.AZURE_STORAGE_CONNECTION_STRING
-        self.storage_account_name = storage_account_name or secrets.AZURE_STORAGE_ACCOUNT_NAME
-        self.container_name = container_name or secrets.AZURE_CONTAINER_NAME
+        self.connection_string = connection_string or credentials.AZURE_STORAGE_CONNECTION_STRING
+        self.storage_account_name = storage_account_name or credentials.AZURE_STORAGE_ACCOUNT_NAME
+        self.container_name = container_name or credentials.AZURE_CONTAINER_NAME
 
     def get_blob_service_client(self) -> BlobServiceClient:
         """Get a BlobServiceClient instance."""

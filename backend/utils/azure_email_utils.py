@@ -7,7 +7,7 @@ from typing import List
 import msal
 
 from backend import (
-    secrets,
+    credentials,
 )
 # init logging
 import logging
@@ -18,11 +18,11 @@ logging.getLogger().handlers[0].setLevel(logging.INFO)
 """
 
 def _get_access_token():
-    authority_url = f'https://login.microsoftonline.com/{secrets.AZURE_OUTLOOK_TENANT_ID}'
+    authority_url = f'https://login.microsoftonline.com/{credentials.AZURE_OUTLOOK_TENANT_ID}'
     app = msal.ConfidentialClientApplication(
         authority=authority_url,
-        client_id=secrets.AZURE_OUTLOOK_CLIENT_ID,
-        client_credential=secrets.AZURE_OUTLOOK_CLIENT_SECRET,
+        client_id=credentials.AZURE_OUTLOOK_CLIENT_ID,
+        client_credential=credentials.AZURE_OUTLOOK_CLIENT_SECRET,
     )
     result = app.acquire_token_for_client(scopes=["https://graph.microsoft.com/.default"])
     if "access_token" in result:

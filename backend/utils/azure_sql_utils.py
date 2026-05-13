@@ -1,7 +1,6 @@
 """
-Azure SQL Server utilities for gas_ebbs_v2.
+Azure SQL Server utilities.
 
-Mirror of azure_postgresql_utils.py adapted for SQL Server.
 Uses pyodbc with ODBC Driver 18 for SQL Server.
 
 Upsert strategy: temp table + MERGE (equivalent to PG's ON CONFLICT).
@@ -23,7 +22,7 @@ warnings.simplefilter(action='ignore', category=Warning)
 logging.basicConfig(level=logging.DEBUG)
 logging.getLogger().handlers[0].setLevel(logging.DEBUG)
 
-from backend import secrets
+from backend import credentials
 
 
 # ── Data type mapping ────────────────────────────────────────────────────
@@ -57,10 +56,10 @@ def _connect_to_azure_sql(
     """Connect to Azure SQL Server using pyodbc."""
     conn_str = (
         f"DRIVER={{ODBC Driver 18 for SQL Server}};"
-        f"SERVER={secrets.AZURE_SQL_SERVER};"
+        f"SERVER={credentials.AZURE_SQL_SERVER};"
         f"DATABASE={database};"
-        f"UID={secrets.AZURE_SQL_USER};"
-        f"PWD={secrets.AZURE_SQL_PASSWORD};"
+        f"UID={credentials.AZURE_SQL_USER};"
+        f"PWD={credentials.AZURE_SQL_PASSWORD};"
         f"Encrypt=yes;"
         f"TrustServerCertificate=no;"
         f"Connection Timeout=30;"

@@ -307,15 +307,14 @@ def send_pipeline_failure_with_log(
 
 if __name__ == "__main__":
 
-    # get secrets
-    from backend import secrets
+    from backend import credentials
 
     client = SlackClient(
-        token=secrets.SLACK_BOT_TOKEN,
-        default_channel_name=secrets.SLACK_DEFAULT_CHANNEL_NAME,
-        default_webhook_url=secrets.SLACK_DEFAULT_WEBHOOK_URL,
+        token=credentials.SLACK_BOT_TOKEN,
+        default_channel_name=credentials.SLACK_DEFAULT_CHANNEL_NAME,
+        default_webhook_url=credentials.SLACK_DEFAULT_WEBHOOK_URL,
     )
     client.send_message(
         message="Hello, world!",
-        channel_name=secrets.SLACK_DEFAULT_CHANNEL_NAME,
+        channel_name=credentials.SLACK_DEFAULT_CHANNEL_NAME,
     )
