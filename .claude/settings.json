@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "deny": [
+      "Read(./backend/cache/**)",
+      "Read(./backend/dbt/**/target/**)",
+      "Read(./backend/dbt/**/dbt_packages/**)",
+      "Read(./backend/mcp_server/logs/**)",
+      "Read(./backend/mcp_server/runs/**)",
+      "Read(./**/__pycache__/**)",
+      "Read(./**/*.parquet)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "mcp__backend-views__.*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/mcp_health_check.py\""
+          }
+        ]
+      }
+    ]
+  }
+}

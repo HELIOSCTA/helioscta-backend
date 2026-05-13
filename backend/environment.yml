@@ -1,4 +1,4 @@
-name: helioscta-backend
+name: helioscta-backend-dev
 channels:
   - defaults
   - conda-forge

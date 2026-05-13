@@ -2,7 +2,7 @@
 Shared runner utility for manually executing backend scrape scripts.
 
 Provides the CLI loop, output suppression, module loading, and adapter-based
-script execution used by all three runners (meteologica, power, positions & trades).
+script execution.
 """
 
 import importlib

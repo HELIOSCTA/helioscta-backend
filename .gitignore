@@ -6,6 +6,7 @@ azure-infra/config.secrets.sh
 
 # Python build/dist directories
 dist/*
+*.egg-info/
 
 # Docusaurus
 node_modules/
@@ -40,5 +41,5 @@ TODO/*
 # refactor
 .refactor/
 
-# meteologica
-backend/src/meteologica/examples_from_api_docs/
+# mcp_server saved digests (logs/ already covered above)
+backend/mcp_server/runs/
