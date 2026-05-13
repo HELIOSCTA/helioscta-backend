@@ -35,13 +35,6 @@ paramiko
 azure-storage-blob>=12.19.0
 azure-core>=1.29.0
 
-# dagster
-dagster
-dagster-webserver
-dagster-cloud
-dagster-postgres
-dagster-dbt
-
 # dbt
 dbt-core==1.8.* 
 dbt-postgres==1.8.*

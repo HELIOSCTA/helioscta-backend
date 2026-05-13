@@ -29,7 +29,6 @@ __pycache__/
 
 # misc files
 .archive/*
-.sql-scripts/*
 .vendor-docs/*
 TODO/*
 *.pdf

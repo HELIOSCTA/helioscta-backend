@@ -11,10 +11,8 @@ __pycache__
 helioscta_backend.egg-info
 .archive
 .refactor
-.sql-scripts
 .vendor-docs
 .vscode
-.SKILLS
 *.csv
 *.xlsx
 *.XLSX
@@ -43,5 +41,3 @@ backend/dbt/dbt_azure_sql/target/
 backend/dbt/dbt_azure_sql/dbt_packages/
 backend/dbt/dbt_azure_sql/logs/
 
-# Local scratch/orchestration state
-.tmp_dagster_home_*/

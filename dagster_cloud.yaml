@@ -1,8 +1,0 @@
-locations:
-  - location_name: helioscta
-    code_source:
-      python_file: backend/orchestration/definitions.py
-    working_directory: .
-    build:
-      directory: .
-      registry: # Dagster Cloud manages this for Serverless
