@@ -18,23 +18,10 @@ from tenacity import (
 logger = logging.getLogger("orchestration.ice_python")
 
 
-# ────── Market-hours gate ──────
-# ICE XL publisher runs on the host's local time (Mountain). We gate fires
-# to weekday 05:00 ≤ hour < 16:00 MT so Task Scheduler can safely fire every
-# few minutes all day without generating off-hours no-ops.
+# ICE XL publisher runs on the host's local time (Mountain). Timestamps in
+# this module — and the post-pull freshness check below — are anchored to MT
+# so they line up with what the .ps1 schedules and what ICE prints.
 TRADING_TZ = pytz.timezone("America/Edmonton")
-TRADING_START_HOUR = 5
-TRADING_END_HOUR = 16  # half-open: the 16:00 fire is already gated off
-
-
-def is_within_trading_hours(now: datetime | None = None) -> bool:
-    """True on weekdays between [TRADING_START_HOUR, TRADING_END_HOUR) MT."""
-    now = now or datetime.now(TRADING_TZ)
-    if now.tzinfo is None:
-        now = TRADING_TZ.localize(now)
-    if now.weekday() >= 5:  # 5=Sat, 6=Sun
-        return False
-    return TRADING_START_HOUR <= now.hour < TRADING_END_HOUR
 
 
 def is_weekday(now: datetime | None = None) -> bool:
