@@ -6,28 +6,16 @@ import Sidebar, { type ActiveSection } from "@/components/Sidebar";
 import GenscapeNomsTable from "@/components/gas/GenscapeNomsTable";
 import KrsWatchlistTable from "@/components/gas/KrsWatchlistTable";
 import WatchlistEditor from "@/components/gas/WatchlistEditor";
-import NomsMovements from "@/components/gas/NomsMovements";
-import ParquetMetaStrip from "@/components/ParquetMetaStrip";
-import type { ParquetDatasetKey } from "@/lib/parquet-datasets";
 import type { Watchlist } from "@/lib/watchlists";
-import {
-  GENSCAPE_ENABLED,
-  ICE_CASH_ENABLED,
-  PJM_ENABLED,
-} from "@/lib/feature-flags";
+import { GENSCAPE_ENABLED, ICE_CASH_ENABLED, PJM_ENABLED } from "@/lib/feature-flags";
 
 const CashPricingMatrix = dynamic(() => import("@/components/gas/CashPricingMatrix"), {
   loading: () => <p className="text-sm text-gray-500">Loading cash pricing matrix...</p>,
   ssr: false,
 });
 
-const PjmLmpPrices = dynamic(() => import("@/components/pjm/PjmLmpPrices"), {
-  loading: () => <p className="text-sm text-gray-500">Loading PJM LMP prices...</p>,
-  ssr: false,
-});
-
-const PjmLoadForecast = dynamic(() => import("@/components/pjm/PjmLoadForecast"), {
-  loading: () => <p className="text-sm text-gray-500">Loading PJM load forecast...</p>,
+const PmiCurve = dynamic(() => import("@/components/power/PmiCurve"), {
+  loading: () => <p className="text-sm text-gray-500">Loading PMI curve...</p>,
   ssr: false,
 });
 
@@ -52,34 +40,19 @@ const SECTION_META: Record<ActiveSection, { title: string; subtitle: string; foo
     subtitle: "Create, edit, and delete watchlists for tracking Genscape nominations.",
     footer: "Watchlists | Source: Azure PostgreSQL",
   },
-  "noms-movements": {
-    title: "Nom Movements",
-    subtitle: "Pipelines where the latest nomination volume moved materially vs trailing 1-day and 7-day averages.",
-    footer: "Nom Movements | Source: Azure SQL",
-  },
   "cash-pricing-matrix": {
     title: "Cash Pricing Matrix",
     subtitle: "Current-month and seasonal NYMEX cash-vs-Henry-Hub futures matrix across key US gas hubs.",
     footer: "ICE Cash Prices | Source: ICE / Azure PostgreSQL",
   },
-  "pjm-lmp-prices": {
-    title: "PJM LMP Prices",
-    subtitle: "Hourly locational marginal prices across PJM hubs — day-ahead, real-time, and DA-RT spread.",
-    footer: "PJM Power | Source: Azure Blob Storage (Parquet)",
-  },
-  "pjm-load-forecast": {
-    title: "PJM Forecasts",
-    subtitle: "Seven-day hourly load forecast by region — latest revision and historical vintages.",
-    footer: "PJM Power | Source: Azure Blob Storage (Parquet)",
+  "pmi-curve": {
+    title: "PMI Forward Curve",
+    subtitle: "PJM Western Hub RT Peak (PMI) futures curve evolution over a configurable lookback window.",
+    footer: "PMI Forward Curve | Source: ICE / Azure PostgreSQL",
   },
 };
 
 type FeatureSection = Exclude<ActiveSection, "home">;
-
-const SECTION_PARQUET_DATASET: Partial<Record<ActiveSection, ParquetDatasetKey>> = {
-  "pjm-lmp-prices": "pjm-lmps",
-  "pjm-load-forecast": "pjm-load-forecast",
-};
 
 interface HomeCard {
   id: FeatureSection;
@@ -108,14 +81,6 @@ const HOME_CARDS: HomeCard[] = [
     accentColor: "purple",
   },
   {
-    id: "noms-movements",
-    title: "Nom Movements",
-    description: "Pipelines with material nomination changes vs trailing 1-day and 7-day averages.",
-    source: "Azure SQL",
-    iconPath: "M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z",
-    accentColor: "purple",
-  },
-  {
     id: "cash-pricing-matrix",
     title: "Cash Pricing Matrix",
     description: "NYMEX-style current-month and seasonal cash matrix relative to Henry Hub futures.",
@@ -124,19 +89,11 @@ const HOME_CARDS: HomeCard[] = [
     accentColor: "cyan",
   },
   {
-    id: "pjm-lmp-prices",
-    title: "PJM LMP Prices",
-    description: "Hourly locational marginal prices across PJM hubs — DA, RT, and DART spread.",
-    source: "Azure Blob (Parquet)",
-    iconPath: "M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z",
-    accentColor: "amber",
-  },
-  {
-    id: "pjm-load-forecast",
-    title: "PJM Forecasts",
-    description: "Seven-day hourly load forecast by region — RTO, Mid-Atlantic, Western, and Southern.",
-    source: "Azure Blob (Parquet)",
-    iconPath: "M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z",
+    id: "pmi-curve",
+    title: "PMI Forward Curve",
+    description: "PJM Western Hub RT Peak futures curve evolution over a configurable lookback window.",
+    source: "ICE / Azure PostgreSQL",
+    iconPath: "M3 13.5l7.5-7.5 4.5 4.5L21 4.5M21 4.5h-5.25M21 4.5v5.25",
     accentColor: "amber",
   },
 ];
@@ -168,13 +125,12 @@ const ACCENT_CLASSES: Record<
 function isFeatureEnabled(section: FeatureSection): boolean {
   if (
     section === "genscape-noms" ||
-    section === "noms-movements" ||
     section === "watchlists" ||
     section === "watchlist-editor"
   ) {
     return GENSCAPE_ENABLED;
   }
-  if (section === "pjm-lmp-prices" || section === "pjm-load-forecast") {
+  if (section === "pmi-curve") {
     return PJM_ENABLED;
   }
   return ICE_CASH_ENABLED;
@@ -311,11 +267,6 @@ export default function HomePageClient() {
               <h1 className="text-xl font-bold text-gray-100 sm:text-3xl">{meta.title}</h1>
               <p className="mt-2 text-sm text-gray-500">{meta.subtitle}</p>
             </div>
-            {SECTION_PARQUET_DATASET[activeSection] && (
-              <div className="md:flex-shrink-0">
-                <ParquetMetaStrip dataset={SECTION_PARQUET_DATASET[activeSection]!} />
-              </div>
-            )}
           </div>
           {activeSection === "home" &&
             (homeCards.length > 0 ? (
@@ -368,24 +319,14 @@ export default function HomePageClient() {
               <WatchlistEditor />
             </div>
           )}
-          {activeSection === "noms-movements" && (
-            <div className="rounded-xl border border-gray-800 bg-gray-900/60 p-3 shadow-2xl sm:p-6">
-              <NomsMovements />
-            </div>
-          )}
           {activeSection === "cash-pricing-matrix" && (
             <div className="rounded-xl border border-gray-800 bg-gray-900/60 p-3 shadow-2xl sm:p-6">
               <CashPricingMatrix />
             </div>
           )}
-          {activeSection === "pjm-lmp-prices" && (
-            <div className="rounded-xl border border-gray-700 bg-gray-900 p-3 shadow-2xl sm:p-6">
-              <PjmLmpPrices />
-            </div>
-          )}
-          {activeSection === "pjm-load-forecast" && (
+          {activeSection === "pmi-curve" && (
             <div className="rounded-xl border border-gray-800 bg-gray-900/60 p-3 shadow-2xl sm:p-6">
-              <PjmLoadForecast />
+              <PmiCurve />
             </div>
           )}
           <p className="mt-6 text-center text-xs text-gray-600">{meta.footer}</p>

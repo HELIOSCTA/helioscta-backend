@@ -9,10 +9,24 @@ in lockstep. Deployed to Vercel via `.github/workflows/frontend-deploy.yml`.
 
 - `app/` — App Router pages and API handlers (`app/api/**/route.ts`).
 - `components/` — reusable React components (PascalCase, e.g.
-  `CashBalmoTable.tsx`).
+  `CashPricingMatrix.tsx`).
 - `lib/` — shared utilities, data fetchers, server helpers.
 - `auth.ts`, `middleware.ts` — NextAuth setup and route middleware.
 - `vercel.json` — Vercel function limits and region pin (`iad1`).
+
+## Data access
+
+The frontend reads **only from Postgres** — there is no HTTP call to the
+backend Python service. Page loaders and `app/api/**/route.ts` handlers
+query the database directly via the connection pool in `lib/`. The
+backend's job is to land data in Postgres (scrapes → `logging` /
+domain schemas → `backend/views/` materialisations); the frontend's
+job is to read it.
+
+Implication for cross-cutting changes: when a backend view's column
+list, name, or schema changes, grep `frontend/` for the table/view
+name before merging — there's no API layer that would surface the
+break.
 
 ## Build, test, and development
 
@@ -22,10 +36,6 @@ in lockstep. Deployed to Vercel via `.github/workflows/frontend-deploy.yml`.
 - `cd frontend && npm run lint` / `npm run lint:fix` — ESLint
   (`next/core-web-vitals`, `next/typescript`).
 - `cd frontend && npm test` — Vitest.
-
-The Docker path (`docker compose up --build` from the old repo root, exposing
-`:2222`) is not wired up at the backend repo root — use `npm run dev` for
-local work.
 
 ## Coding conventions
 

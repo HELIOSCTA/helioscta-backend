@@ -5,12 +5,10 @@ import { useState } from "react";
 export type ActiveSection =
   | "home"
   | "genscape-noms"
-  | "noms-movements"
   | "watchlists"
   | "watchlist-editor"
   | "cash-pricing-matrix"
-  | "pjm-lmp-prices"
-  | "pjm-load-forecast";
+  | "pmi-curve";
 
 interface SidebarProps {
   activeSection: ActiveSection;
@@ -50,6 +48,16 @@ function getSections(enabled: SidebarProps["enabled"]): TopSection[] {
     });
   }
 
+  if (enabled.pjm) {
+    sections.push({
+      key: "pjm",
+      label: "PJM",
+      navItems: [
+        { id: "pmi-curve", label: "PMI Forward Curve" },
+      ],
+    });
+  }
+
   if (enabled.genscape) {
     sections.push({
       key: "genscape",
@@ -58,18 +66,6 @@ function getSections(enabled: SidebarProps["enabled"]): TopSection[] {
         { id: "watchlist-editor", label: "Manage Watchlists" },
         { id: "watchlists", label: "Watchlists" },
         { id: "genscape-noms", label: "Historical Noms" },
-        { id: "noms-movements", label: "Nom Movements", disabled: true },
-      ],
-    });
-  }
-
-  if (enabled.pjm) {
-    sections.push({
-      key: "pjm",
-      label: "PJM POWER",
-      navItems: [
-        { id: "pjm-lmp-prices", label: "LMP Prices" },
-        { id: "pjm-load-forecast", label: "Forecasts" },
       ],
     });
   }
