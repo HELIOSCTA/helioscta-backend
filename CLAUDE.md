@@ -39,6 +39,10 @@ have all been removed and live only in git history (or under
   — prefer `credentials.py` for new code (see `backend/CLAUDE.md`).
 - Scrape CLIs run as `python -m backend.scrapes.<source>.runs`; the
   runner pattern is documented in `backend/CLAUDE.md`.
+- Frontend dev: `cd frontend && npm install` once, then
+  `npm run dev` for the local Next.js server. `npm run lint` and
+  `npm test` (Vitest) before pushing. See `frontend/CLAUDE.md` for
+  the full set of commands and conventions.
 
 ## Pointers for agents
 

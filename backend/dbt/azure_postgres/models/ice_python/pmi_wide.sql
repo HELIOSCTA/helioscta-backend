@@ -21,7 +21,10 @@ FROM {{ source('ice_python', 'future_contracts_v1_2025_dec_16') }} AS f
 LEFT JOIN {{ source('ice_python', 'contract_dates') }} AS cd
     ON cd.symbol     = f.symbol
    AND cd.trade_date = f.trade_date
-WHERE f.symbol = 'PMI K26-IUS'
+-- All PMI futures (PJM Western Hub RT Peak, 1 MW).
+-- Symbol grammar: `PMI <strip><yy>-IUS` (e.g. PMI K26-IUS = May 2026).
+-- Pattern match is sufficient — ICE only emits PMI symbols in this shape.
+WHERE f.symbol LIKE 'PMI %-IUS'
 GROUP BY
     f.trade_date,
     f.symbol,
