@@ -43,3 +43,6 @@ TODO/*
 
 # mcp_server saved digests (logs/ already covered above)
 backend/mcp_server/runs/
+
+# Archived improve-prompt outputs (local-only)
+.claude/prompts/
