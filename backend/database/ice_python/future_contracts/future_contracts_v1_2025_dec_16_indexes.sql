@@ -21,6 +21,20 @@
 
 
 -- =========================================================================
+-- Session settings — give the index builds room to finish cleanly
+-- =========================================================================
+-- maintenance_work_mem: a larger value lets the b-tree builder keep more of
+-- the sort in memory instead of spilling to disk. 1GB is comfortable for a
+-- ~3M-row index. Reduce if your Azure tier rejects it (some Burstable
+-- tiers cap lower — Postgres will silently clamp on managed services).
+SET maintenance_work_mem = '1GB';
+
+-- statement_timeout: disable for this session so a long index build can't
+-- be killed by a default per-connection cap.
+SET statement_timeout = 0;
+
+
+-- =========================================================================
 -- 1. Generic field-keyed covering index
 -- =========================================================================
 -- Leading column matches the universal predicate (data_type = '<field>').

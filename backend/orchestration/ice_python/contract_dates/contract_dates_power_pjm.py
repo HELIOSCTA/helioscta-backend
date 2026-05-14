@@ -1,15 +1,10 @@
-"""Task Scheduler entry point for the PJM short-term ICE contract-dates scrape.
+"""Task Scheduler entry point for the PJM power-futures contract-dates scrape.
 
 Wraps `contract_dates_v1.main` with a weekday gate and an ICE-transient
-retry. Sibling of the three futures contract-dates entries — the only
-difference is that the symbol list comes straight from the PJM short-term
-symbol registry instead of being expanded from product codes.
+retry. Sibling of `contract_dates_gas` / `contract_dates_power_ercot`.
 
-Intended cadence: hourly 05:00–10:00 MT Mon–Fri. Task Scheduler owns the
-window via .ps1; the weekday gate only catches off-schedule invocations.
-
-Usage (local Windows host, via Task Scheduler):
-    python -m backend.orchestration.ice_python.contract_dates.contract_dates_pjm_short_term
+Usage (Task Scheduler):
+    python -m backend.orchestration.ice_python.contract_dates.contract_dates_power_pjm
 """
 from __future__ import annotations
 
@@ -22,15 +17,17 @@ from backend.orchestration.ice_python._policies import (
     is_weekday,
     TRADING_TZ,
 )
-from backend.scrapes.ice_python.contract_dates import contract_dates_v1
-from backend.scrapes.ice_python.symbols.short_term.pjm import (
-    get_pjm_symbol_codes,
-    resolve_pjm_symbol_entries,
+from backend.scrapes.ice_python.contract_dates import (
+    contract_dates_v1,
+    ice_contract_dates_utils,
+)
+from backend.scrapes.ice_python.symbols.futures.power_pjm import (
+    get_pjm_power_futures_product_codes,
 )
 from backend.utils import logging_utils
 
-PIPELINE_NAME = "runner_pjm_short_term_contract_dates"
-PRODUCT_LABEL = "PJM short-term"
+PIPELINE_NAME = "runner_future_contracts_power_pjm_contract_dates"
+PRODUCT_LABEL = "PJM power futures"
 
 logger = logging_utils.init_logging(
     name=f"orchestration_{PIPELINE_NAME}",
@@ -42,7 +39,9 @@ logger = logging_utils.init_logging(
 
 @ice_transient_retry_policy(attempts=2)
 def _run_scrape() -> None:
-    symbols = get_pjm_symbol_codes(resolve_pjm_symbol_entries(symbols=None))
+    symbols = ice_contract_dates_utils.build_futures_symbols(
+        product_codes=get_pjm_power_futures_product_codes(),
+    )
     contract_dates_v1.main(
         symbols=symbols,
         pipeline_name=PIPELINE_NAME,

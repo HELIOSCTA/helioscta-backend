@@ -28,7 +28,14 @@ VWAP_OPEN = "VWAP Open"
 VWAP_HIGH = "VWAP High"
 VWAP_LOW = "VWAP Low"
 VWAP_CLOSE = "VWAP Close"
+# Settlement label varies by product family. Both strings are valid ICE
+# inputs; ICE returns whichever you ask for. The helioscta table tracks
+# them separately on purpose:
+#   futures  → "Settlement"  (FUTURE_CONTRACTS_FIELDS)
+#   balmo    → "Settle"      (BALMO_FIELDS)
+# Don't mix them in a single scrape's preset.
 SETTLE = "Settle"
+SETTLEMENT = "Settlement"
 BLOCK_VOLUME = "Block Volume"
 EFS_VOLUME = "EFS Volume"
 EFP_VOLUME = "EFP Volume"
@@ -54,7 +61,7 @@ IMPLIED_VOLATILITY = "Implied Volatility"
 
 ALL_FIELDS: list[str] = [
     OPEN, HIGH, LOW, CLOSE, LAST, VOLUME, OPEN_INTEREST,
-    VWAP_OPEN, VWAP_HIGH, VWAP_LOW, VWAP_CLOSE, SETTLE,
+    VWAP_OPEN, VWAP_HIGH, VWAP_LOW, VWAP_CLOSE, SETTLE, SETTLEMENT,
     BLOCK_VOLUME, EFS_VOLUME, EFP_VOLUME, ORDERBOOK_VOLUME,
     BLOCK_PRICE_OPEN, BLOCK_PRICE_HIGH, BLOCK_PRICE_LOW, BLOCK_PRICE_CLOSE,
     COMBINED_PRICE_OPEN, COMBINED_PRICE_HIGH, COMBINED_PRICE_LOW, COMBINED_PRICE_CLOSE,

@@ -11,28 +11,27 @@ Edit a preset here rather than hardcoding a field list inside a scrape.
 from __future__ import annotations
 
 from backend.scrapes.ice_python.fields.catalog import (
-    SETTLE,
+    SETTLE, SETTLEMENT,
     OPEN, HIGH, LOW, CLOSE, LAST,
     VOLUME, OPEN_INTEREST,
     VWAP_OPEN, VWAP_HIGH, VWAP_LOW, VWAP_CLOSE,
     IMPLIED_VOLATILITY,
 )
 
-# Future contracts: daily OHLCV + settlement + open interest + VWAP four-pack.
-# Drops Block / Combined / ICE Theoretical (synthetic or sparse) and Implied
-# Volatility (structurally empty on non-options). Confirmed against a PMI
-# K26-IUS run on 2026-05-13.
+# Future contracts: daily OHLCV + settlement + open interest + VWAP close.
+# Uses SETTLEMENT (not SETTLE) — the historical helioscta table and the
+# spark-spread-viz frontend both key on data_type='Settlement' for futures.
 FUTURE_CONTRACTS_FIELDS: list[str] = [
-    SETTLE,
+    SETTLEMENT,
     OPEN, HIGH, LOW, CLOSE, LAST,
     VOLUME, OPEN_INTEREST,
     VWAP_CLOSE,
 ]
 
-# Options: same daily set as futures plus Implied Volatility, which futures
-# leave empty. Starter set — refine when the options scrape is rewired.
+# Options: futures daily set plus Implied Volatility (only options expose it).
+# Starter set — refine when the options scrape is rewired.
 OPTIONS_FIELDS: list[str] = [
-    SETTLE,
+    SETTLEMENT,
     OPEN, HIGH, LOW, CLOSE, LAST,
     VOLUME, OPEN_INTEREST,
     IMPLIED_VOLATILITY,
@@ -44,8 +43,11 @@ INTRADAY_QUOTES_FIELDS: list[str] = [
     LAST, OPEN, HIGH, LOW, CLOSE, VOLUME, SETTLE,
 ]
 
-# Single-day balance-of-month strip. Matches today's settle-only behavior.
+# Single-day balance-of-month strip. SETTLE (not SETTLEMENT) — balmo
+# products write the canonical ICE "Settle" label, distinct from the
+# "Settlement" futures use.
 BALMO_FIELDS: list[str] = [SETTLE]
 
-# Daily next-day gas settles. Matches today's settle-only behavior.
+# Daily next-day gas settles. SETTLE matches today's behavior (no historical
+# rename needed).
 NEXT_DAY_GAS_FIELDS: list[str] = [SETTLE]
