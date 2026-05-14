@@ -74,12 +74,15 @@ jobs:
           fi
 
       - name: Pull Vercel environment
+        # Creates .vercel/.env.<env>.local with project env vars so the
+        # subsequent `vercel build` has DB/auth credentials available.
+        # We rely on this single build step (rather than running
+        # `npm run build` first as a separate gate) because the app
+        # reads env vars at module-load and `npm run build` without the
+        # pulled env would fail in CI.
         run: npx vercel@latest pull --yes --environment=${{ steps.env.outputs.env }} --token=${{ secrets.VERCEL_TOKEN }}
 
-      - name: Build (CI gate)
-        run: npm run build
-
-      - name: Build (Vercel artifacts)
+      - name: Build (Vercel)
         run: npx vercel@latest build ${{ steps.env.outputs.prod_flag }} --token=${{ secrets.VERCEL_TOKEN }}
 
       - name: Deploy to Vercel
