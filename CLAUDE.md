@@ -9,10 +9,15 @@ have all been removed and live only in git history (or under
 
 ## Layout
 
-- `backend/` — the only live code path. Scrapes, shared utilities, and
+- `backend/` — the Python code path. Scrapes, shared utilities, and
   the Prefect worker image. See `backend/CLAUDE.md` for the sub-area
   map, runner pattern, pipeline-logging contract, and conventions.
   **Read it before editing anything under `backend/`.**
+- `frontend/` — Next.js 15 + TypeScript dashboard, imported from the
+  former `helioscta-gas-frontend` repo on 2026-05-13. Deploys to
+  Vercel via `.github/workflows/frontend-deploy.yml`. See
+  `frontend/CLAUDE.md` for layout, build commands, and styling /
+  performance standards.
 - `.archive/` — preserved-for-history snapshots of the old dbt and
   positions refactors. Not part of the runtime; don't import from it
   and don't take it as a model for new code.
