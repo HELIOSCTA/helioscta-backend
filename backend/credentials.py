@@ -21,6 +21,11 @@ AZURE_POSTGRESQL_DB_PASSWORD = os.getenv("AZURE_POSTGRESQL_DB_PASSWORD")
 AZURE_POSTGRESQL_DB_PORT = os.getenv("AZURE_POSTGRESQL_DB_PORT")
 AZURE_POSTGRESQL_DB_NAME = os.getenv("AZURE_POSTGRESQL_DB_NAME")
 
+# Read-only role used by backend/dbt/ for compile-only operation. Same
+# host/port/dbname as above; distinct user with SELECT-only grants.
+AZURE_POSTGRESQL_DB_READONLY_USER = os.getenv("AZURE_POSTGRESQL_DB_READONLY_USER")
+AZURE_POSTGRESQL_DB_READONLY_PASSWORD = os.getenv("AZURE_POSTGRESQL_DB_READONLY_PASSWORD")
+
 # ────── AWS PostgreSQL (read-only) ──────
 AWS_POSTGRESQL_DB_HOST = os.getenv("AWS_POSTGRESQL_DB_HOST")
 AWS_POSTGRESQL_DB_USER = os.getenv("AWS_POSTGRESQL_DB_USER")

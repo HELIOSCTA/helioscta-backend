@@ -8,7 +8,7 @@ jupyter
 notebook
 
 # python
-python-dotenv==1.0.1
+python-dotenv[cli]==1.0.1
 numpy
 pandas>=2.0.0
 pyarrow>=12.0.0
@@ -41,3 +41,11 @@ slack-sdk
 fastapi>=0.110
 fastapi-mcp>=0.4
 uvicorn[standard]>=0.27
+
+# ──── transformations (local-only — excluded from Dockerfile.prefect) ────
+# Everything below this marker is filtered out of the Prefect worker
+# image. dbt powers backend/dbt/ during local dev (compile-only against
+# a read-only Postgres role) and does not need to ship in the scrapes
+# container.
+dbt-core>=1.8
+dbt-postgres>=1.8

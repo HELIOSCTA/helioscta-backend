@@ -4,6 +4,10 @@
 .mcp.json
 azure-infra/config.secrets.sh
 
+# dbt operator files with hardcoded credentials (local-only)
+backend/dbt/azure_postgres/profiles.yml
+backend/dbt/azure_postgres/create_dbt_readonly_role.sql
+
 # Python build/dist directories
 dist/*
 *.egg-info/

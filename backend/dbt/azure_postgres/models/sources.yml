@@ -1,0 +1,33 @@
+version: 2
+
+sources:
+  - name: ice_python
+    description: Tables populated by backend/scrapes/ice_python/.
+    database: helioscta
+    schema: ice_python
+    tables:
+      - name: future_contracts_v1_2025_dec_16
+        description: >
+          Narrow facts table — one row per
+          (trade_date, symbol, data_type). Written by
+          backend/scrapes/ice_python/contract_data/.
+        columns:
+          - name: trade_date
+          - name: symbol
+          - name: data_type
+          - name: value
+          - name: created_at
+          - name: updated_at
+      - name: contract_dates
+        description: >
+          Contract metadata (strip, start_date, end_date) snapshotted
+          per (trade_date, symbol). Written by
+          backend/scrapes/ice_python/contract_dates/contract_dates_v1.py.
+        columns:
+          - name: trade_date
+          - name: symbol
+          - name: strip
+          - name: start_date
+          - name: end_date
+          - name: created_at
+          - name: updated_at

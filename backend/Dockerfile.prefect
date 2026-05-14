@@ -11,7 +11,11 @@ RUN apt-get update && apt-get install -y \
 RUN pip install --no-cache-dir pendulum --only-binary :all:
 
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# Strip the local-only transformations section (sqlmesh, duckdb) before
+# install — the scrapes runtime does not call them and the image stays
+# leaner without them. The marker is a fixed string in requirements.txt.
+RUN sed '/transformations (local-only/,$d' requirements.txt > requirements.runtime.txt \
+    && pip install --no-cache-dir -r requirements.runtime.txt
 
 COPY . .
 
