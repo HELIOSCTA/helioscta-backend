@@ -83,3 +83,30 @@ ENERGY_ASPECTS_API_KEY = os.getenv("ENERGY_ASPECTS_API_KEY")
 # ────── EIA ──────
 # Free API key from https://www.eia.gov/opendata/register.php
 EIA_API_KEY = os.getenv("EIA_API_KEY")
+
+# ────── SFTP feeds (NAV / Marex / Clear Street / MUFG) ──────
+# Clear Street uses an RSA private key (CLEAR_STREET_SSH_KEY_CONTENT),
+# not a password. NAV/Marex/MUFG use password auth.
+CLEAR_STREET_SFTP_HOST = os.getenv("CLEAR_STREET_SFTP_HOST")
+CLEAR_STREET_SFTP_USER = os.getenv("CLEAR_STREET_SFTP_USER")
+CLEAR_STREET_SFTP_PORT = int(os.getenv("CLEAR_STREET_SFTP_PORT")) if os.getenv("CLEAR_STREET_SFTP_PORT") else None
+CLEAR_STREET_SFTP_REMOTE_DIR = r'/'
+CLEAR_STREET_SSH_KEY_CONTENT = os.getenv("CLEAR_STREET_SSH_KEY_CONTENT")
+
+MUFG_SFTP_HOST = os.getenv("MUFG_SFTP_HOST")
+MUFG_SFTP_USER = os.getenv("MUFG_SFTP_USER")
+MUFG_SFTP_PASSWORD = os.getenv("MUFG_SFTP_PASSWORD")
+MUFG_SFTP_PORT = int(os.getenv("MUFG_SFTP_PORT")) if os.getenv("MUFG_SFTP_PORT") else None
+MUFG_SFTP_REMOTE_DIR = r'/'
+
+MAREX_SFTP_HOST = os.getenv("MAREX_SFTP_HOST")
+MAREX_SFTP_USER = os.getenv("MAREX_SFTP_USER")
+MAREX_SFTP_PASSWORD = os.getenv("MAREX_SFTP_PASSWORD")
+MAREX_SFTP_PORT = int(os.getenv("MAREX_SFTP_PORT")) if os.getenv("MAREX_SFTP_PORT") else None
+MAREX_SFTP_REMOTE_DIR = r'/'
+
+NAV_SFTP_HOST = os.getenv("NAV_SFTP_HOST")
+NAV_SFTP_USER = os.getenv("NAV_SFTP_USER")
+NAV_SFTP_PASSWORD = os.getenv("NAV_SFTP_PASSWORD")
+NAV_SFTP_PORT = int(os.getenv("NAV_SFTP_PORT")) if os.getenv("NAV_SFTP_PORT") else None
+NAV_SFTP_REMOTE_DIR = r'/'

@@ -2,9 +2,16 @@ import { NextResponse } from "next/server";
 import { query } from "@/lib/db";
 import { buildContractSymbols, defaultCandidateYears } from "@/lib/iceSymbols";
 
-export const dynamic = "force-dynamic";
+// Let Vercel honor Cache-Control + SWR headers and collapse concurrent
+// requests at the CDN. `force-dynamic` silently disables that layer; explicit
+// runtime/region/maxDuration keeps the function configurable per-route.
+export const runtime = "nodejs";
+export const preferredRegion = "iad1";
+export const maxDuration = 30;
 
 const CACHE_TTL_MS = 5 * 60 * 1000;
+const FRESH_CACHE_HEADER = "public, s-maxage=300, stale-while-revalidate=60";
+const STALE_CACHE_HEADER = "public, s-maxage=60, stale-while-revalidate=300";
 const RESPONSE_CACHE = new Map<string, { expiresAt: number; payload: PmiWidePayload }>();
 
 const DEFAULT_LOOKBACK_DAYS = 30;
@@ -147,13 +154,17 @@ function buildPayload(
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const lookbackDays = parseLookbackDays(searchParams.get("days"));
+  const refresh = searchParams.get("refresh") === "1";
 
   const cacheKey = `pmi-wide:${lookbackDays}`;
-  const cached = RESPONSE_CACHE.get(cacheKey);
-  if (cached && cached.expiresAt > Date.now()) {
-    return NextResponse.json(cached.payload, {
-      headers: { "Cache-Control": "public, s-maxage=300, stale-while-revalidate=60" },
-    });
+
+  if (!refresh) {
+    const cached = RESPONSE_CACHE.get(cacheKey);
+    if (cached && cached.expiresAt > Date.now()) {
+      return NextResponse.json(cached.payload, {
+        headers: { "Cache-Control": FRESH_CACHE_HEADER, "X-Pmi-Wide-Cache": "HIT" },
+      });
+    }
   }
 
   try {
@@ -163,7 +174,7 @@ export async function GET(request: Request) {
     if (activeResult.rows.length === 0) {
       const payload: PmiWidePayload = { asOf: null, lookbackDays, contracts: [] };
       return NextResponse.json(payload, {
-        headers: { "Cache-Control": "public, s-maxage=300, stale-while-revalidate=60" },
+        headers: { "Cache-Control": FRESH_CACHE_HEADER, "X-Pmi-Wide-Cache": "MISS" },
       });
     }
 
@@ -178,10 +189,18 @@ export async function GET(request: Request) {
     RESPONSE_CACHE.set(cacheKey, { expiresAt: Date.now() + CACHE_TTL_MS, payload });
 
     return NextResponse.json(payload, {
-      headers: { "Cache-Control": "public, s-maxage=300, stale-while-revalidate=60" },
+      headers: { "Cache-Control": FRESH_CACHE_HEADER, "X-Pmi-Wide-Cache": "MISS" },
     });
   } catch (error) {
     console.error("[pmi-wide] DB query failed:", error);
+    // Graceful degradation: serve last good cached payload instead of 500.
+    // Shorter s-maxage lets the CDN retry sooner once the DB recovers.
+    const stale = RESPONSE_CACHE.get(cacheKey);
+    if (stale) {
+      return NextResponse.json(stale.payload, {
+        headers: { "Cache-Control": STALE_CACHE_HEADER, "X-Pmi-Wide-Cache": "STALE" },
+      });
+    }
     return NextResponse.json(
       { error: "Failed to fetch PMI wide data" },
       { status: 500 }
