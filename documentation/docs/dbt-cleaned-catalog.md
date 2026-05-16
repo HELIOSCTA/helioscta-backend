@@ -4,6 +4,8 @@ Central reference for every dataset in HeliosCTA. Find any table by name, see wh
 
 Click any link in the Source Scrape or dbt View columns for details.
 
+> **Note (2026-05-16):** Only the `positions_and_trades` dbt models are currently built on a schedule. All other modules (power, meteologica, wsi, eia, genscape, bloomberg, ice, energy_aspects, the shared `dbt/utils/`) have been moved to `backend/dbt/dbt_azure_postgresql/.archive/` and dropped from the database to reduce load. The catalog entries below are kept as a reference for past models; tables for archived modules are no longer refreshed.
+
 ---
 
 ## Power -- PJM Electricity Markets

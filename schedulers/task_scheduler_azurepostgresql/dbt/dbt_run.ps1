@@ -1,13 +1,13 @@
 # dbt run (Azure PostgreSQL)
 #
-# Registers a single scheduled task that runs the Python dbt runner every 10
-# minutes. The Python runner handles overlap via PostgreSQL advisory locks,
-# retry/backoff, and structured logging.
+# Registers a single scheduled task that runs the Python dbt runner every hour.
+# The Python runner handles overlap via PostgreSQL advisory locks, retry/backoff,
+# and structured logging.
 #
 # Python entrypoint: backend\dbt\dbt_azure_postgresql\runner_dbt_azure_postgresql.py
 # Task path:         \helioscta-backend\dbt\
 # Task name:         dbt run (Azure PostgreSQL)
-# Cadence:           every 10 minutes, indefinitely
+# Cadence:           every 1 hour, indefinitely
 #
 # To register: Run this script in an elevated PowerShell session.
 # To remove:   Unregister-ScheduledTask -TaskName "dbt run (Azure PostgreSQL)" -TaskPath "\helioscta-backend\dbt\"
@@ -21,11 +21,11 @@ $action = New-ScheduledTaskAction `
     -Argument "/c `"call `"$condaPath`" helioscta-backend && python `"$runScript`" --timeout 1800 --max-attempts 3 --retry-backoff-seconds 30`"" `
     -WorkingDirectory $repoRoot
 
-# Run every 10 minutes, starting one minute from registration time.
+# Run every 1 hour, starting one minute from registration time.
 $trigger = New-ScheduledTaskTrigger `
     -Once `
     -At (Get-Date).AddMinutes(1) `
-    -RepetitionInterval (New-TimeSpan -Minutes 10)
+    -RepetitionInterval (New-TimeSpan -Hours 1)
 
 # OS-level protections:
 # - Ignore overlapping instances
